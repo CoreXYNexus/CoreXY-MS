@@ -64,7 +64,7 @@ Blower.scad uses http://www.thingiverse.com/thing:387301
 
 The feet: http://www.thingiverse.com/thing:15880
 
-The 400mm x 300mm 1/4" MIC-6 AL plate bed uses three short 2020 to support the bed, they're attached just like rest of the extrusions. I used three 45mm x 25mm x 9mm 6061 with a 5mm hole for the extrusion mount and tapped a 3mm hole to hold the bed. I uses some silicon tubing for the bed spacers. I used two keenovo 200x300 600w 110vac silicon heaters, using the thermistor in the center and wired the ac in parallel to a SSR. The printer uses 11.28 amps until PID kicks in, while printing it uses about 5 amps.
+The 400mm x 300mm 1/4" MIC-6 AL plate bed uses three short 2020 to support the bed, they're attached just like rest of the extrusions. I used three 45mm x 25mm x 9mm 6061 with a 5mm hole for the extrusion mount and tapped a 3mm hole to hold the bed. I used some silicon tubing for the bed spacers. I used two keenovo 200x300 600w 110vac silicon heaters, using the thermistor in the center and wired the ac in parallel to a SSR. The printer uses 11.28 amps until PID kicks in, while printing it uses about 5 amps.
 
 Cover for the SSR: http://www.thingiverse.com/thing:1001385
 
