@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 8/23/2016
+// Last Update: 11/5/2016
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/28/16 - modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
 // 7/3/16  - added assembly info
@@ -13,6 +13,7 @@
 //			 spruced up the side supports
 // 8/21/16 - Added belt drive version
 // 8/23/16 - GT2 40t pulleys arrived, adjusted spacer thickness and motor mount height
+// 11/5/16 - Added idler bearing to the z axis bearing mounts, so that the belt would wrap around more
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -90,13 +91,13 @@ module all(belt) {
 		translate([51,-10,-2.5]) rotate([0,0,90]) double(1); // two znut holders
 	}
 	if(belt) { // one motor driving two leadscrews via a belt
-		bearing_mount(); // bearing mount at bottom of z-axis leadscrew
-		translate([0,65,0]) bearing_mount(); // bearing mount at bottom of z-axis leadscrew
-		translate([60,0,0]) belt_motor(1);	// one stepper motor mount with idler
-		translate([40,50,-2.5]) lockring();	// something to hold leadscrew in bearing
-		translate([40,70,-2.5]) lockring();	// something to hold leadscrew in bearing
-		translate([-77,-45,-2.5]) single(1); // znut holder
-		translate([110,-60,-2.5]) rotate([0,0,90]) single(1); // znut holder
+		bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
+		translate([70,0,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
+		translate([130,0,0]) belt_motor(1);	// one stepper motor mount with idler
+		translate([0,80,-2.5]) lockring();	// something to hold leadscrew in bearing
+		translate([0,100,-2.5]) lockring();	// something to hold leadscrew in bearing
+		translate([40,170,-2.5]) rotate([0,0,-90]) single(1); // znut holder
+		translate([80,15,-2.5]) rotate([0,0,90]) single(1); // znut holder
 	}
 }
 
@@ -110,14 +111,14 @@ module partial() { // this is here just to make it easier to print a single item
 	//test();  // test print for checking motor alignment
 	//rotate([-90,0,0]) testnut(1);	// print a shortened nut section for test fitting
 	bearing_mount();
-	translate([0,65,0]) bearing_mount(); // bearing mount at bottom of z-axis leadscrew
+	translate([70,0,0]) bearing_mount(); // bearing mount at bottom of z-axis leadscrew
 	//test_bearing_hole(); // test fit the bearing hole
 	//translate([60,0,0])
 	//	belt_motor(1);	// 1 - include idlers on mount
 	//translate([95,-50,-2.5])
 	//	bearing_idler();
-	//lockring();
-	//translate([20,0,0]) lockring();
+	//translate([-37,0,0]) lockring();
+	//translate([-37,20,0]) lockring();
 	//idler_spacers(1); // included with belt_motor()
 }
 
@@ -401,6 +402,7 @@ module bearing_mount(Spc=0,SpcThk=idler_spacer_thickness) { // bearing holder at
 		translate([-48+ms_notch_offset,20-ms_notch_depth,-m_height+3]) cubeX([10,thickness-1,m_height-2],2);
 	}
 	if(Spc) translate([0,10,-2.5]) idler_spacers(0,SpcThk);
+	single_attached_idler(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -539,6 +541,19 @@ module testf625z() { // used to check fit
 		cylinder(h=5,d=dia_f625z);
 		translate([0,0,-1]) cylinder(h=7,d=screw5);
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module single_attached_idler(Spc=1) { // Spc = spacers, Spt = add support to attached idler plate
+	difference() { // needs to be a bit wider with Spt==1
+		translate([-27.5,30,-2.5]) cubeX([55,25,thickness],2);
+		translate([dia_f625z-dia_f625z/2+2,60-dia_f625z,-5]) cylinder(h=10,d=screw5);
+		translate([dia_f625z-30,60-dia_f625z,-5]) cylinder(h=10,d=screw5);
+	}
+	translate([22.5,26,-2.5]) cubeX([thickness,29,thickness*3],2);
+	translate([-27.5,26,-2.5]) cubeX([thickness,29,thickness*3],2);
+	if(Spc) translate([-35.5,50,-2.5]) idler_spacers(0,idler_spacer_thickness);
 }
 
 /////////////// end of corexy-z-axis.scad ////////////////////////////////////////////////////////////////////
