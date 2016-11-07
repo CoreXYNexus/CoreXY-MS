@@ -1,12 +1,14 @@
 CXY-MSv1 -- A corexy printer using Makerslide and a DuetWifi on 24vdc. Please ignore the messy wiring in the photos. :-)
 
+This is also available at http://www.thingiverse.com/thing:1470253
+
 https://youtu.be/llArYEVT2ow
 
 9/18/16 - Changed to a double plate x-carriage, corexy-x-carriage.scad has mounts for BLTouch and dc42's ir sensor. Proximity sensor version is for 19mm diameter.
 9/23/16 - Added photos of the rear of the x-carriage.
 10/1/16 - Added mount for E3D's Titan Extruder with a E3DV6 hotend, posted stl has mounting for the ir bracket to use DC42's ir sensor. Proximity & BLTouch is available in the scad file.
 10/15/16 - Updated blower.scad for the blower mounts for the Titan extruder mount.
-11/5/16 - Added an idler bearing to the z-axis leadscrew bearing mounts so that the belt wraps around more of the pulleys.
+11/7/16 - Added an idler bearing to the z-axis leadscrew bearing mounts so that the belt wraps around more of the pulleys.  Also included a stl that just has the z bearing mounts for printing replacements of the originals.
 
 All the horizontal 2020/2040, and the vertical & horizontal makerslide ends are tapped for 5mm.
 Vertical 2020 is drilled with a 5.5mm bit for access to the screws that hold everything together. Four in the top and two in the bottom. Use drillguide.stl for drilling the holes.
