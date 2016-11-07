@@ -75,6 +75,8 @@ Fans are 24vdc 5015 blowers.
 
 FancapL.stl is for the power supply fan to make it blow to the side.
 
-Uses cubeX from http://www.thingiverse.com/thing:112008 and NEMA17 from https://github.com/mtu-most/most-scad-libraries
+Uses: cubeX from http://www.thingiverse.com/thing:112008
+      NEMA17 from https://github.com/mtu-most/most-scad-libraries
+      configuration.scad, metric.scad, and functions.scad are from http://github.com/prusajr/PrusaMendel
 
 
