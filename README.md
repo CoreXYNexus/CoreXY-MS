@@ -19,41 +19,6 @@ Vertical 2020 is drilled with a 5.5mm bit for access to the screws that hold eve
 Corexy-x-carriage-extruder-drillguide.stl has a drill guide if you want to use 1/8" Aluminum in place of the printed extruder plate.
 
 Additional information can be found in the scad files. Include files are expected to be in a folder called inc in the folder with the printer's scad files.
-
-Incomplete BOM for a printer that covers about x400 y400 z270:
-2 650mm 2040 (front & rear) Can use makerslide
-2 598mm Makerslide (y-axis - left and right)
-1 631mm Makerslide (x-axis)
-2 470mm Makerslide (z-axis)
-4 550mm 2020 (for the four corners)
-2 650mm 2020 (bottom front & rear)
-2 598mm 2020 (bottom left & right)
-2 580mm 2040 for a basic bed holder between z-axis plates
-4 300mm 2020 for diagonal side supports
-4 Makerslide carriage plates
-14 Makerslide wheel kits
-6 Eccentric spacers
-5x30mm screws
-5x35mm screws
-24 M5x7mm screws (holds the extrusions together)
-18 M5x6mm screws for the motor mounts & bearing brackets
-2 M5x50 for front bearing brackets
-4 M5x40mm for the corexy-xy.stls
-M5 nuts
-16 F625Z bearings & 12 5mm washers
-4.8m GT2 belt
-2 GT2 20 tooth pulleys
-2 400mm TR8-8 leadscrews with flanged nut
-For Z Axis belt drive, uses one stepper motor
-1 1524mm GT2 closed loop belt
-1 GT2 20 tooth pulley
-2 GT2 40 tooth pulleys with 8mm hole for TR8 leadscrews
-2 608 bearings
-4 F625Z bearings
-2 M3 set screws
-2 M5x35mm screws
-4 M5 washers
-2 M5 nuts
 In the top extrusions, I put 8 tnuts in each channel, the rest four in each. Use a short screw in a unused one to hold them to one side to quiet the rattle they can make while printing.
 
 Spool holder: 300mm 2020 with two screw access holes in the bottom to mount it on the top rear 4020 and a 8mm hole in the top for a 8mm threaded rod long enough to hold a spool on each side. Using http://www.thingiverse.com/thing:1647748 to hold the spools.
@@ -64,7 +29,7 @@ If you use metal couplers for the z-axis, use a 4mm ball bearing in between the 
 
 The Litemount.stl holds a 70mm LED ring in http://www.thingiverse.com/thing:8211 I used a LM2596 buck convertor to get the 12vdc to power the ring.
 
-Alternate lighting method is to use a 5050 LED light string stuck to the bottom of the y axis makerslide.
+Alternate lighting method is to use a 5050 LED light string stuck to the bottom of the x axis makerslide.
 
 Blower.scad uses http://www.thingiverse.com/thing:387301
 
