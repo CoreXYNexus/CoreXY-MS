@@ -21,7 +21,7 @@ Corexy-x-carriage-extruder-drillguide.stl has a drill guide if you want to use 1
 Additional information can be found in the scad files. Include files are expected to be in a folder called inc in the folder with the printer's scad files.
 In the top extrusions, I put 8 tnuts in each channel, the rest four in each. Use a short screw in a unused one to hold them to one side to quiet the rattle they can make while printing.
 
-Spool holder: 300mm 2020 with two screw access holes in the bottom to mount it on the top rear 4020 and a 8mm hole in the top for a 8mm threaded rod long enough to hold a spool on each side. Using http://www.thingiverse.com/thing:1647748 to hold the spools.
+Spool holder: 300mm 2020 with two screw access holes in the bottom to mount it on the top rear 4020 and a 8mm hole in the top for a 8mm threaded rod long enough to hold a spool on each side. Using http://www.thingiverse.com/thing:1647748 to hold the spools.  The horizontal 2020 300mm long to hold filament guides for each spool.
 
 On the bearing brackets from the top: M5x50, bearing support, washer, 2xF625Z,2x washers,2x F625Z, M5 nut.
 
