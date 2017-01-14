@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 11/5/2016
+// Last Update: 11/7/2016
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/28/16 - modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
 // 7/3/16  - added assembly info
@@ -14,6 +14,7 @@
 // 8/21/16 - Added belt drive version
 // 8/23/16 - GT2 40t pulleys arrived, adjusted spacer thickness and motor mount height
 // 11/5/16 - Added idler bearing to the z axis bearing mounts, so that the belt would wrap around more
+//			 Didn't bother to make left/right versions
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -25,12 +26,11 @@ $fn=50;
 // Uses M3x6 screws & washers for the stepper motor
 // Uses M5x6 screws & t-nuts for mounting to makerslide & extrusion
 //-----------------------------------------------------------------------------------------------------
-// Belt version untested, waiting for parts (8/21/16)
-// Belt idler needs adjusting?  Spacer thickness?
 //-----------------------------------------------------------------------------------------------------
 // For the belt version, you move the stepper motor mount to tension belt
 // Uses one 40 tooth GT2 belt pulley, 1 608 bearing, 2 washers, one lockring
-// on each z axis leadscrew
+// on each z axis leadscrew.  Each bearing mount uses two F625Z, M5x30, M5 nut on the side
+// that makes the belt wrap around the most on the pulley (it'll be the side the stepper motor is on)
 // Idler uses a total of 4 F625Z bearings, 2 M5 washers, 2 M5 screws & nuts, 2 printed spacers
 // Each idler stack from bottom: printed spacer,washer,f625z,f625z,washer,idler plate,nut
 // Each leadscrew 608 has a washer on each side
@@ -390,7 +390,7 @@ module testnut(Type) { 	// a shortened nut section for test fitting of the nut &
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module bearing_mount(Spc=0,SpcThk=idler_spacer_thickness) { // bearing holder at bottom of z-axis
-	rotate([180,0,0]) {
+	rotate([180,0,0]) {										// didn't bother to make a left/right versions
 		mount(1);
 		difference() {
 			translate([0,-(shaft_offset-base_offset),0]) cubeX([b_width,b_length,thickness],2,center=true);

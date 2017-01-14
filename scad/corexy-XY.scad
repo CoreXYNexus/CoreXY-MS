@@ -2,11 +2,12 @@
 // corexy-XY.scad - xy bearing mount on the carriage plates
 ///////////////////////////////////////////////////////////////////////////////////////
 // created 6/27/2016
-// last upate 7/22/16
+// last upate 1/10/17
 ///////////////////////////////////////////////////////////////////////////////////////
 // 7/3/16 - added comments and some assembly info
 // 7/17/16 - swtiched to inside of carriage plate, added partial()
 // 7/22/16 - added belt_adjust for adjusting the bearings on the b_mount
+// 1/10/17 - added labels and colors to preview for easier editing
 ///////////////////////////////////////////////////////////////////////////////////////
 // Requires drilling two holes in the makerslide carriage plate
 // Use a couple of 3mm screws to space the b_mount above the makerslide, mark the outline
@@ -66,6 +67,15 @@ module b_mount(upper,spacers) {	// bearing mount bracket
 		translate([-10,one_stack-2,0]) rotate([-90,0,-0]) bearspacer(one_stack);
 		translate([-10,one_stack*2,0]) rotate([-90,0,-0]) bearspacer(one_stack);
 	}
+	if(!upper) {
+		translate([10,10,4.5]) printchar("Left");
+		translate([8,35,12]) rotate([90,0,0]) printchar("D");
+		translate([30,35,30]) rotate([90,180,0]) printchar("U");
+	} else {
+		translate([10,10,4.5]) printchar("Right");
+		translate([12,35,30]) rotate([90,180,0]) printchar("U");
+		translate([25,35,12]) rotate([90,0,0]) printchar("D");
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -73,12 +83,12 @@ module b_mount(upper,spacers) {	// bearing mount bracket
 module walls(upper,lower) {	// the walls that hold the bearings
 	if(lower) {
 		difference() {	// lower bearing support wall
-			cubeX([width,5,belt_height+f625z_d],2);
+			color("red") cubeX([width,5,belt_height+f625z_d],2);
 			bearscrews(upper);
 		}
 	} else {
 		difference() {	// upper bearing support wall
-			translate([0,one_stack*2+5,0]) cubeX([width,5,belt_height+f625z_d],2);
+			translate([0,one_stack*2+5,0]) color("blue") cubeX([width,5,belt_height+f625z_d],2);
 			bearscrews(upper);
 		}
 	}
@@ -88,11 +98,11 @@ module walls(upper,lower) {	// the walls that hold the bearings
 
 module bearscrews(upper) {	// bearing screw holes
 	if(upper) { // upper farther, lower closer
-		translate([width-f625z_d/2-belt_offset,50,Ibelt_height+f625z_d/2+Ibelt_adjust]) rotate([90,0,0]) cylinder(h=60,r=screw5/2);
-		translate([f625z_d/2+belt_offset,50,Obelt_height+f625z_d/2+Obelt_adjust]) rotate([90,0,0]) cylinder(h=60,r=screw5/2);
+		translate([width-f625z_d/2-belt_offset,50,Ibelt_height+f625z_d/2+Ibelt_adjust]) rotate([90,0,0]) color("red") cylinder(h=60,r=screw5/2);
+		translate([f625z_d/2+belt_offset,50,Obelt_height+f625z_d/2+Obelt_adjust]) rotate([90,0,0]) color("white") cylinder(h=60,r=screw5/2);
 	} else {	// upper closer, lower farther
-		translate([width-f625z_d/2-belt_offset,50,Obelt_height+f625z_d/2+Obelt_adjust]) rotate([90,0,0]) cylinder(h=60,r=screw5/2);
-		translate([f625z_d/2+belt_offset,50,Ibelt_height+f625z_d/2+Ibelt_adjust]) rotate([90,0,0]) cylinder(h=60,r=screw5/2);
+		translate([width-f625z_d/2-belt_offset,50,Obelt_height+f625z_d/2+Obelt_adjust]) rotate([90,0,0])  color("yellow")cylinder(h=60,r=screw5/2);
+		translate([f625z_d/2+belt_offset,50,Ibelt_height+f625z_d/2+Ibelt_adjust]) rotate([90,0,0])  color("gray")cylinder(h=60,r=screw5/2);
 	}
 }
 
@@ -100,8 +110,8 @@ module bearscrews(upper) {	// bearing screw holes
 
 module bearspacer(length=one_stack) {	// fill in the non-bearing space
 	difference() {
-		rotate([90,0,0]) cylinder(h=length,r=screw5);
-		translate([0,1,0]) rotate([90,0,0]) cylinder(h=length+5,r=screw5/2);
+		rotate([90,0,0]) color("pinK") cylinder(h=length,r=screw5);
+		translate([0,1,0]) rotate([90,0,0]) color("cyan") cylinder(h=length+5,r=screw5/2);
 	}
 
 }
@@ -110,9 +120,9 @@ module bearspacer(length=one_stack) {	// fill in the non-bearing space
 
 module base() { // base mount
 	difference() {
-		cubeX([width,one_stack*2+10,5],2);
-		translate([width/4-1,22,-1]) cylinder(h=10,r=screw5/2);	// mounting screw holes
-		translate([width-width/4+1,12,-1]) cylinder(h=10,r=screw5/2);
+		color("cyan") cubeX([width,one_stack*2+10,5],2);
+		translate([width/4-1,22,-1]) color("salmon") cylinder(h=10,r=screw5/2);	// mounting screw holes
+		translate([width-width/4+1,12,-1]) color("green") cylinder(h=10,r=screw5/2);
 	}
 }
 
@@ -120,6 +130,13 @@ module base() { // base mount
 
 module drillguide() {	// something to help in locating the holes to drill
 	base();
+	translate([3,3,4.5]) printchar("Drill Guide");
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+module printchar(String,Height=1.5,Size=4) { // print something
+	color("coral") linear_extrude(height = Height) text(String, font = "Liberation Sans",size=Size);
 }
 
 /////////////////////////// corexy_XY.scad ///////////////////////////////////

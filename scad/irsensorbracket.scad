@@ -93,4 +93,30 @@ module ext_mount(Top) // screw holes for mounting to extruder plate
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bheight = 17.62; // taken from https://miscsolutions.wordpress.com/mini-height-sensor-board/
+bwidth = 24;
+cap_d = 6.5;
+cap_h = 8.2;
+led_d = 3.5;
+led_h = 5.7;
+bthickness = 1;
+
+//////////////////////////////////////////////////////////////
+module ir_mockup() {
+	difference() {
+		cube([bwidth,bheight,bthickness]); // pc board
+		translate([hole1x,hole1y,-1]) cylinder(h=thickness*5,r=holedia/2,$fn=100); // mounting hole
+		translate([hole2x,hole2y,-1]) cylinder(h=thickness*5,r=holedia/2,$fn=100); // mounting hole
+	}
+	translate([width/2,cap_d/2+0.5,thickness]) cylinder(h=cap_h,r=cap_d/2,$fn=100); // C3
+	
+	translate([width/2+6.2,led_d/2+1,thickness]) cylinder(h=led_h,r=led_d/2,$fn=100); // D1
+	translate([width/2+10,led_d/2+1,thickness]) cylinder(h=led_h,r=led_d/2,$fn=100); // D2
+	
+	translate([width/2-5.5,led_d/2+1,thickness]) cylinder(h=led_h,r=led_d/2,$fn=100); // Q1
+	
+	translate([width/2-6,height-3.5,thickness]) cube([7.4,2.5,9]); // pin header
+}
+
 ///////////////////////////// end of irsensorbracket.scad ////////////////////////////////////////////////////
