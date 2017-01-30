@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 1/15/2017
+// Last Update: 1/29/2017
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/28/16 - modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
 // 7/3/16  - added assembly info
@@ -15,7 +15,7 @@
 // 8/23/16 - GT2 40t pulleys arrived, adjusted spacer thickness and motor mount height
 // 11/5/16 - Added idler bearing to the z axis bearing mounts, so that the belt would wrap around more
 //			 Didn't bother to make left/right versions
-// 1/15/17 - Added pivot style carriage/2020 mounts for multi-motor leveling
+// 1/29/17 - Removed bed pivots from here and made a new file: bearing_pivots.scad
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -87,11 +87,10 @@ shiftbm = 0; 				// move belt motor mount up/down (- shifts it up)
 GT2_40t_h = 6.1;			// thickness of the clamping part on the 40 tooth GT2 pulley
 idler_spacer_thickness = GT2_40t_h + 0.9;	// thickness of idler bearing spacer
 layer = 0.25;				// printed layer thickness
-dia_625z = 16;				// diameter of a 625z (no flange)
 ////////////////////////////////////////////////////////////////////////////
 
-//all(1);
-partial();
+all(1);
+//partial();
 	
 //////////////////////////////////////////////////////////////////////////////
 
@@ -131,20 +130,9 @@ module partial() { // this is here just to make it easier to print a single item
 	//translate([-37,0,0]) lockring();
 	//translate([-37,20,0]) lockring();
 	//idler_spacers(1); // included with belt_motor()
-	z_pivots(1);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module z_pivots(Qty) {
-	for(i=[0:Qty-1]){
-		translate([0,i*45,0]) z_pivot_carriage();
-		translate([70,i*45,15]) z_pivot_2040();
-		translate([115,i*45,0]) center_pivot();
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module motor_mount(makerslide=0) { // motor mount
 	rotate([180,0,0]) {
@@ -577,71 +565,5 @@ module single_attached_idler(Spc=1) { // Spc = spacers, Spt = add support to att
 	translate([-27.5,26,-2.5]) cubeX([thickness,29,thickness*3],2);
 	if(Spc) translate([-35.5,50,-2.5]) idler_spacers(0,idler_spacer_thickness);
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module z_pivot_carriage() { // 3 625 bearing pivot mounts on the makerslide carriage
-	difference() {
-		color("cyan") cubeX([60,40,8],2);
-		bearing_hole(30,20,3);
-		translate([10,10,-2]) color("blue") cylinder(h=20,d=screw5,$fn=100);
-		translate([50,10,-2]) color("white") cylinder(h=20,d=screw5,$fn=100);
-		translate([10,30,-2]) color("black") cylinder(h=20,d=screw5,$fn=100);
-		translate([50,30,-2]) color("gray") cylinder(h=20,d=screw5,$fn=100);
-	}
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module z_pivot_2040() { // 3 625 bearing pivot mounts on the 2040 holding the bed
-	difference() {
-		translate([0,0,-15]) color("cyan") cubeX([35,40,20],2);
-		translate([6,-2,-23]) color("cyan") cubeX([20,45,25],2);
-		side_screws_2040();
-	}
-	difference() {
-		translate([-5,0,-15]) color("blue") cubeX([10,40,40],2);
-		side_screws_2040();
-	}
-	difference() {
-		translate([28,0,-15]) color("red") cubeX([10,40,40],2);
-		side_screws_2040();
-	}
-	%translate([6,19.7,5.5]) rotate([45,0,0]) center_pivot(); // test center_pivot, it'll never need to tilt this far
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module center_pivot() {
-	difference() {
-		color("cyan") cubeX([dia_625z+5,dia_625z+5,dia_625z+15],2);
-		translate([-10,dia_625z/2+2.5,dia_625z/2+2]) rotate([0,90,0]) bearing_hole(0,0,0);
-		translate([30,dia_625z/2+2.5,dia_625z/2+2]) rotate([0,-90,0]) bearing_hole(0,0,0);
-		translate([dia_625z/2+2.5,dia_625z/2+2.5,dia_625z-3]) color("yellow") cylinder(h=40,d=screw5,$fn=100);
-		translate([-5,dia_625z/2-2,dia_625z/2+13]) color("green") cube([40,8.6,4]);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module side_screws_2040() {
-		translate([-7,10,-8]) rotate([0,90,0]) color("white") cylinder(h=50,d=screw5,$fn=100);
-		translate([-7,30,-8]) rotate([0,90,0]) color("gray") cylinder(h=50,d=screw5,$fn=100);
-		translate([-7,20,20]) rotate([0,90,0]) color("salmon") cylinder(h=50,d=screw5,$fn=100);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module bearing_support(Xpos,Ypos,Zpos) {
-		translate([12.5,20,Zpos]) color("pink") cylinder(h=layer,d=dia_625z+1);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module bearing_hole(Xpos,Ypos,Zpos) {
-	translate([Xpos,Ypos,Zpos]) color("white") cylinder(h=15,d=dia_625z,$fn=100);
-	translate([Xpos,Ypos,-2]) color("black") cylinder(h=30,d=screw5hd,$fn=100);
-}
-
 
 /////////////// end of corexy-z-axis.scad ////////////////////////////////////////////////////////////////////
