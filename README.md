@@ -1,7 +1,9 @@
 # CXY-MSv1
 A corexy printer using Makerslide and a DuetWifi on 24vdc. Please ignore the messy wiring in the photos. :-)
 
-This is also available at http://www.thingiverse.com/thing:1470253
+This is also available at http://www.thingiverse.com/thing:1470253\
+
+https://creativecommons.org/licenses/by-sa/3.0/
 
 https://youtu.be/llArYEVT2ow
 
