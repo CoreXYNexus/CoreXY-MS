@@ -3,13 +3,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 1/29/2017
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 1/29/2017
+// Last Update: 2/5/2017
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/15/17 - Added bearing pivot style carriage & 2040 mounts for multi-motor leveling
 // 1/29/17 - Added pivot version using just a M5 screw
 //			 Made separate scad file for this and removed them from corexy-z-axis.scad
 //			 Added roounded version of the center pivot
 // 1/30/17 - Fixed M5 round version
+// 2/5/17  - Added a spacer for the center_pivot to allow it to rotate in the makerslide carriage plate
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -20,18 +21,19 @@ dia_625z = 16;	// diameter of a 625z (no flange)
 layer = 0.2;	// printed layer thickness
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-z_pivots(1,0,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
-
+z_pivots(3,0,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+//spacer_pivot(6);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module z_pivots(Qty,Bearing,Round) {
 	for(i=[0:Qty-1]){
 		translate([0,i*45,15]) z_pivot_2040(Bearing,Round);
 		if(Round)
-			translate([45,i*45+20,29]) rotate([180,0,0]) center_pivot2(Bearing);
+			translate([75,i*45+20,21]) rotate([180,90,0]) center_pivot2(Bearing);
 		else
 			translate([45,i*45,0]) center_pivot(Bearing); // non-rounded version
-		if(Bearing) translate([70,i*45,0]) z_pivot_carriage();
+		if(Bearing) translate([70,i*45,0])z_pivot_carriage();
+		translate([15,i*45+10,0]) spacer_pivot();
 	}
 }
 
@@ -110,7 +112,18 @@ module center_pivot2(Bearing) {
 		translate([-5,dia_625z/2-2,dia_625z/2+13]) color("green") cube([40,8.6,4]);
 	}
 	double_bearing_mount(Bearing);
-	screw_hole_spport(dia_625z/2+2.5,dia_625z/2+2.5,dia_625z/2+13-layer);
+	//screw_hole_spport(dia_625z/2+2.5,dia_625z/2+2.5,dia_625z/2+13-layer);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module spacer_pivot(Qty=1) { // a little spacer to make it pivotable on the carriage plate, uses excentric hole
+	for(i=[0:Qty-1]){
+		translate([0,i*10,0]) difference() {
+			cylinder(h=4,d=6.8,$fn=100);
+			translate([0,0,-2]) cylinder(h=10,d=screw5,$fn=100);
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
