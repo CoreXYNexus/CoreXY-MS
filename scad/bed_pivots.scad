@@ -23,6 +23,7 @@ layer = 0.2;	// printed layer thickness
 
 z_pivots(3,0,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
 //spacer_pivot(6);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module z_pivots(Qty,Bearing,Round) {
