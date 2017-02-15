@@ -2,7 +2,7 @@
 // corexy-motor-bearing.scad - hove the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2026
-// last update 1/10/17
+// last update 2/14/17
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16 - added built-in spacer to the bearing_bracket
 // 7/14/16 - adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -16,6 +16,9 @@
 // 7/20/16 - Moved upper belt stepper motor up 10mm
 // 8/23/16 - Added Vthickness & Tthickness for bearing_support()
 // 1/10/17 - Added labels to motor mounts and colors to preview for easier editing
+// 2/14/17 - Adjusted bearing screw hole in bearing_support, noticed that it's off by 2mm when I replaced the
+//			 makerslide with a 2040 to use the makerslide for a three motor z axis.
+//			 Tapered the spacer on the bearing_bracket and added L/R labels.
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in bearing_bracket() must match stepper motor shaft in motor_mount()
 //       If the motors get hot, print it from something that can handle it
@@ -51,23 +54,23 @@ all(1); // all the needed parts
 
 module all(MS) {
 	motor_mount(1);
-	translate([65,-29.5,-2.5]) rotate([0,0,90]) bearing_bracket();
+	translate([35,99.5,-2.5]) rotate([0,0,-90]) bearing_bracket(0,"Right");
 	translate([85,25,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
 	translate([0,70,0]) motor_mount(0);
-	translate([65,99.5,-2.5]) rotate([0,0,90]) mirror() bearing_bracket(); // mirror it for the other side
+	translate([35,-29.5,-2.5]) rotate([0,0,-90]) mirror() bearing_bracket(0,"Left"); // mirror it for the other side
 	translate([60,-65,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module partial() { // uncomment the parts you want and adjust translates as needed
-	motor_mount(1);
+	//motor_mount(1);
 	//translate([0,70,0]) motor_mount(0);
-	//bearing_bracket(0);
-	//translate([-5,0,0]) mirror() bearing_bracket(); // mirror it for the other side
+	bearing_bracket(0,"Right");
+	translate([-5,0,0]) mirror() bearing_bracket(0,"Left"); // mirror it for the other side
 	//rotate([0,180,0]) 
-	//	bearing_support(1);
-	//translate([0,50,0]) rotate([0,180,0]) bearing_support(1);
+	//	bearing_support(0);
+	//translate([0,50,0]) rotate([0,180,0]) bearing_support(0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +148,7 @@ module mountscrews(Mount_S) { // all of them; Mount_S is hight of top screw hole
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-module bearing_bracket(TapIt=0) {
+module bearing_bracket(TapIt=0,Label="") {
 	difference() {
 		color("white") cubeX([40,30,40],2);
 		if(TapIt)
@@ -164,13 +167,15 @@ module bearing_bracket(TapIt=0) {
 	}
 	if(!TapIt) translate([b_posY-4,b_posX-4.5,b_height+30-8]) color("salmon")cube([10,10,layer_t]); // nut hole support
 	translate([b_posY,b_posX,40]) spacer(TapIt);
+	if(Label=="Right") translate([4,0.1,20]) rotate([90,0,0]) printchar(Label);
+	if(Label=="Left") translate([14,-1.4,20]) rotate([90,0,180]) printchar(Label);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module spacer(TapIt=0) { // spacer to raise bearing on bearing braket to match the corexy-xy.scad
 	difference() {
-		cylinder(h=b_height,r=screw5);
+		color("cyan") cylinder(h=b_height,r1=screw5+2,r2=screw5);
 		if(TapIt)
 			translate([0,0,-1]) color("darkgray") cylinder(h=b_height+2,r=screw5t/2);
 		else
@@ -200,7 +205,7 @@ module bearing_support(NotchIt=0) {	// keep the bearing from tilting on the brac
 	}
 	difference() { // top
 		translate([0,0,one_stack*2+b_height+38]) color("white") cubeX([50,20,Tthickness],2);
-		translate([Vthickness+28,10,one_stack*2+b_height]) color("blue") cylinder(h=50,d=screw5);
+		translate([Vthickness+30,10,one_stack*2+b_height]) color("blue") cylinder(h=50,d=screw5);
 	}
 	difference() { // angled support for top
 		translate([-11,8,one_stack*2+b_height+30]) rotate([0,45,0]) color("darkgray") cubeX([20,Tthickness,45],2);
