@@ -30,6 +30,9 @@
 // 1/8/17	- changed side mounting holes of titan3(), shifted up to allow access to lower mouting holes when
 //			  assembled
 // 1/9/17	- made titan() able to be used as the titan bowden mount
+// 7/9/18	- added a rounded bevel around the hotend clearance hole to the titan mount using corner-tools.scad
+//			  and fixed the rear support to be rounded in titan() and removed some unecessary code
+//			  added rounded hole under motor to titan3() and fixed mounting holes
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -58,11 +61,14 @@
 // with the three makerslide wheels, three M5 washers, three M5 nuts, two M3x16mm screws
 //-----------------------------------------------------------
 // IR sensor bracket is in irsensorbracket.scad
+//-----------------------------------------------------------
+// corner-tools.scad fillet_r() doesn't show in preview
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/configuration.scad> // http://github.com/prusajr/PrusaMendel, which also uses functions.scad & metric.scad
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
 use <inc/Nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
+use <inc/corner-tools.scad>
 $fn=50;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // variables
@@ -138,7 +144,7 @@ irrecess = -2; // recess in ir mount for pin heater vertical depth
 // NOTE: there are some variables defined right before titan()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//all(1,2,3);
+//all(1,2,1);
 partial();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,11 +180,10 @@ module partial() {
 	//wireclamp();
 	//carriagebelt(0);
 	//translate([0,-45,26]) rotate([-90,0,0]) // this puts the titan mount on the carraige
-		titan(10);	// extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
+		titan(5);	// extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
 					// 4 - all sensor brackets; 5 - no sensor brackets
-	//titan2(); // right angle titan mount to 2020
-	//titan3(screw5);	// titan mount with 2020 mounting holes on side
-					// the arg is screw size as defined in screwsizes.scad, used for the mounting holes
+	//titan2(); // right angle titan mount to 2020 for bowden
+	//titan3();	// extruder platform to mount directly on x_carridge()
 	//prox_mount(shiftprox);
 }
 
@@ -270,7 +275,7 @@ module sidemounts(Screw=screw3t,Left=1) {	// combo of above two modules
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module extruder(recess=0) // bolt-on extruder platform, works for either makerslide or lm8uu versions
-{
+{							// used for extruder mount via a wades extruder style
 	difference() {
 		cubeX([widthE,heightE,wall],radius=2,center=true); // extruder side
 		if(recess == 2) {
@@ -672,20 +677,19 @@ ir_gap = 0;		// adjust edge of board up/down
 ir_height = (hotend_length - irboard_length - ir_gap) - irmount_height;	// height of the mount
 
 module titan(recess=3) { // extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
-	difference() {
+ 	difference() {
 		translate([-37.5,-42,-wall/2]) color("cyan") cubeX([widthE+shifthotend2/1.3,heightE+13,wall],2); // extruder side
-		if(recess==10)
-			extmount(screw5);
-		else
-			extmount(screw3);
-		color("red") hull() {	// hole for e3dv6, shifted to front by 11mm
-			translate([-15.5+shifthotend2,-18+shifthotend,-10]) cylinder(h=20,d=e3dv6,$fn=100);
-			translate([-35+shifthotend2,-18+shifthotend,-10]) cylinder(h=20,d=e3dv6);
-		}
-		translate([20+shifthotend2,-5,-10]) color("pink") cylinder(h=20,d=25,$fn=100); // remove some under the motor
-		if(recess!=10) translate([-15,16.5,44]) rotate([90,0,0]) fan(screw3t,0); // fan & servo mounting holes
-		if(recess!=10) translate([-50,0,44.5]) rotate([90,0,90]) fan(); // mounting holes for bltouch & prox sensor
-		if(recess!=10) translate([-10,0,0]) ir_mount_screws(); // mounting holes for irsensor bracket
+		extmount(screw3);
+        e3dv6hole();
+ 		 // remove some under the motor
+		translate([20+shifthotend2,-5,-10]) color("pink") cylinder(h=20,d=23.5,$fn=100);
+	    translate([0,-5,wall/2]) color("purple") fillet_r(2,23/2,-1,$fn);	// round top edge
+	    translate([0,-5,-wall/2]) color("purple") rotate([180]) fillet_r(2,23/2,-1,$fn);	// round bottom edge
+	    translate([0,-5,wall/2]) color("purple") fillet_r(2,23/2,-1,$fn);	// round top edge
+		
+		translate([-15,16.5,44]) rotate([90,0,0]) fan(screw3t,0); // fan & servo mounting holes
+		translate([-50,0,44.5]) rotate([90,0,90]) fan(); // mounting holes for bltouch & prox sensor
+		translate([-10,0,0]) ir_mount_screws(); // mounting holes for irsensor bracket
 	}
 	difference() {
 		translate([shifthotend2,-32,0]) rotate([90,0,90]) titanmotor();
@@ -693,8 +697,8 @@ module titan(recess=3) { // extruder platform for e3d titan with (0,1)BLTouch or
 		translate([-10,0,0]) ir_mount_screws(); // mounting holes for irsensor bracket
 	}
 	if(recess == 0 || recess == 1) translate([30,0,-wall/2]) blt_mount(recess,shiftblt); // BLTouch mount
-	if(recess == 2) translate([30,0,-wall/2]) prox_mount(shiftprox);
-	if(recess == 3) {
+	if(recess == 2) translate([30,0,-wall/2]) prox_mount(shiftprox); // round hole mount proximity sensor
+	if(recess == 3) { // ir mount
 		translate([30,-10,-wall/2]) difference() {
 			iradapter(0,ir_height);
 			translate([25,4,40]) rotate([90,0,0]) ir_mount_screws();
@@ -712,6 +716,17 @@ module titan(recess=3) { // extruder platform for e3d titan with (0,1)BLTouch or
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module e3dv6hole() {
+		// hole for e3dv6, shifted to front by 11mm
+		translate([-15.5+shifthotend2,-18+shifthotend,-10]) color("pink") cylinder(h=20,d=e3dv6,$fn=100);
+		// round top edge
+	    translate([-15.5+shifthotend2,-18+shifthotend,wall/2]) color("purple") fillet_r(2,e3dv6/2,-1,$fn);
+		// round bottom edge
+	    translate([-15.5+shifthotend2,-18+shifthotend,-wall/2]) rotate([180]) color("purple") fillet_r(2,e3dv6/2,-1,$fn);
+}
+    
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module prox_mount(Shift) {
@@ -757,13 +772,22 @@ module titan2() { // extruder platform for e3d titan to mount on a AL extruder p
 
 module titan3(Screw=screw4) { // extruder platform for e3d titan to mount directly on the x-carraige
 	difference() { // bottom support
-		translate([0,0,0]) color("indianred") cubeX([45,57,5],2); // extruder side
-		translate([20,28,-10]) color("red") cylinder(h=20,d=20,$fn=100); // remove some plastic under the motor
+		translate([0,0,0]) color("pink") cubeX([45,57,5],2); // extruder side
+		translate([20,28,-10]) color("red") cylinder(h=20,d=23,$fn=100); // remove some plastic under the motor
+	    translate([20,28,-wall/2+4]) color("purple") rotate([180]) fillet_r(2,23/2,-1,$fn);	// round bottom edge
+	    translate([20,28,wall/2+1]) color("purple") fillet_r(2,23/2,-1,$fn);	// round top edge
+		translate([6,65,47]) rotate([90,0,0]) fan(screw3t,0); // fan & servo mounting holes at rear
+		translate([-15,45,47]) rotate([90,0,90]) fan(); // mounting holes for bltouch & prox sensor on the side
+		translate([25,43,2.6]) ir_mount_screws(); // mounting holes for irsensor bracket on the side
 	}
-	translate([0,1,0]) rotate([90,0,90]) titanmotor(3,Screw);
+	difference() {
+		translate([0,1,0]) rotate([90,0,90]) titanmotor(1);
+		translate([25,43,2.6]) ir_mount_screws(); // clear the mounting holes for irsensor bracket on the side
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 module extmount(Screw=screw3) {		// screw holes to mount extruder plate
 	if(Screw==screw3) {
 		translate([0,30-wall/2,-10]) color("red") cylinder(h = 25, d = Screw, $fn = 50);
@@ -801,13 +825,9 @@ module blt(Ver=0) { // BLTouch mounts
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module titanmotor(WallMount,Screw=screw4) {
-	difference() {	// motor mounting holes
-		if(WallMount) {
-			translate([-1,0,0]) color("red") cubeX([57,60+shifttitanup,5],2);
-		} else {
-			translate([-1,0,0]) color("red") cubeX([54,60+shifttitanup,5],2);
-		}
+module titanmotor(WallMount=0,Screw=screw4) {
+	difference() {	// motor mount
+		translate([-1,0,0]) color("red") cubeX([57,60+shifttitanup,5],2);
 		translate([25,35+shifttitanup,-1]) rotate([0,0,45]) color("purple") NEMA17_x_holes(8, 2);
 	}
 	difference() { // front support
@@ -817,7 +837,7 @@ module titanmotor(WallMount,Screw=screw4) {
 	}
 	if(WallMount) {
 		difference() { // rear support
-			translate([52,0,0]) color("cyan") cubeX([4,60+shifttitanup,45],2);
+			translate([52,0,0]) color("cyan") cubeX([4,45+shifttitanup,45],2);
 			// lower mounting screw holes
 			translate([40,15,11]) rotate([0,90,0]) color("cyan") cylinder(h=20,d=Screw,$fn=100);
 			translate([40,15,11+i3x_sep]) rotate([0,90,0])  color("blue") cylinder(h=20,d=Screw,$fn=100);
@@ -828,9 +848,9 @@ module titanmotor(WallMount,Screw=screw4) {
 		}
 	} else {
 		difference() { // rear support
-			translate([49,0,0]) color("cyan") cubeX([4,50,50],2);
-			translate([47,50,4]) rotate([56,0,0]) cube([7,50,70]);
-			translate([47,-4,36]) cube([wall,wall,wall]);
+			translate([49,24,-48]) rotate([60]) color("cyan") cubeX([4,60,60],2);
+			translate([47,0,-67]) cube([7,70,70]);
+			translate([47,-70,-36]) cube([7,70,70]);
 		}
 	}
 }

@@ -2,9 +2,10 @@
 // prox_mount2.scad - mount on the x-carriage
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 12/30/2016
-// last update 1/3/17
+// last update 7/9/18
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 1/3/16 - added ir version
+// 1/3/16	- added ir version
+// 7/9/18	- removed commented code
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubex.scad>
@@ -22,7 +23,7 @@ holedia = 2.8;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rotate([0,-90,0])
+//rotate([0,-90,0])
 	prox_mount(0);
 //	ir_mount(0);
 
@@ -30,7 +31,7 @@ rotate([0,-90,0])
 
 module prox_mount(Shift) {
 	difference() {
-		translate([0,0,0]) color("red") cubeX([30,30,5],2);
+		color("red") cubeX([30,30,5],2);
 		translate([15,12,-2]) color("olive") cylinder(h=wall*2,d=psensord,$fn=100); // proximity sensor hole
 	}
 	difference() {
@@ -65,11 +66,8 @@ module fan(Screw=screw3t,Left=1) {	// fan mounting holes
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module extmount() {		// screw holes to mount extruder plate
-	//translate([0,30-wall/2,-10]) color("red") cylinder(h = 25, r = screw3/2, $fn = 50);
 	translate([widthE/2-5,30-wall/2,-10]) color("white") cylinder(h = 25, r = screw3/2, $fn = 50);
-	//translate([-(widthE/2-5),30-wall/2,-10]) color("blue") cylinder(h = 25, r = screw3/2, $fn = 50);
 	translate([widthE/4-2,30-wall/2,-10]) color("green") cylinder(h = 25, r = screw3/2, $fn = 50);
-	//translate([-(widthE/4-2),30-wall/2,-10]) color("purple") cylinder(h = 25, r = screw3/2, $fn = 50);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

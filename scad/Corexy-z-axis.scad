@@ -3,29 +3,32 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 2/5/2017
+// Last Update: 7/9/2018
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 6/28/16 - modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
-// 7/3/16  - added assembly info
-// 7/4/16  - added flange nut style and testnut() to print only znut section for testing
-// 7/27/16 - cleaned up code and added test prints
-//			 changed znut to inside mount, added notches for makerslide
-//			 spruced up the side supports
-// 8/21/16 - Added belt drive version
-// 8/23/16 - GT2 40t pulleys arrived, adjusted spacer thickness and motor mount height
-// 11/5/16 - Added idler bearing to the z axis bearing mounts, so that the belt would wrap around more
-//			 Didn't bother to make left/right versions
-// 1/29/17 - Removed bed pivots from here and made a new file: bearing_pivots.scad
-// 1/31/17 - Added plates to mount makerslide instead of drilling access holes & threading the makerslide
-//			 Made z leadscrew bearing mount outside larger for better strength
-// 2/4/17  - Added AddOffset to single() for third z-axis rail, changed to a single idler mount on
-//			 bearing_mount()
-// 2/5/17  - Added a spacer block for the 3rd z-axis makerslide bearing/motor mount
+// 6/28/16	- modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
+// 7/3/16	- added assembly info
+// 7/4/16	- added flange nut style and testnut() to print only znut section for testing
+// 7/27/16	- cleaned up code and added test prints
+//			  changed znut to inside mount, added notches for makerslide
+//			  spruced up the side supports
+// 8/21/16	- Added belt drive version
+// 8/23/16	- GT2 40t pulleys arrived, adjusted spacer thickness and motor mount height
+// 11/5/16	- Added idler bearing to the z axis bearing mounts, so that the belt would wrap around more
+//			  Didn't bother to make left/right versions
+// 1/29/17	- Removed bed pivots from here and made a new file: bearing_pivots.scad
+// 1/31/17	- Added plates to mount makerslide instead of drilling access holes & threading the makerslide
+//			  Made z leadscrew bearing mount outside larger for better strength
+// 2/4/17	- Added AddOffset to single() for third z-axis rail, changed to a single idler mount on
+//			  bearing_mount()
+// 2/5/17	- Added a spacer block for the 3rd z-axis makerslide bearing/motor mount
+// 7/9/18	- Added use of coreer-tools.scad to round over bearing holder
+//			  added bearing_ider() to all()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
-$fn=50;
+use <corner-tools.scad>
+$fn=100;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // Another idea: single bearing and a coupler to make the flexible z bed mounts.
 //-----------------------------------------------------------------------------------------------------
@@ -94,8 +97,8 @@ idler_spacer_thickness = GT2_40t_h + 0.9;	// thickness of idler bearing spacer
 layer = 0.25;				// printed layer thickness
 ////////////////////////////////////////////////////////////////////////////
 
-//all(1,1,1,1);
-partial();
+all(1,1,0,1);
+//partial();
 	
 //////////////////////////////////////////////////////////////////////////////
 
@@ -107,12 +110,12 @@ module all(belt,Plate=0,MS=0,Third=0) {
 		translate([51,-10,-2.5]) rotate([0,0,90]) double(1); // two znut holders
 		if(Third) translate([101,-10,-2.5]) rotate([0,0,90]) single(1); // 3rd znut holder
 		if(Plate) {
-			translate([-20,100,0]) plates(1,1);
+			translate([-20,100,0]) plates(1,MS);
 			translate([70,100,0]) plates(1,MS);
 			if(Third) translate([0,-75,0]) plates(1,MS);
 		}
 	}
-	if(belt) { // one motor driving two leadscrews via a belt
+	if(belt) { // a motor driving leadscrew via a belt (defaults to two)
 		bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
 		translate([70,0,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
 		if(Third) translate([30,-60,0]) rotate([0,0,90]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
@@ -122,9 +125,10 @@ module all(belt,Plate=0,MS=0,Third=0) {
 		if(Third) translate([0,110,-2.5]) lockring();	// something to hold leadscrew in bearing
 		translate([40,170,-2.5]) rotate([0,0,-90]) single(1); // znut holder
 		translate([80,15,-2.5]) rotate([0,0,90]) single(1); // znut holder
+		translate([165,-50,-2.5]) bearing_idler();
 		if(Third) translate([75,-135,-2.5]) rotate([0,0,90]) single(1); // znut holder
 		if(Plate) {
-			translate([-20,125,0]) plates(1,1);
+			translate([-20,125,0]) plates(1,MS);
 			translate([70,125,0]) plates(1,MS);
 			if(Third) translate([80,-115,0]) plates(1,MS);
 		}
@@ -141,20 +145,20 @@ module partial() { // this is here just to make it easier to print a single item
 	//translate([-15,30,0]) single(1,25); // znut nut holder for third rail
 	//test();  // test print for checking motor alignment
 	//rotate([-90,0,0]) testnut(1);	// print a shortened nut section for test fitting
-	translate([0,0,2.5]) bearing_mount(0);
+	//translate([0,0,2.5]) bearing_mount(0);
 	//translate([70,0,2.5]) bearing_mount(); // bearing mount at bottom of z-axis leadscrew
 	//test_bearing_hole(); // test fit the bearing hole
 	//translate([60,0,0])
 	//	belt_motor(1);	// 1 - include idlers on mount
 	//translate([95,-50,-2.5])
-	//	bearing_idler();
+		bearing_idler();
 	//translate([-37,0,0]) lockring();
 	//translate([-37,20,0]) lockring();
 	//idler_spacers(1); // included with belt_motor()
 	//translate([0,60,0]) plates(2,1);
 	//translate([-20,60,0]) plate2();
 	//translate([25,60,0]) plate2();
-	translate([40,0,0]) third_z_spacer();
+	//translate([40,0,0]) third_z_spacer();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -431,7 +435,7 @@ module bearing_mount(Spc=0,SpcThk=idler_spacer_thickness) { // bearing holder at
 		mount(1);
 		difference() {
 			translate([0,-(shaft_offset-base_offset),0]) color("navy") cubeX([b_width,b_length,thickness],2,center=true);
-			translate([0,-shaft_offset,-6]) color("red") cylinder(h=10,d=dia_608,$fn=100);
+		translate([0,-shaft_offset,-6]) color("red") cylinder(h=10,d=dia_608,$fn=100);
 			notchit();
 		}
 		translate([0,-shaft_offset,0]) bearing_hole();
@@ -450,9 +454,10 @@ module bearing_hole() {	// holds the bearing
 		translate([0,0,thickness/3]) color("blue") cylinder(h=h_608,d=dia_608+10,$fn=100);
 		translate([0,0,0]) color("red") cylinder(h=15,d=dia_608,$fn=100);
 	}
-	translate([0,0,-10]) difference() {
-		translate([0,0,thickness/3]) color("white") cylinder(h=h_608/2,d=dia_608+10,$fn=100);
-		translate([0,0,0]) color("black") cylinder(h=15,d=nut_clearance,$fn=100);
+	difference() {
+		translate([0,0,-h_608-1.3]) color("white") cylinder(h=h_608/2,d=dia_608+10,$fn=100);
+		translate([0,0,-h_608-5]) color("black") cylinder(h=15,d=nut_clearance,$fn=100);
+		translate([0,0,-8.4]) rotate([0,180,0]) color("red") fillet_r(2,(dia_608+10.1)/2,1,$fn);
 	}
 	bearing_hole_support();
 }
@@ -520,7 +525,7 @@ module bearing_idler() {	// belt idler (currently not used)
 	}
 	difference() {
 		translate([-b_width/3,-19,0]) color("green") cubeX([b_width,23,20],2);
-		translate([-b_width/3-1,-36,14]) rotate([-45,0,0]) color("bluen") cube([b_width+2,22,40]);
+		translate([-b_width/3-1,-36,14]) rotate([-45,0,0]) color("blue") cube([b_width+2,22,40]);
 		translate([-b_width/2+18,-8,-thickness/2]) color("white") cylinder(h=40,d=screw5);
 		translate([b_width/2,-8,-thickness/2]) color("pink") cylinder(h=40,d=screw5);
 		translate([-b_width/2+18,-8,5]) color("salmon") cylinder(h=15,d=screw5hd);
