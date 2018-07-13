@@ -2,7 +2,7 @@
 // corexy-motor-bearing.scad - hove the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2026
-// last update 2/14/17
+// last update 7/14/18
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16 - added built-in spacer to the bearing_bracket
 // 7/14/16 - adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -19,6 +19,7 @@
 // 2/14/17 - Adjusted bearing screw hole in bearing_support, noticed that it's off by 2mm when I replaced the
 //			 makerslide with a 2040 to use the makerslide for a three motor z axis.
 //			 Tapered the spacer on the bearing_bracket and added L/R labels.
+// 7/13/18	- Added a cube showing a 200x200 bed to all()
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in bearing_bracket() must match stepper motor shaft in motor_mount()
 //       If the motors get hot, print it from something that can handle it
@@ -47,18 +48,19 @@ Vthickness = 7;		// thickness of bearing support vertical section
 Tthickness = 5;		// thickness of bearing support top and fillet
 /////////////////////////////////////////////////////////////////////////////////////////
 
-all(0); // all the needed parts
+all(1); // all the needed parts
 //partial();
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module all(MS) {
-	motor_mount(1);
-	translate([35,99.5,-2.5]) rotate([0,0,-90]) bearing_bracket(0,"Right");
-	translate([85,25,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
-	translate([0,70,0]) motor_mount(0);
+	%translate([0,0,-5]) cube([200,200,2],center=true);
+	translate([0,-5,0]) motor_mount(1);
+	translate([35,94.5,-2.5]) rotate([0,0,-90]) bearing_bracket(0,"Right");
+	translate([85,21,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
+	translate([0,65,0]) motor_mount(0);
 	translate([35,-29.5,-2.5]) rotate([0,0,-90]) mirror() bearing_bracket(0,"Left"); // mirror it for the other side
-	translate([60,-65,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
+	translate([60,-66,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

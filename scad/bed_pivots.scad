@@ -21,19 +21,19 @@ dia_625z = 16;	// diameter of a 625z
 layer = 0.2;	// printed layer thickness
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-z_pivots(3,0,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
-//spacer_pivot(6);
+//z_pivots(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+spacer_pivot(6);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module z_pivots(Qty,Bearing=0,Round=1) {
 	for(i=[0:Qty-1]){
-		translate([0,i*45,15]) z_pivot_2040(Bearing,Round);
+		translate([0,i*45,15]) z_pivot_2040(Bearing,1);
 		if(Round)
 			translate([75,i*45+20,21]) rotate([180,90,0]) center_pivot2(Bearing);
 		else
 			translate([45,i*45,0]) center_pivot(Bearing); // non-rounded version
-		if(Bearing) translate([70,i*45,0])z_pivot_carriage();
+		if(Bearing) translate([80,i*45,0])z_pivot_carriage();
 		translate([15,i*45+10,0]) spacer_pivot();
 	}
 }
@@ -121,8 +121,8 @@ module center_pivot2(Bearing) {
 module spacer_pivot(Qty=1) { // a little spacer to make it pivotable on the makerslide carriage plate,
 	for(i=[0:Qty-1]){		 //	uses excentric hole
 		translate([0,i*10,0]) difference() {
-			cylinder(h=4,d=6.8,$fn=100);
-			translate([0,0,-2]) cylinder(h=10,d=screw5,$fn=100);
+			color("blue") cylinder(h=4,d=6.8,$fn=100);
+			translate([0,0,-2]) color("cyan") cylinder(h=10,d=screw5,$fn=100);
 		}
 	}
 }

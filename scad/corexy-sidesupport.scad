@@ -9,7 +9,7 @@
 //			  makerslide
 // 7/28/16	- changed bottom access hole and slotted the hole for the 2020 end
 // 7/9/18	- Added corner-tools.scad to round over the large screw access holes
-//			  added missing mounting hole
+//			  added missing mounting hole, added a 200x200 bed under all() in preview
 ////////////////////////////////////////////////////////////////////////////
 // It takes a while to render all
 ////////////////////////////////////////////////////////////////////////////
@@ -31,12 +31,13 @@ ms_width = 40;
 MS_bg_size = 4;	// space needed for the bit that the wheels ride on
 ////////////////////////////////////////////////////////////////////////////
 
-//all();
-partial();
+all();
+//partial();
 
 //////////////////////////////////////////////////////////////////////////////
 
 module all() {
+	%translate([0,0,-15]) cube([200,200,2],center=true);
 	translate([0,-10,0]) rotate([90,0,0]) // lay down for printing
 		MS_corner(1,0);
 	rotate([-90,0,0]) // lay down for printing

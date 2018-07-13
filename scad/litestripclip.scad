@@ -23,9 +23,7 @@ clips(6); // must be multiples of two
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-module clips(Qty=1) {
-	if(Qty==1)
-		translate([-1,-top_w-thickness*2,height+0.5-tab_t/2]) rotate([-45,0,0]) cube([thickness*2,thickness*2,tab_t*2]);
+module clips(Qty=2) {
 	if(Qty>1) {
 		for (i=[0:(Qty/2)-1]) translate([i*20,0,0]) rotate([0,-90,0]) clip();
 		for (i=[0:(Qty/2)-1]) translate([i*20,20,0]) rotate([0,-90,0]) clip();
@@ -36,15 +34,15 @@ module clips(Qty=1) {
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 module clip() {
-	translate([0,0,thickness-2]) cubeX([thickness,thickness,height+2]);
-	translate([0,-b_width,0]) cubeX([thickness,b_width+thickness,thickness]);
-	translate([0,-b_width,thickness-2]) cubeX([thickness,thickness,lite_t+2]);
+	translate([0,0,thickness-2]) color("cyan") cubeX([thickness,thickness,height+2]);
+	translate([0,-b_width,0]) color("red") cubeX([thickness,b_width+thickness,thickness]);
+	translate([0,-b_width,thickness-2]) color("blue") cubeX([thickness,thickness,lite_t+2]);
 	difference() {
-		translate([0,-top_w-2,height]) cubeX([thickness,top_w*2+2,thickness]);
+		translate([0,-top_w-2,height]) color("gray") cubeX([thickness,top_w*2+2,thickness]);
 		anglecut();
 	}
 	difference() {
-		translate([0,-top_w-thickness,height-tab_t]) cubeX([thickness,thickness,thickness+tab_t]);
+		translate([0,-top_w-thickness,height-tab_t]) color("black") cubeX([thickness,thickness,thickness+tab_t]);
 		anglecut();
 	}
 }
@@ -52,7 +50,7 @@ module clip() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module anglecut() {
-	translate([-1,-top_w-thickness*2,height+0.5-tab_t/2]) rotate([-45,0,0]) cube([thickness*2,thickness*2,tab_t*2]);
+	translate([-1,-top_w-thickness*2,height+0.5-tab_t/2]) rotate([-45,0,0]) color("white") cube([thickness*2,thickness*2,tab_t*2]);
 }
 
 

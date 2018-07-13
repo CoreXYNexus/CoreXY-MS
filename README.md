@@ -12,8 +12,8 @@ https://youtu.be/llArYEVT2ow
 10/1/16 - Added mount for E3D's Titan Extruder with a E3DV6 hotend, posted stl has mounting for the ir bracket to use DC42's ir sensor. Proximity & BLTouch is available in the scad file.
 10/15/16 - Updated blower.scad for the blower mounts for the Titan extruder mount.
 11/7/16 - Added an idler bearing to the z-axis leadscrew bearing mounts so that the belt wraps around more of the pulleys.  Also included a stl that just has the z bearing mounts for printing replacements of the originals.
-
 12/20/16 - Changed the Titan extruder plate by moving the hotend 20mm to the -x and changed the sensor mounts to seperate attachments.
+7/12/18 - Now uses corner-tools.scad and aded a plate for the x carridge stuff
 
 All the horizontal 2020/2040, and the vertical & horizontal makerslide ends are tapped for 5mm.
 Vertical 2020 is drilled with a 5.5mm bit for access to the screws that hold everything together. Four in the top and two in the bottom. Use drillguide.stl for drilling the holes.
@@ -45,8 +45,11 @@ Fans are 24vdc 5015 blowers.
 
 FancapL.stl is for the power supply fan to make it blow to the side.
 
-Uses: cubeX from http://www.thingiverse.com/thing:112008
-      NEMA17 from https://github.com/mtu-most/most-scad-libraries
-      configuration.scad, metric.scad, and functions.scad are from http://github.com/prusajr/PrusaMendel
+Use your favorite coupler for the direct drive on the z axis, not needed for belt drive.
 
-
+Uses:	OpenSCAD 2015-03-1
+		cubeX from http://www.thingiverse.com/thing:112008
+		NEMA17 from https://github.com/mtu-most/most-scad-libraries
+		configuration.scad, metric.scad, and functions.scad are from http://github.com/prusajr/PrusaMendel
+		corner-tools.scad from thingivers and can't find it now
+		

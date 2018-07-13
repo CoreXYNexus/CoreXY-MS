@@ -13,14 +13,14 @@ offset = 17.5;
 //////////////////////////////////////////////////////////////////////////////////////////
 
 difference() {
-	cubeX([offset+7,25,5],2);
-	translate([offset,12.5,-2]) cylinder(h=20,d=screw5);
-	translate([5,4,-2]) rotate([0,0,0]) cylinder(h = 25, r = screw3/2, $fn = 50);
-	translate([5,20.75,-2]) rotate([0,0,0]) cylinder(h = 25, r = screw3/2, $fn = 50);
+	color("cyan") cubeX([offset+7,25,5],2);
+	translate([offset,12.5,-2]) color("red") cylinder(h=20,d=screw5);
+	translate([5,4,-2]) rotate([0,0,0]) color("blue") cylinder(h = 25, r = screw3/2, $fn = 50);
+	translate([5,20.75,-2]) rotate([0,0,0]) color("purple") cylinder(h = 25, r = screw3/2, $fn = 50);
 }
 difference() {	
-	translate([offset,12.5,0]) cylinder(h=8,d=screw5hd);
-	translate([offset,12.5,-2]) cylinder(h=20,d=screw5);
+	translate([offset,12.5,0]) color("gray") cylinder(h=8,d=screw5hd);
+	translate([offset,12.5,-2]) color("black") cylinder(h=20,d=screw5);
 }
 
 /////////////////// end of litemount.scad ///////////////////////////////////////////////

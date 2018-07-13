@@ -18,6 +18,7 @@
 // ------------------------------------------------------------------------------------
 // Uses 8 F625Z bearings, 8 5mm washers, 4 5x40mm screws
 // Bearing stack is one washer, two bearings flanges out, one washer and one spacer
+// U - bearings on upper, D - bearings on lower
 ///////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008

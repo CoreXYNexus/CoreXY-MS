@@ -23,6 +23,7 @@
 // 2/5/17	- Added a spacer block for the 3rd z-axis makerslide bearing/motor mount
 // 7/9/18	- Added use of coreer-tools.scad to round over bearing holder
 //			  added bearing_ider() to all()
+// 7/13/18	- Made plates to fit a 200x200 bed
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -97,12 +98,76 @@ idler_spacer_thickness = GT2_40t_h + 0.9;	// thickness of idler bearing spacer
 layer = 0.25;				// printed layer thickness
 ////////////////////////////////////////////////////////////////////////////
 
-all(1,1,0,1);
+// These are setup for three leadscrews
+//all_belt_1();  // z leadscrews for belt version
+//all_belt_2();  // z motor mount for belt version
+//all_belt_3();  // z idler and makerslide brackets to 2040 and backside of makerslide, idler may not be needed
+all_1();  // direct drive for z
+//all_2();  // makerslide brackets
+
+// uses a 300x400 large bed
+//all(1,1,0,1); // three leadscrews, belt, idler may not be needed
+//all(1,1,0,0); // two leadscrews, belt, idler may not be needed
+//all(0,1,0,1); // three leadscrews, direct drive
+//all(0,1,0,0); // two leadscrews, direct drive
+
 //partial();
 	
 //////////////////////////////////////////////////////////////////////////////
 
+module all_belt_1() {
+	%translate([0,0,-5]) cube([200,200,2],center=true);
+	// a motor driving leadscrew via a belt
+	translate([-50,-50,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
+	translate([20,-50,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
+	translate([-30,50,0]) rotate([0,0,90]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
+	translate([30,130,-2.5]) rotate([0,0,-90]) single(1); // znut holder
+	translate([65,-25,-2.5]) rotate([0,0,90]) single(1); // znut holder
+	translate([70,-110,-2.5]) rotate([0,0,90]) single(1); // znut holder
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module all_belt_2() {
+	%translate([0,0,-5]) cube([200,200,2],center=true);
+	translate([-30,-30,0]) belt_motor(1);	// one stepper motor mount with idler
+	translate([10,-30,-2.5]) lockring();	// something to hold leadscrew in bearing
+	translate([10,0,-2.5]) lockring();	// something to hold leadscrew in bearing
+	translate([10,30,-2.5]) lockring();	// something to hold leadscrew in bearing
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module all_belt_3(MS=0) {	//if(Plate) {
+	%translate([0,0,-5]) cube([200,200,2],center=true);
+	translate([50,-40,-2.5]) bearing_idler();
+	translate([-60,-20,0]) plates(1,MS);
+	translate([-60,30,0]) plates(1,MS);
+	translate([-60,-70,0]) plates(1,MS);
+}
+
+module all_1() {  // z motor mount for 3 z motors
+	%translate([0,0,-5]) cube([200,200,2],center=true);
+	translate([-40,30,2.5]) motor_mount(1);
+	translate([40,35,0]) motor_mount(1);
+	translate([-40,-40,2.5]) motor_mount(1);
+	translate([20,50,-2.5]) rotate([0,0,-90]) single(1); // znut holder
+	translate([130,-70,-2.5]) rotate([0,0,180]) single(1); // znut holder
+	translate([70,50,-2.5]) rotate([0,0,-90]) single(1); // znut holder
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module all_2(MS=0) {  // makerslide brackets
+	%translate([0,0,-5]) cube([200,200,2],center=true);
+	translate([-60,-20,0]) plates(1,MS);
+	translate([-60,30,0]) plates(1,MS);
+	translate([-60,-70,0]) plates(1,MS);
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+
 module all(belt,Plate=0,MS=0,Third=0) {
+	%translate([70,0,-5]) cube([300,400,2],center=true);
 	if(!belt) { // two motor direct drive setup (initial design)
 		motor_mount(1); // motor mount
 		translate([60,0,0]) motor_mount(1); // 2nd motor mount

@@ -9,12 +9,11 @@
 // 1/10/17 - Added colors for easier editing in preview and added mount for a power switch
 // 1/11/17 - Added label to power switch mount
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// NOTE: Originall used Digi-Key Part number: CCM1666-ND
+// NOTE: Originally used Digi-Key Part number: CCM1666-ND
 //		 http://www.digikey.com/product-detail/en/te-connectivity-corcom-filters/1609112-3/CCM1666-ND/758835
 //		 ---------------------------------------------------------------------------------------------------
 //		 If the socket hole size changes, then the size & postions of the walls/wings & socket may need adjusting
-//       The socket above has screw mounting holes, after installing the socket, drill them with 2.5mm bit for M3 screws
-//		 Cover uses three M3 screws, use M3 tap in holes on sock
+//		 The power socket uses 3mm screws to mount, drill with 2.5mm and tap after installing the socket
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
 include <inc/screwsizes.scad>
@@ -28,9 +27,9 @@ socket_shift = 0; // move socket left/right
 socket_s_shift = 0; // move socket up/down
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//all();
+all();
 //testfit();	// print part of it to test fit the socket & 2020
-switch(0);		// 4 args: flip label, width, length, clip thickness; defaults to 0,13,19.5,2
+//switch();		// 4 args: flip label, width, length, clip thickness; defaults to 0,13,19.5,2
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////

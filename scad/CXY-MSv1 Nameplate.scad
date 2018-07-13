@@ -10,11 +10,12 @@ include <inc/screwsizes.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
 use <inc/Nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
 use <inc/corner-tools.scad>
+use <b5_____.ttf>
 $fn=50;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //vars
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//"Babylon5:style=Regular" is b5_____.ttf, need to install the font, if you don't have it
+// "Babylon5:style=Regular" is b5_____.ttf
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 plate();
@@ -23,9 +24,9 @@ plate();
 
 module plate() {
 	difference() {
-		cubeX([105,20,3]);
-		translate([5,10,-5]) cylinder(h=10,d=screw3,$fn=100);
-		translate([100,10,-5]) cylinder(h=10,d=screw3,$fn=100);
+		color("cyan") cubeX([105,20,3]);
+		translate([5,10,-5]) color("red") cylinder(h=10,d=screw3,$fn=100);
+		translate([100,10,-5]) color("blue") cylinder(h=10,d=screw3,$fn=100);
 		translate([9,4.5,1]) printchar("CXY-MSV1",5,12);
 	}	
 }

@@ -26,12 +26,11 @@ shift = 6;	// move switch mounting holes along width
 
 //thing(hole distance,hole diagonal offset,amount to move from edge,screw hole size);
 
-//thing(22,10,3,screw3t);	// TEMCo CN0097: 22,10,screw3t ; Little green/black: 9,0,screw2
-//thing(10,0,7,screw2); // black microswitch inline mount
-//translate([25,0,0]) clamp();
-strikeY();
-//translate([-20,0,0])
-//	strikeX();
+thing(22,10,3,screw3t);	// TEMCo CN0097: 22,10,screw3t ; Little green/black: 9,0,screw2
+translate([0,40,0]) thing(10,0,7,screw2); // black microswitch inline mount
+translate([0,-40,0]) clamp();
+translate([-40,-35,0])strikeY();
+translate([-55,0,0]) strikeX();
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -44,9 +43,9 @@ module thing(Sep,DiagOffset,Offset,ScrewT) {
 
 module mount() {
 	difference() {
-		cubeX([22,width,Switch_thk],2);
-		translate([10,6.5,-1]) cylinder(h=Switch_thk*2,r=screw5/2);
-		translate([10,26.5,-1]) cylinder(h=Switch_thk*2,r=screw5/2);
+		color("cyan") cubeX([22,width,Switch_thk],2);
+		translate([10,6.5,-1]) color("red") cylinder(h=Switch_thk*2,r=screw5/2);
+		translate([10,26.5,-1]) color("blue") cylinder(h=Switch_thk*2,r=screw5/2);
 	}
 	difference() {
 		translate([2,0,Switch_thk-4]) cubeX([20,width,Switch_thk2],2);
@@ -59,16 +58,16 @@ module mount() {
 module base(Sep,DiagOffset,Offset,ScrewT) {
 	rotate([0,-90,0]) difference() {
 		difference() {
-			translate([0,0,-4]) cubeX([Switch_thk,width,Switch_ht+4],2);
+			translate([0,0,-4]) color("yellow") cubeX([Switch_thk,width,Switch_ht+4],2);
 			// screw holes for switch
 			rotate([0,90,0]) {		
 				translate([-(Switch_ht-Offset), shift, -1]) {
-					cylinder(h = 11, r = ScrewT/2, center = false, $fn=100);
+					color("purple") cylinder(h = 11, r = ScrewT/2, center = false, $fn=100);
 				}
 			}
 			rotate([0,90,0]) {
 				translate(v = [-(Switch_ht-Offset)+DiagOffset, shift+Sep, -1]) {
-					cylinder(h = 11, r = ScrewT/2, center = false, $fn=100);
+					color("black") cylinder(h = 11, r = ScrewT/2, center = false, $fn=100);
 				}
 			}
 		}
@@ -89,9 +88,9 @@ module clamp() {	// something to clamp the wires on the corexy belt holder
 
 module strikeY() {	// used on y a-xis
 	difference() {
-		cubeX([35,25,12],2);
-		translate([9,28,6]) rotate([90,0,0]) cylinder(h=30,r=screw5/2);
-		translate([9,5,6]) rotate([90,0,0]) cylinder(h=30,r=screw5hd/2);
+		color("cyan") cubeX([35,25,12],2);
+		translate([9,28,6]) rotate([90,0,0]) color("red") cylinder(h=30,r=screw5/2);
+		translate([9,5,6]) rotate([90,0,0]) color("blue") cylinder(h=30,r=screw5hd/2);
 	}
 }
 
@@ -99,11 +98,11 @@ module strikeY() {	// used on y a-xis
 
 module strikeX() {	// used on y a-xis
 	difference() {	
-		cubeX([9,80,9],radius=2,center=true);
-		translate([-10,-35,0]) rotate([0,90,0]) cylinder(h=20,d=screw5);
-		translate([-10,-15,0]) rotate([0,90,0]) cylinder(h=20,d=screw5);
+		color("cyan") cubeX([9,80,9],radius=2,center=true);
+		translate([-10,-35,0]) rotate([0,90,0]) color("red") cylinder(h=20,d=screw5);
+		translate([-10,-15,0]) rotate([0,90,0]) color("blue") cylinder(h=20,d=screw5);
 	}
-	translate([14,35,0]) cubeX([35,10,9],radius=2,center=true);
+	translate([14,35,0]) color("black") cubeX([35,10,9],radius=2,center=true);
 }
 
 ////////////////////////////////////////////////////////////////////////////
