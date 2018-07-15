@@ -690,8 +690,7 @@ module titan(recess=3) { // extruder platform for e3d titan with (0,1)BLTouch or
 		translate([20+shifthotend2,-5,-10]) color("pink") cylinder(h=20,d=23.5,$fn=100);
 	    translate([0,-5,wall/2]) color("purple") fillet_r(2,23/2,-1,$fn);	// round top edge
 	    translate([0,-5,-wall/2]) color("purple") rotate([180]) fillet_r(2,23/2,-1,$fn);	// round bottom edge
-	    translate([0,-5,wall/2]) color("purple") fillet_r(2,23/2,-1,$fn);	// round top edge
-		
+	    
 		translate([-15,16.5,44]) rotate([90,0,0]) fan(screw3t,0); // fan & servo mounting holes
 		translate([-50,0,44.5]) rotate([90,0,90]) fan(); // mounting holes for bltouch & prox sensor
 		translate([-10,0,0]) ir_mount_screws(); // mounting holes for irsensor bracket
