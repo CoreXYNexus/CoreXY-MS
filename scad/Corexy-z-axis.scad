@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 7/9/2018
+// Last Update: 8/19/2018
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/28/16	- modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
 // 7/3/16	- added assembly info
@@ -24,6 +24,7 @@
 // 7/9/18	- Added use of coreer-tools.scad to round over bearing holder
 //			  added bearing_ider() to all()
 // 7/13/18	- Made plates to fit a 200x200 bed
+// 8/19/18	- OpenSCAD 2018.06.01 for $preview
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -116,7 +117,7 @@ all_1();  // direct drive for z
 //////////////////////////////////////////////////////////////////////////////
 
 module all_belt_1() {
-	%translate([0,0,-5]) cube([200,200,2],center=true);
+	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
 	// a motor driving leadscrew via a belt
 	translate([-50,-50,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
 	translate([20,-50,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew

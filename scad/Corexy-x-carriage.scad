@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Corexy-x-carriage - x carriage for makerslide and vertical x-axis with 8mm rods
 // created: 2/3/2014
-// last modified: 7/12/2018
+// last modified: 8/19/2018
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to makerslide carriage and put it into a seperate module
@@ -20,7 +20,7 @@
 // 9/11/16 - added irsensor bracket to extruder plate
 // 9/16/16 - added combined rear carriage & belt holder
 // 9/26/16 - design for using the E3D Titan
-// 10/25/16 - added Titan mount for AL extruder plate and for mounting right on x-carraige using i3x_sep
+// 10/25/16 - added Titan mount for AL extruder plate and for mounting right on x-carraige using mount_seperation
 // 11/29/16 - made titanmotor expand up/down with shiftitanup variable
 // 12/18/16 - on the titan extruder plate, the titan was shifted towards the hotend side by 20mm to make the
 //			  adjusting screw easier to get to.  Also, began adding color to parts for easier editing.
@@ -34,6 +34,7 @@
 //			  and fixed the rear support to be rounded in titan() and removed some unecessary code
 //			  added rounded hole under motor to titan3() and fixed mounting holes
 // 7/12/18	- Noticed the plate was not setup for a 200x200 bed
+// 8/19/18	- Daul Titabnmountis in DualTitan.scad, OpenSCAD 2018.06.01 for $preview
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -102,8 +103,8 @@ servo_offset = 20; // adjust to move servo mount
 screw_depth = 25;
 vertx_distance = 70; // distance between x rods for vertical x axis
 ps_spacer = 10.5; // don't need to print support between lm8uu holders, adjust this when width changes
-i3x_sep = 23;	// mount for Prusa i3 stlye extruder; Wilson is 23, Prusa i3 is 30
-i3x_ht = 11.5;	// move the Prusa i3 extruder mounting holes up/down
+mount_seperation = 23;	// mount for Prusa i3 stlye extruder; Wilson is 23, Prusa i3 is 30
+mount_height = 11.5;	// move the Prusa i3 extruder mounting holes up/down
 psensord = 19;	// diameter of proximity sensor (x offset is 0)
 layer = 0.2;	// printed layer thickness
 // BLTouch variables - uses the screw2 size for the mounting holes, which work fine with the provided screws or can
@@ -151,7 +152,7 @@ all(1,2,4);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module all(Crg,Ext,Htr) {
-	%translate([0,0,-7]) cube([200,200,1],center=true);
+	if($preview) %translate([0,0,-7]) cube([200,200,1],center=true);
 	if(Crg == 0) {
 		translate([-20,10,0]) carriage(1);		// makerslide x-carriage
 		translate([-20,-80,-4]) belt(); 		// x-carriage belt attachment with the clamps
@@ -475,15 +476,15 @@ module belt_roundclamp() // something round to let the belt smoothly move over w
 
 module i3mount() { // four mounting holes for using a Prusa i3 style extruder
 	// lower
-	translate([i3x_sep/2,-height/4 + i3x_ht,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
-	//translate([i3x_sep/2,-height/4 + i3x_ht,2]) nut(m3_nut_diameter,3);
-	translate([-i3x_sep/2,-height/4+ i3x_ht,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
-	//translate([-i3x_sep/2,-height/4+ i3x_ht,2]) nut(m3_nut_diameter,3);
+	translate([mount_seperation/2,-height/4 + mount_height,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
+	//translate([mount_seperation/2,-height/4 + mount_height,2]) nut(m3_nut_diameter,3);
+	translate([-mount_seperation/2,-height/4+ mount_height,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
+	//translate([-mount_seperation/2,-height/4+ mount_height,2]) nut(m3_nut_diameter,3);
 	// upper
-	translate([i3x_sep/2,-height/4 + i3x_ht + i3x_sep,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
-	//translate([i3x_sep/2,-height/4 + i3x_ht + i3x_sep,2]) nut(m3_nut_diameter,3);
-	translate([-i3x_sep/2,-height/4+ i3x_ht + i3x_sep,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
-	//translate([-i3x_sep/2,-height/4+ i3x_ht + i3x_sep,2]) nut(m3_nut_diameter,3);
+	translate([mount_seperation/2,-height/4 + mount_height + mount_seperation,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
+	//translate([mount_seperation/2,-height/4 + mount_height + mount_seperation,2]) nut(m3_nut_diameter,3);
+	translate([-mount_seperation/2,-height/4+ mount_height + mount_seperation,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
+	//translate([-mount_seperation/2,-height/4+ mount_height + mount_seperation,2]) nut(m3_nut_diameter,3);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -836,10 +837,10 @@ module titanmotor(WallMount=0,Screw=screw4) {
 			translate([52,0,0]) color("cyan") cubeX([4,45+shifttitanup,45],2);
 			// lower mounting screw holes
 			translate([40,15,11]) rotate([0,90,0]) color("cyan") cylinder(h=20,d=Screw,$fn=100);
-			translate([40,15,11+i3x_sep]) rotate([0,90,0])  color("blue") cylinder(h=20,d=Screw,$fn=100);
+			translate([40,15,11+mount_seperation]) rotate([0,90,0])  color("blue") cylinder(h=20,d=Screw,$fn=100);
 			if(Screw==screw4) { // add screw holes for horizontal extrusion
-				translate([40,15+i3x_sep,34]) rotate([0,90,0]) color("red") cylinder(h=20,d=Screw,$fn=100);
-				translate([40,15+i3x_sep,34-i3x_sep]) rotate([0,90,0])  color("pink") cylinder(h=20,d=Screw,$fn=100);
+				translate([40,15+mount_seperation,34]) rotate([0,90,0]) color("red") cylinder(h=20,d=Screw,$fn=100);
+				translate([40,15+mount_seperation,34-mount_seperation]) rotate([0,90,0])  color("pink") cylinder(h=20,d=Screw,$fn=100);
 			}
 		}
 	} else {

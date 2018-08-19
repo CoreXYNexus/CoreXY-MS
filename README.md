@@ -14,6 +14,7 @@ https://youtu.be/llArYEVT2ow
 11/7/16 - Added an idler bearing to the z-axis leadscrew bearing mounts so that the belt wraps around more of the pulleys.  Also included a stl that just has the z bearing mounts for printing replacements of the originals.
 12/20/16 - Changed the Titan extruder plate by moving the hotend 20mm to the -x and changed the sensor mounts to seperate attachments.
 7/12/18 - Now uses corner-tools.scad and aded a plate for the x carridge stuff
+8/19/18 - OpenSCAD 2018.06.01 for #preview and added a dual Titan mount(not tested)
 
 All the horizontal 2020/2040, and the vertical & horizontal makerslide ends are tapped for 5mm.
 Vertical 2020 is drilled with a 5.5mm bit for access to the screws that hold everything together. Four in the top and two in the bottom. Use drillguide.stl for drilling the holes.

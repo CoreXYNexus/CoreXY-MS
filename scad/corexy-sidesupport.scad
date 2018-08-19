@@ -3,13 +3,14 @@
 ////////////////////////////////////////////////////////////////////////////
 // Created: 7/20/2016
 ////////////////////////////////////////////////////////////////////////////
-// Last Update: 7/9/2018
+// Last Update: 8/19/2018
 ////////////////////////////////////////////////////////////////////////////
 // 7/20/16	- adjusted positions for cubeX and added ms_notch for using against
 //			  makerslide
 // 7/28/16	- changed bottom access hole and slotted the hole for the 2020 end
 // 7/9/18	- Added corner-tools.scad to round over the large screw access holes
 //			  added missing mounting hole, added a 200x200 bed under all() in preview
+// 8/19/18	- OpenSCAD 2018.06.01 for $preview
 ////////////////////////////////////////////////////////////////////////////
 // It takes a while to render all
 ////////////////////////////////////////////////////////////////////////////
@@ -37,7 +38,7 @@ all();
 //////////////////////////////////////////////////////////////////////////////
 
 module all() {
-	%translate([0,0,-15]) cube([200,200,2],center=true);
+	if($preview) %translate([0,0,-15]) cube([200,200,2],center=true);
 	translate([0,-10,0]) rotate([90,0,0]) // lay down for printing
 		MS_corner(1,0);
 	rotate([-90,0,0]) // lay down for printing

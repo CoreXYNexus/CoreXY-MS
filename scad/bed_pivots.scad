@@ -3,14 +3,15 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 1/29/2017
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 2/5/2017
+// Last Update: 8/19/2018
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 1/15/17 - Added bearing pivot style carriage & 2040 mounts for multi-motor leveling
-// 1/29/17 - Added pivot version using just a M5 screw
-//			 Made separate scad file for this and removed them from corexy-z-axis.scad
-//			 Added roounded version of the center pivot
-// 1/30/17 - Fixed M5 round version
-// 2/5/17  - Added a spacer for the center_pivot to allow it to rotate in the makerslide carriage plate
+// 1/15/17	- Added bearing pivot style carriage & 2040 mounts for multi-motor leveling
+// 1/29/17	- Added pivot version using just a M5 screw
+//			  Made separate scad file for this and removed them from corexy-z-axis.scad
+//			  Added roounded version of the center pivot
+// 1/30/17	- Fixed M5 round version
+// 2/5/17	- Added a spacer for the center_pivot to allow it to rotate in the makerslide carriage plate
+// 8/19/19	- OpenSCAD 2018.06.01 for $preview
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -75,9 +76,9 @@ module z_pivot_2040(Bearing=1,RoundPivot=1) { // 3 625 bearing pivot mounts on t
 			side_screws_2040(20);
 	}
 	if(!RoundPivot) // test center_pivot, should never need to tilt this far
-		%translate([6,19.7,5.5]) rotate([45,0,0]) center_pivot(Bearing);
+		if($preview) %translate([6,19.7,5.5]) rotate([45,0,0]) center_pivot(Bearing);
 	else
-		%translate([6,9.7,6.5]) center_pivot2(Bearing);
+		if($preview) %translate([6,9.7,6.5]) center_pivot2(Bearing);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

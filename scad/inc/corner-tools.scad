@@ -2,6 +2,7 @@
 // for straight and round edges
 // for corners
 // for filling inside edges and corners
+// https://www.myminifactory.com/it/object/3d-print-tools-for-fillets-and-chamfers-on-edges-and-corners-straight-and-or-round-45862 by Ewald Ikemann
 
 az=0.001; //anti z fight
 

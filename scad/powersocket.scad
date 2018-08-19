@@ -2,12 +2,13 @@
 // powersocket.scad - uses a pc style power socket with switch
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 7/4/2016
-// last update 1/12/17
+// last update 8/19/18
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 8/4/16 - Added cover
-// 8/5/16 - adjusted cover & 2020 mounting holes
-// 1/10/17 - Added colors for easier editing in preview and added mount for a power switch
-// 1/11/17 - Added label to power switch mount
+// 8/4/16	- Added cover
+// 8/5/16	- adjusted cover & 2020 mounting holes
+// 1/10/17	- Added colors for easier editing in preview and added mount for a power switch
+// 1/11/17	- Added label to power switch mount
+// 8/19/18	- OpenSCAD 2018.06.01 for $preview
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Originally used Digi-Key Part number: CCM1666-ND
 //		 http://www.digikey.com/product-detail/en/te-connectivity-corcom-filters/1609112-3/CCM1666-ND/758835
@@ -35,9 +36,10 @@ all();
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module all() {
+	if($preview) %translate([25,20,-5]) cube([200,200,2],center=true); // show the 200x200 bed
 	sock();
 	translate([0,8,45]) rotate([180,0,0]) cover();
-	translate([0,95,0])	switch(0);		// 3 args: width, length, clip thickness; defaults to 13,19.5,2
+	translate([-50,55,0])	switch(0);		// 3 args: width, length, clip thickness; defaults to 13,19.5,2
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////

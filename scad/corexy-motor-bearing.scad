@@ -2,7 +2,7 @@
 // corexy-motor-bearing.scad - hove the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2026
-// last update 7/14/18
+// last update 8/19/18
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16 - added built-in spacer to the bearing_bracket
 // 7/14/16 - adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -20,6 +20,7 @@
 //			 makerslide with a 2040 to use the makerslide for a three motor z axis.
 //			 Tapered the spacer on the bearing_bracket and added L/R labels.
 // 7/13/18	- Added a cube showing a 200x200 bed to all()
+// 8/19/18	- OpenSCAD 2018.06.01 for $preview
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in bearing_bracket() must match stepper motor shaft in motor_mount()
 //       If the motors get hot, print it from something that can handle it
@@ -54,7 +55,7 @@ all(1); // all the needed parts
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module all(MS) {
-	%translate([0,0,-5]) cube([200,200,2],center=true);
+	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true); // show the 200x200 bed
 	translate([0,-5,0]) motor_mount(1);
 	translate([35,94.5,-2.5]) rotate([0,0,-90]) bearing_bracket(0,"Right");
 	translate([85,21,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);

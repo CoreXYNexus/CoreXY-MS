@@ -2,12 +2,13 @@
 // corexy-XY.scad - xy bearing mount on the carriage plates
 ///////////////////////////////////////////////////////////////////////////////////////
 // created 6/27/2016
-// last upate 1/10/17
+// last upate 8/19/2018
 ///////////////////////////////////////////////////////////////////////////////////////
 // 7/3/16 - added comments and some assembly info
 // 7/17/16 - swtiched to inside of carriage plate, added partial()
 // 7/22/16 - added belt_adjust for adjusting the bearings on the b_mount
 // 1/10/17 - added labels and colors to preview for easier editing
+// 8/19/18	- OpenSCAD 2018.06.01 for $preview
 ///////////////////////////////////////////////////////////////////////////////////////
 // Requires drilling two holes in the makerslide carriage plate
 // Use a couple of 3mm screws to space the b_mount above the makerslide, mark the outline
@@ -43,6 +44,7 @@ all(1); // everything
 //////////////////////////////////////////////////////////////////////////////////
 
 module all(Spacers) {	// all the parts as a plate
+	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true); // show the 200x200 bed
 	b_mount(0,Spacers);	// 1st arg: 0 - left, 1 - right; 2nd arg 0 - no bearing spacers; 1 - bearing spacers
 	translate([0,40,0])	b_mount(1,Spacers);
 	translate([40,0,0])	drillguide();
