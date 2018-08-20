@@ -8,12 +8,19 @@ https://creativecommons.org/licenses/by-sa/3.0/
 https://youtu.be/llArYEVT2ow
 
 9/18/16 - Changed to a double plate x-carriage, corexy-x-carriage.scad has mounts for BLTouch and dc42's ir sensor. Proximity sensor version is for 19mm diameter.
+
 9/23/16 - Added photos of the rear of the x-carriage.
+
 10/1/16 - Added mount for E3D's Titan Extruder with a E3DV6 hotend, posted stl has mounting for the ir bracket to use DC42's ir sensor. Proximity & BLTouch is available in the scad file.
+
 10/15/16 - Updated blower.scad for the blower mounts for the Titan extruder mount.
+
 11/7/16 - Added an idler bearing to the z-axis leadscrew bearing mounts so that the belt wraps around more of the pulleys.  Also included a stl that just has the z bearing mounts for printing replacements of the originals.
+
 12/20/16 - Changed the Titan extruder plate by moving the hotend 20mm to the -x and changed the sensor mounts to seperate attachments.
+
 7/12/18 - Now uses corner-tools.scad and aded a plate for the x carridge stuff
+
 8/19/18 - OpenSCAD 2018.06.01 for #preview and added a dual Titan mount(not tested)
 
 All the horizontal 2020/2040, and the vertical & horizontal makerslide ends are tapped for 5mm.
