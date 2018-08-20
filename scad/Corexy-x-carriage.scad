@@ -34,7 +34,8 @@
 //			  and fixed the rear support to be rounded in titan() and removed some unecessary code
 //			  added rounded hole under motor to titan3() and fixed mounting holes
 // 7/12/18	- Noticed the plate was not setup for a 200x200 bed
-// 8/19/18	- Daul Titabnmountis in DualTitan.scad, OpenSCAD 2018.06.01 for $preview
+// 8/19/18	- Dual Titabnmountis in DualTitan.scad, OpenSCAD 2018.06.01 for $preview
+// 8/20/18	- Added a carridge and belt only for DualTitan.scad, redid the modules for the other setups
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -66,111 +67,45 @@
 //-----------------------------------------------------------
 // corner-tools.scad fillet_r() doesn't show in preview
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-include <inc/configuration.scad> // http://github.com/prusajr/PrusaMendel, which also uses functions.scad & metric.scad
-include <inc/screwsizes.scad>
-use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
-use <inc/Nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
-use <inc/corner-tools.scad>
+include <cxy-msv1_h.scad>
 $fn=50;
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// variables
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-wall = 8;		// thickness of the plates
-width = 75;		// width of back/front/extruder plates
-depth = wall;	// used where depth is a better description
-height = 90;	// height of the back/front plates
-widthE = width;	// extruder plate width
-depthE = wall;	// thickness of the extruder plate
-heightE = 60; 	// screw holes may need adjusting when changing the front to back size
-dual_sep = 50.6; // distance between bottom two wheels (this is less than what's on a standard carriage aluminum plate)
-tri_sep = 64.6;	// distance between bottom two wheels and top wheel
-screw = 5.4;	// makerslide wheel screw hole (all the screw holes are oversize since slic3r makes them too small)
-screw_hd = 12.5;	// size of hole for screw head for countersink
-screw4 = 4.5;	// extruder mount screw hole
-screw3 = 3.5;	//3mm screw hole
-screw2 = 2.6;	// 3mm screw tapping hole size
-screw5 = 5.7;	// 5mm screw hole
-screw5t = 4.5;	// 5mm tapping hole size
-adjuster = 7.3; // adjuster hole size
-extruder = 50;	// mounting hole distance
-extruder_back = 18; // adjusts extruder mounting holes from front edge
-strutw=8;		// little side struts
-struth = 25;
-fan_spacing = 32;
-fan_offset = -6;  // adjust to align fan with extruder
-servo_spacing = 32;
-servo_offset = 20; // adjust to move servo mount
-screw_depth = 25;
-vertx_distance = 70; // distance between x rods for vertical x axis
-ps_spacer = 10.5; // don't need to print support between lm8uu holders, adjust this when width changes
-mount_seperation = 23;	// mount for Prusa i3 stlye extruder; Wilson is 23, Prusa i3 is 30
-mount_height = 11.5;	// move the Prusa i3 extruder mounting holes up/down
-psensord = 19;	// diameter of proximity sensor (x offset is 0)
-layer = 0.2;	// printed layer thickness
-// BLTouch variables - uses the screw2 size for the mounting holes, which work fine with the provided screws or can
-// ----------------   tapped for 3mm screws
-bltouch = 18;// hole distance on BLTouch by ANTCLabs
-bltl = 30;	// length of bltouch mount plus a little
-bltw = 16;	// width of bltouch mount plus a little
-bltd = 14;	// diameter of bltouch body plus 1mm
-bltdepth = -2;	// a recess to adjust the z position to keep the retracted pin from hitting the bed
-//                         value provided was for the inital test
-// BLTouch X offset: 0 - centered behind hotend
-// BLTouch Y offset: 38mm - behind hotend (see titan module for titan offsets)
-// BLTouch Z offset: you'll have to check this after assembly
-// BLTouch retracted size: 42.6mm - as measured on the one I have
-// BLTouch extended size: 47.87mm
-// The hotend tip must be in the range of the BLTouch to use the plate as coded in here,
-// adjust the BLTouch vars as necessary
-// The top mounting through hole works for the old MakerGear hotend (which is what I have)
-// J-head and the E3dV6 - not tested
-// -------------------------------------
-belt_adjust = 29;	// belt clamp hole position (increase to move rearward)
-//---------------------------------------------------------------------------------------
-// following are taken from https://miscsolutions.wordpress.com/mini-height-sensor-board
-hole1x = 2.70;
-hole1y = 14.92;
-hole2x = 21.11;
-hole2y = 14.92;
-holedia = 2.8;
-//---------------------------------------------------------------------------------------
-iroffset = 3;		// ir sensor mount hole distance
-iroffset2 = 9;	// shift extruder mount holes
-irnotch_d = 4;	// depth of notch to clear thru hole components
-irmount_height = 25;	// height of the mount
-irmount_width = 27;	// width of the mount
-irthickness = 6;		// thickness of the mount
-irmounty = irmount_height-3; // position of the ir mount holes from end
-irreduce = 13.5; // hole in ir mount vertical position
-irrecess = -2; // recess in ir mount for pin heater vertical depth
 // NOTE: there are some variables defined right before titan()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-all(1,2,4);
 //partial();
+FCarridgeWithBeltandClamps();
+//RCarridgeBeltClamps();
+//ExtruderMount(2,3);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module all(Crg,Ext,Htr) {
-	if($preview) %translate([0,0,-7]) cube([200,200,1],center=true);
-	if(Crg == 0) {
-		translate([-20,10,0]) carriage(1);		// makerslide x-carriage
-		translate([-20,-80,-4]) belt(); 		// x-carriage belt attachment with the clamps
-	}
-	if(Crg == 1) {	// rear carriage with belt
-		translate([-30,20,0]) carriagebelt(1);
-		translate([-10,-50,0]) rotate([0,0,90]) carriage(1);		// makerslide x-carriage
-	}
+module FCarridgeWithBeltandClamps() {
+	if($preview) %translate([0,0,-5]) cube([200,200,1],center=true);
+	translate([-20,10,0]) carriage(0);		// makerslide x-carriage
+	translate([-20,-80,-4]) belt(); 		// x-carriage belt attachment with the clamps
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module RCarridgeBeltClamps() {
+	if($preview) %translate([0,0,-5]) cube([200,200,1],center=true);
+	translate([-30,20,0]) carriagebelt(1);
+	translate([-10,-50,0]) rotate([0,0,90]) carriage(1);		// makerslide x-carriage
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module ExtruderMount(Ext,Sensor) {
+	if($preview) %translate([0,0,-5]) cube([200,200,1],center=true);
 	if(Ext == 0)
-		translate([55,25,0]) extruder(Htr);	// for BLTouch: 0 = top mounting through hole, 1 - bottom mount in recess
-											// 2 - proximity sensor hole in psensord size
-											// 3 - dc42's ir sensor
-	if(Ext == 1) {							// 4 or higher = none
+		extruder(Sensor);	// for BLTouch: 0 = top mounting through hole, 1 - bottom mount in recess
+							// 2 - proximity sensor hole in psensord size
+							// 3 - dc42's ir sensor
+	if(Ext == 1) {			// 4 or higher = none
 		// drill guide for using an AL plate instead of a printed one
-		translate([55,0,0]) rotate([0,0,90]) extruderplatedrillguide();
+		rotate([0,0,90]) extruderplatedrillguide();
 	}
 	if(Ext == 2)  // extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
-		translate([55,45,0]) rotate([0,0,-90]) titan(Htr);
+		translate([5,5,0]) rotate([0,0,-90]) titan(Sensor);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,8 +126,8 @@ module partial() {
 	//titan3();	// extruder platform to mount directly on x_carridge()
 	//prox_mount(shiftprox);
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module carriage(Titan=0,Tshift=0) { // wheel side
 	difference() {
 		color("cyan") cubeX([width,height,wall],radius=2,center=true); // makerslide side
@@ -233,7 +168,7 @@ module carriage(Titan=0,Tshift=0) { // wheel side
 		// screw holes in top (alternate location for a belt holder)
 		translate([width/4-5,height/2+2,0]) rotate([90,0,0]) color("red") cylinder(h = 25, r = screw2/2, $fn = 50);
 		translate([-(width/4-5),height/2+2,0]) rotate([90,0,0]) color("blue") cylinder(h = 25, r = screw2/2, $fn = 50);
-		color("red") i3mount(); // mounting holes for a Prusa i3 style extruder
+		color("red") CarridgeMount(); // mounting holes for a Prusa i3 style extruder
 	}
 }
 
@@ -474,17 +409,13 @@ module belt_roundclamp() // something round to let the belt smoothly move over w
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module i3mount() { // four mounting holes for using a Prusa i3 style extruder
+module CarridgeMount() { // four mounting holes for using seperate mounting extruder brcket
 	// lower
 	translate([mount_seperation/2,-height/4 + mount_height,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
-	//translate([mount_seperation/2,-height/4 + mount_height,2]) nut(m3_nut_diameter,3);
 	translate([-mount_seperation/2,-height/4+ mount_height,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
-	//translate([-mount_seperation/2,-height/4+ mount_height,2]) nut(m3_nut_diameter,3);
 	// upper
 	translate([mount_seperation/2,-height/4 + mount_height + mount_seperation,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
-	//translate([mount_seperation/2,-height/4 + mount_height + mount_seperation,2]) nut(m3_nut_diameter,3);
 	translate([-mount_seperation/2,-height/4+ mount_height + mount_seperation,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
-	//translate([-mount_seperation/2,-height/4+ mount_height + mount_seperation,2]) nut(m3_nut_diameter,3);
 }
 
 ////////////////////////////////////////////////////////////////////

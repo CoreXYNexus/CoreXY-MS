@@ -55,7 +55,7 @@ all(1); // all the needed parts
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module all(MS) {
-	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true); // show the 200x200 bed
+	if($preview) %translate([20,10,-5]) cube([200,200,2],center=true); // show the 200x200 bed
 	translate([0,-5,0]) motor_mount(1);
 	translate([35,94.5,-2.5]) rotate([0,0,-90]) bearing_bracket(0,"Right");
 	translate([85,21,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);

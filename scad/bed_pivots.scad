@@ -11,7 +11,7 @@
 //			  Added roounded version of the center pivot
 // 1/30/17	- Fixed M5 round version
 // 2/5/17	- Added a spacer for the center_pivot to allow it to rotate in the makerslide carriage plate
-// 8/19/19	- OpenSCAD 2018.06.01 for $preview
+// 8/19/19	- OpenSCAD 2018.06.01 for $preview, added 200x200 bed in preview
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -22,12 +22,13 @@ dia_625z = 16;	// diameter of a 625z
 layer = 0.2;	// printed layer thickness
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//z_pivots(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
-spacer_pivot(6);
+z_pivots(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+//spacer_pivot(6);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module z_pivots(Qty,Bearing=0,Round=1) {
+	if($preview) %translate([-40,-30,-5]) cubeX([200,200,5]);
 	for(i=[0:Qty-1]){
 		translate([0,i*45,15]) z_pivot_2040(Bearing,1);
 		if(Round)

@@ -6,8 +6,8 @@
 // 8/17/18	- dual filament setup using two Titan extruders on the x carridge, varibles and a couple of modules from
 //			  corxy-x-carridge.scad
 //			  Uses two stl files from https://www.thingiverse.com/thing:2065461
-//			  Fan mount (print two): SE_Titan_i3mk2_-_nozzle_fan_mount_radial_v1.2x.stl or
-//									 SE_Titan_i3mk2_-_nozzle_fan_mount_axial.stl
+//			  Print two of each for dual: SE_Titan_i3mk2_-_nozzle_fan_mount_radial_v1.2x.stl or
+//									 	  SE_Titan_i3mk2_-_nozzle_fan_mount_axial.stl
 //			  Titan mount (print two): SE_Titan_i3mk2_-_extruder_mount_v1.1.stl
 // 8/19/18	- Changed to Development Snapshot of OpenSCAD 2018.06.01 to be able to use $preview
 //			- Added a bowden setup for single or dual using the bowden setup from my CXY-MGNv2
@@ -39,7 +39,7 @@ module mountingblock(Qty=1,X=0,Y=0,Z=0,TMountholes=1) {
 		translate([X,Y,Z]) {
 			difference() {
 				translate([-5,-30,33])	bracketmount(TMountholes);
-				translate([25,-15,33]) i3mount();	// carriage mount is behind left titan
+				translate([25,-15,33]) CarriageMount();	// carriage mount is behind left titan
 			}
 		}
 	}
@@ -47,7 +47,7 @@ module mountingblock(Qty=1,X=0,Y=0,Z=0,TMountholes=1) {
 		translate([X,Y,Z]) {
 			difference() {
 				translate([-5,-30,33])	bracketmount(TMountholes);
-				translate([25,-6,33]) i3mount();	// carriage mount is behind left titan
+				translate([25,-6,33]) CarriageMount();	// carriage mount is behind left titan
 			}
 			translate([-5,28,33]) bracketmount();		
 			difference() {
@@ -77,7 +77,7 @@ module bracketmount(TMountholes) {
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module i3mount() { // four mounting holes for using a Prusa i3 style extruder
+module CarriageMount() { // four mounting holes for using a Prusa i3 style extruder
 	// lower
 	translate([mount_bolt_seperation/2,0,-5]) color("pink") cylinder(h = 18, r = screw4/2);
 	translate([-mount_bolt_seperation/2,0,-5]) color("black") cylinder(h = 18, r = screw4/2);
@@ -89,7 +89,7 @@ module i3mount() { // four mounting holes for using a Prusa i3 style extruder
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module titanbracket(Qty) {
+module titanbracket(Qty) {	// render fails on two of them
 	import("SE_Titan_i3mk2_-_extruder_mount_v1.1.stl");
 	if(Qty ==2) translate([0,58,0]) import("SE_Titan_i3mk2_-_extruder_mount_v1.1.stl");
 }

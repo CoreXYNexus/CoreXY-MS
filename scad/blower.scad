@@ -2,7 +2,7 @@
 // blower.scad - adapter for blower fan to an AL plate
 //////////////////////////////////////////////////////////////////////////
 // created 5/21/2016
-// last update 9/30/16
+// last update 8/20/18
 //////////////////////////////////////////////////////////////////////////
 // 6/29/16 Made fan mount a bit thicker
 // 7/19/16 Added adapter3() for corexy x-carriage extruder plate
@@ -11,6 +11,7 @@
 // 9/30/16 Added adapter for the titan extruder setup, some vars and modules are from
 //		   corexy-x-carriage.scad
 // 7/13/18 Added color to preview
+// 8/20/18 Removed unused code
 //////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>
@@ -44,78 +45,24 @@ screw_depth = 25;
 //////////////////////////////////////////////////////////////////////////
 
 titan_version();
+//titanDS_Bowden(2);
 
 ///////////////////////////////////////////////////////////////////////////
 module titan_version() {
-translate([0,-20,0])
+	translate([0,-20,0])
 	adaptertitan();
-translate([0,45,0])
+	translate([0,45,0])
 	adaptertitan2();
-translate([-15,0,0]) color("cyan") FanDuct();
-translate([-45,0,0]) color("red") FanDuct();
+	translate([-15,0,0]) color("cyan") FanDuct();
+	translate([-45,0,0]) color("red") FanDuct();
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-module adapter() {
-	difference() {
-		color("cyan") cube([Mwidth,Mheight,thickness]); 
-		ext_mount();
-	}
-	fanmount();
+module titanDS_Bowden(Qty=2) {  // make fan mounts for the bowden Daul hotend
 }
 
-module adapter2() {
-	difference() {
-		color("cyan") cube([Mwidth,Mheight,thickness]);
-		ext_mount();
-	}
-	fanmount2();
-}
-
-module fanmount() { // mount the blower
-	difference() {
-		translate([Mwidth/2-3,0,thickness]) color("cyan") cube([Fwidth,thickness,Fheight]);
-		translate([Mwidth/2,-1,Fheight-Fspace/2+1]) color("red") cube([Fspace,thickness+2,Fspace]);
-		translate([Mwidth/2-5,thickness/2,Fheight]) rotate([0,90,0]) color("black") cylinder(h=Fwidth*2,r=screw4/2,$fn=50);
-	}
-}
-
-module fanmount2() { // mount the blower
-	difference() {
-		translate([Mwidth/2-2.5,0,thickness]) color("cyan") cube([Fwidth,thickness,Fheight*2]);
-		translate([Mwidth/2,-1,Fheight+Fspace/2]) color("red") cube([Fspace,thickness+2,Fspace]);
-		translate([Mwidth/2-5,thickness/2,Fheight*2]) rotate([0,90,0]) color("blue") cylinder(h=Fwidth*2,r=screw4/2,$fn=50);
-		translate([Mwidth/2-5,thickness-1,Mheight-0.9]) rotate([-20,0,0]) color("black") cube([Fwidth+5,thickness,Fheight]);
-	}
-}
-
-module ext_mount() {
-	//mounting screw holes
-	translate([8,thickness+2,thickness/2]) rotate([90,0,0]) color("cyan") cylinder(h=20,r=screw3t/2,$fn=50);
-	translate([32,thickness+2,thickness/2]) rotate([90,0,0]) color("blue") cylinder(h=20,r=screw3t/2,$fn=50);
-}
-
-module adapter3() {
-	difference() {
-		color("cyan") cube([Mwidth3,Mheight3,thickness3]);
-		ext_mount3();
-	}
-	translate([6,7,0]) rotate([90,0,0]) fanmount3();
-}
-
-module ext_mount3() {	//mounting screw holes
-	translate([5,thickness3+2,thickness3/2]) rotate([90,0,0]) color("blue") cylinder(h=20,r=screw3/2,$fn=50);
-	translate([21,thickness3+2,thickness3/2]) rotate([90,0,0]) color("red") cylinder(h=20,r=screw3/2,$fn=50);
-}
-
-module fanmount3() { // mount the blower
-	difference() {
-		translate([Mwidth3/2+2,0,thickness3]) color("cyan") cube([Fwidth,thickness3*3.5,Fheight3*2.5]);
-		translate([Mwidth3/2+5,-1,Fheight3+1]) color("red") cube([Fspace,thickness3*3.5+2,Fspace*2]);
-		translate([Mwidth3/2-5,thickness3/2+14,Fheight3*2+6]) rotate([0,90,0]) color("black") cylinder(h=Fwidth*2,r=screw4/2,$fn=50);
-	}
-}
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 module adaptertitan() { // stepper motor side
 	translate([0,Mheight3,0]) rotate([0,0,180]) difference() {

@@ -55,7 +55,8 @@ FancapL.stl is for the power supply fan to make it blow to the side.
 
 Use your favorite coupler for the direct drive on the z axis, not needed for belt drive.
 
-Uses:	OpenSCAD 2018-06-01
+Uses:
+		OpenSCAD 2018-06-01
 
 		cubeX from http://www.thingiverse.com/thing:112008
 		
@@ -63,6 +64,6 @@ Uses:	OpenSCAD 2018-06-01
 		
 		configuration.scad, metric.scad, and functions.scad are from http://github.com/prusajr/PrusaMendel
 		
-		corner-tools.scad from ttps://www.myminifactory.com/it/object/3d-print-tools-for-fillets-and-chamfers-on-edges-and-corners-straight-and-or-round-45862 by Ewald Ikemann
+		corner-tools.scad from https://www.myminifactory.com/it/object/3d-print-tools-for-fillets-and-chamfers-on-edges-and-corners-straight-and-or-round-45862 by Ewald Ikemann
 
 		

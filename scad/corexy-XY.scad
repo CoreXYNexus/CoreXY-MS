@@ -46,8 +46,8 @@ all(1); // everything
 module all(Spacers) {	// all the parts as a plate
 	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true); // show the 200x200 bed
 	b_mount(0,Spacers);	// 1st arg: 0 - left, 1 - right; 2nd arg 0 - no bearing spacers; 1 - bearing spacers
-	translate([0,40,0])	b_mount(1,Spacers);
-	translate([40,0,0])	drillguide();
+	translate([0,-40,0])	b_mount(1,Spacers);
+	translate([40,-40,0])	drillguide();
 }
 
 //////////////////////////////////////////////////////////////////////////////////

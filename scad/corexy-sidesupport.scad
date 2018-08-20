@@ -38,7 +38,7 @@ all();
 //////////////////////////////////////////////////////////////////////////////
 
 module all() {
-	if($preview) %translate([0,0,-15]) cube([200,200,2],center=true);
+	if($preview) %translate([-20,0,-15]) cube([200,200,2],center=true);
 	translate([0,-10,0]) rotate([90,0,0]) // lay down for printing
 		MS_corner(1,0);
 	rotate([-90,0,0]) // lay down for printing
