@@ -44,22 +44,24 @@ servo_offset = 20; // adjust to move servo mount
 screw_depth = 25;
 //////////////////////////////////////////////////////////////////////////
 
-titan_version();
-//titanDS_Bowden(2);
+//titan_version();
+NewTitanDualBowden();
 
 ///////////////////////////////////////////////////////////////////////////
 module titan_version() {
-	translate([0,-20,0])
-	adaptertitan();
-	translate([0,45,0])
-	adaptertitan2();
+	translate([0,-20,-1.45]) adaptertitan();
+	translate([0,45,-1.45]) adaptertitan2();
 	translate([-15,0,0]) color("cyan") FanDuct();
 	translate([-45,0,0]) color("red") FanDuct();
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-module titanDS_Bowden(Qty=2) {  // make fan mounts for the bowden Daul hotend
+module NewTitanDualBowden() {  // make fan mounts for the bowden Daul hotend
+	translate([0,-20,-1.45]) adaptertitan();
+	translate([0,45,-1.45]) adaptertitan();
+	translate([-15,0,0]) color("cyan") FanDuct();
+	translate([-45,0,0]) color("red") FanDuct();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////

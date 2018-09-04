@@ -25,7 +25,7 @@
 // 12/18/16 - on the titan extruder plate, the titan was shifted towards the hotend side by 20mm to make the
 //			  adjusting screw easier to get to.  Also, began adding color to parts for easier editing.
 // 12/22/16 - changed z probe mounts and mounting for titan() extruder plate
-// 12/23/16 - cleaned up some code and fixed the screw hole sizes in prox_adapter & ir_adapter
+// 12/23/16 - cleaned up some code and fixed the screw hole sizes in prox_adapter() & iradapter()
 // 12/27/16 - fixed fan mount screw holes on titan()
 // 1/8/17	- changed side mounting holes of titan3(), shifted up to allow access to lower mouting holes when
 //			  assembled
@@ -104,7 +104,7 @@ module ExtruderMount(Ext,Sensor) {
 		// drill guide for using an AL plate instead of a printed one
 		rotate([0,0,90]) extruderplatedrillguide();
 	}
-	if(Ext == 2)  // extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
+	if(Ext == 2)  // Proximity
 		translate([5,5,0]) rotate([0,0,-90]) titan(Sensor);
 }
 
