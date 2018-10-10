@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dual_titan.scad - to mount two titans with a e3dv6 or two e3dv6 in bowden on the x carridge
 // created: 8/17/2018
-// last modified: 8/19/2018
+// last modified: 9/15/2018
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/17/18	- dual filament setup using two Titan extruders on the x carridge and a couple of modules from
 //			  corxy-x-carridge.scad
@@ -12,8 +12,10 @@
 // 8/19/18	- Changed to Development Snapshot of OpenSCAD 2018.06.01 to be able to use $preview
 //			- Added a bowden setup for single or dual using the bowden setup from my CXY-MGNv2
 // 8/23/18	- Redid titan_motor() supports; added sensor mounts
+// 9/15/18	- Added missing m4 screwholes and nut holders on dualmountblock()
+//			  Added just_extruders() and sensor_mount()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// For some reason OpenSCAD thinks the dual titan bowden may not be a valid 2-manifold, Slic3r PE doesn't
+// For some reason OpenSCAD thinks the dual titan bowden, in titan(), may not be a valid 2-manifold, Slic3r PE doesn't
 // Not printed as of 8/23/18
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <cxy-msv1_h.scad> // http://github.com/prusajr/PrusaMendel, which also uses functions.scad & metric.scad
@@ -24,19 +26,18 @@ $fn=50; // Compiling does take a while at 100, even with a 1950X, 32GB & 1080ti
 AdjustE3DV6_UD = 0; // move the e3dv groove mounts in opposite directions for the bowden setup
 					// if one of the hotends is 0.01 too high, then set AdjustE3DV6_UD by half: 0.005
 // these to be adjusted when it's finally printed:
-IR_Adapter_Length = 10; // set position of dc42's ir adapter
+IR_Adapter_Length = 10; // move position of dc42's ir adapter up/down
 Shift_BL_Touch = 10; // move bl_touch up/down
 Shift_Proximity = 10; // move proximity up/down
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//titan(2,1,4);  // first arg is quanity of 1 or 2, second arg is 0 no bowden, 1 for bowden (default is 1, no bowden, no sensor)
-			   // third arg is for sensor (0-ir,1=blt,2=blt recessed,3=proximity,4=none
-//		translate([5,5,0]) rotate([0,0,-90])
-//blt_mount(1);
-newtitan(3,0); // dual hotends that are closer together than the other
-			 // 1st arg is for sensor (0-ir,1=blt,2=blt recessed,3=proximity,4=none
-			 // 2nd arg: 0=no titan extruder mounts,1=titan extruder mounts
-
+//titan(2,1,4);	// first arg is quanity of 1 or 2, second arg is 0 no bowden, 1 for bowden (default is 1, no bowden, no sensor)
+				// third arg is for sensor (0-ir,1=blt,2=blt recessed,3=proximity,>=4-none
+newtitan(3,1);	// dual hotends that are closer together than the other version
+				// 1st arg is for sensor type (0-ir,1=blt,2=blt recessed,3=proximity,>=4-none
+				// 2nd arg: 0=no titan extruder mounts,1=titan extruder mounts
+//just_extruders(); // just the two titan extruder mounts
+//sensor_mount(0); // sensor mount only; arg is for sensor type (0-ir,1=blt,2=blt recessed,3=proximity,>=4-nothing
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module titan(Qty = 1,Bowden=0,Sensor=4) {
@@ -84,6 +85,12 @@ module dualmountingblock(Sensor,Extruders) {
 	difference() {
 		translate([-5,-30,33]) newbracketmount(0); // left side
 		translate([30,0,33]) NewCarriageMount();
+				// mounting screw holes and nuts for clamp
+		translate([7.5,-2.5,29]) rotate([0,0,90]) bowden_screws();
+		translate([7.5,-25,29]) rotate([0,0,90]) bowden_screws();
+		translate([0.5,-13,31]) color("blue") nut(m4_nut_diameter,5);
+		translate([0.5,10,31]) color("plum") nut(m4_nut_diameter,5);
+		translate([0.5,32,31]) color("red") nut(m4_nut_diameter,5);
 	}
 	Newtitanbowden(2,Sensor,Extruders);
 }
@@ -197,7 +204,15 @@ module Newtitanbowden(Dual=2,Sensor=0,Extruders) { // defaults to two bowden hot
 		Newe3dv6_bowden_single(Sensor);
 	}
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module just_extruders() {
+	translate([-5,-90,-20]) bowden_titan();  // Titan extruder frame mount
+	translate([-5,-90,40]) bowden_titan();  // Titan extruder frame mount
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module titanbowden(Dual=2,Sensor=0) { // defaults to two bowden hotends
 	if(Dual == 2) { // two bowden hotends
@@ -273,7 +288,7 @@ module Newe3dv6_bowden(Adjust=0,Sensor=0) {
 	if(Sensor==2) translate([-5,10,20]) rotate([0,90,0]) blt_mount(0,Shift_BL_Touch);
 	if(Sensor==3) translate([-5,10,20]) rotate([0,90,0]) prox_mount(Shift_Proximity);
 		
-	translate([1.85,0,0]) difference() {
+	translate([-85,0,85]) rotate([0,90,0]) difference() {
 		union() {
 			difference() {
 				translate([6,-4.5,80]) rotate([0,0,90]) bowden_clamp(-Adjust);
@@ -291,6 +306,15 @@ module Newe3dv6_bowden(Adjust=0,Sensor=0) {
 			translate([64,0,3.5]) color("cyan") cylinder(h=25,d=screw3t);
 		}
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module sensor_mount(Sensor) {
+	if(Sensor==0) iradapter2(IR_Adapter_Length);
+	if(Sensor==1) rotate([0,90,0]) blt_mount(1,Shift_BL_Touch);
+	if(Sensor==2) rotate([0,90,0]) blt_mount(0,Shift_BL_Touch);
+	if(Sensor==3) rotate([0,90,0]) prox_mount(Shift_Proximity);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -376,12 +400,12 @@ module bowden_clamp(Adjust=0) {
 
 module bowden_titan(Screw=screw4) { // platform for e3d titan
 	difference() {
-		cubeX([40,54,5],2); // extruder side
-		translate([20,28,-10]) cylinder(h=20,d=20,$fn=100); // remove some plastic under the motor
-		translate([10,10,-1]) cylinder(h=20,d=Screw,$fn=100); // mounting screw hole
-		translate([30,10,-1]) cylinder(h=20,d=Screw,$fn=100); // mounting screw hole
-		translate([10,45,-1]) cylinder(h=20,d=Screw,$fn=100); // mounting screw hole
-		translate([30,45,-1]) cylinder(h=20,d=Screw,$fn=100); // mounting screw hole
+		color("cyan") cubeX([40,54,5],2); // extruder side
+		translate([20,28,-10]) color("blue") cylinder(h=20,d=20,$fn=100); // remove some plastic under the motor
+		translate([10,10,-1]) color("red") cylinder(h=20,d=Screw,$fn=100); // mounting screw hole
+		translate([30,10,-1]) color("white") cylinder(h=20,d=Screw,$fn=100); // mounting screw hole
+		translate([10,45,-1]) color("gray") cylinder(h=20,d=Screw,$fn=100); // mounting screw hole
+		translate([30,45,-1]) color("black") cylinder(h=20,d=Screw,$fn=100); // mounting screw hole
 	}
 	translate([0,1,1]) rotate([90,0,90]) titanmotor(5+shifttitanup);
 }
@@ -390,8 +414,8 @@ module bowden_titan(Screw=screw4) { // platform for e3d titan
 
 module titanmotor(ShiftUp=0) {
 	difference() {	// motor mounting holes
-		translate([-1,0,0]) cubeX([54,50+ShiftUp,5],2);
-		translate([25,25+ShiftUp,-1]) rotate([0,0,45])  NEMA17_x_holes(8, 2);
+		translate([-1,0,0]) color("plum") cubeX([54,50+ShiftUp,5],2);
+		translate([25,25+ShiftUp,-1]) rotate([0,0,45]) color("gray") NEMA17_x_holes(8, 2);
 	}
 	difference() { // front support
 		translate([-1,19,-46]) rotate([56,0,0]) color("red") cubeX([4,60,63],2);
