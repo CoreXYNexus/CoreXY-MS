@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Corexy-x-carriage - x carriage for makerslide and vertical x-axis with 8mm rods
 // created: 2/3/2014
-// last modified: 8/19/2018
+// last modified: 12/8/2018
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to makerslide carriage and put it into a seperate module
@@ -34,8 +34,13 @@
 //			  and fixed the rear support to be rounded in titan() and removed some unecessary code
 //			  added rounded hole under motor to titan3() and fixed mounting holes
 // 7/12/18	- Noticed the plate was not setup for a 200x200 bed
-// 8/19/18	- Dual Titabnmountis in DualTitan.scad, OpenSCAD 2018.06.01 for $preview
+// 8/19/18	- Dual Titabnmount is in DualTitan.scad, OpenSCAD 2018.06.01 for $preview, which is used to make sure
+//			  a 200x200 bed can print multiple parts.
 // 8/20/18	- Added a carridge and belt only for DualTitan.scad, redid the modules for the other setups
+// 12/8/18	- Changed belt clamp from adjusting type to solid (stepper motors are adjustable)
+//			  Added preview color to belt modules
+//			  Added x-carriage belt drive loop style
+// 12/10/18	- Edited carriage() and carriagebelt() to not use center=true for the cubeX[]
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -46,13 +51,10 @@
 // Extruder plate use ABS or better if you have a hotend that gets hot at it's mounting.
 // for example: using an E3DV6, PLA will work fine, since it doesn't get hot at the mount.
 // ---------------------------------------------------------
-// Each belt holder uses 3 3x25mm screws and 3 3mm nuts
-// Put round one on the screws first, followed by the slotted one, then it mount on the holder.
-// One screw & nut in the adjuster hole, screw head pointing to front, belt anvil on nut side.
-// Left side use lower adjuster hole
-// Right side use upper adjuster hole
-// Assemble both belt clamps before mounting on x-carriage, leave loose enough to install belts
+// Belt clamp style: Assemble both belt clamps before mounting on x-carriage, leave loose enough to install belts
 // The four holes on top are for mounting an endstopMS.scad holder, tap them with a 5mm tap.
+// ---------------------------------------------------------
+// For the loop belt style: tap holes for 3mm and mount two belt holders, it's in belt_holder.scad
 //----------------------------------------------------------
 // If the extruder plate is used with an 18mm proximity sensor, don't install the center mounting screw, it gets
 // in the way of the washer & nut.
@@ -69,33 +71,37 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <cxy-msv1_h.scad>
 $fn=50;
+TestLoop=1; // have original belt clamp mount hole visible
+LoopHoleOffset=28;	// distance between the belt lopp mounting holes (same as in belt_holder.scad)
+LoopHOffset=0;		// shift horizontal the belt loop mounting holes
+LoopVOffset=-2;		// shift vertical the belt loop mounting holes
 // NOTE: there are some variables defined right before titan()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //partial();
-FCarridgeWithBeltandClamps();
-//RCarridgeBeltClamps();
-//ExtruderMount(2,3);
+FrontCarridge(0,1);  // 1st:0-no clamps,1-clamps;2nd:clamps style,2-belt loop style
+//RearCarridge(0,1); // 1st:0-no clamps,1-clamps;2nd:clamps style,2-belt loop style
+//ExtruderPlateMount(2,2);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module FCarridgeWithBeltandClamps() {
-	if($preview) %translate([0,0,-5]) cube([200,200,1],center=true);
-	translate([-20,10,0]) carriage(0);		// makerslide x-carriage
-	translate([-20,-80,-4]) belt(); 		// x-carriage belt attachment with the clamps
+module FrontCarridge(Clamps=1,Loop=0) {
+	if($preview) %translate([-100,-100,-1]) cube([200,200,1]);
+	translate([-40,0,0]) carriage(0);			// makerslide x-carriage
+	translate([-10,-50,0]) belt(Clamps,Loop);  // x-carriage belt attachment
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module RCarridgeBeltClamps() {
-	if($preview) %translate([0,0,-5]) cube([200,200,1],center=true);
-	translate([-30,20,0]) carriagebelt(1);
-	translate([-10,-50,0]) rotate([0,0,90]) carriage(1);		// makerslide x-carriage
+module RearCarridge(Clamps=1,Loop=0) {
+	if($preview) %translate([-100,-100,-1]) cube([200,200,1]);
+	translate([10,-40,0]) carriagebelt(Clamps,Loop);
+	translate([-80,-40,0]) carriage(1,0); // makerslide x-carriage
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-module ExtruderMount(Ext,Sensor) {
-	if($preview) %translate([0,0,-5]) cube([200,200,1],center=true);
+module ExtruderPlateMount(Ext=0,Sensor=0) {
+	if($preview) %translate([-100,-100,-5]) cube([200,200,1]);
 	if(Ext == 0)
 		extruder(Sensor);	// for BLTouch: 0 = top mounting through hole, 1 - bottom mount in recess
 							// 2 - proximity sensor hole in psensord size
@@ -111,11 +117,13 @@ module ExtruderMount(Ext,Sensor) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module partial() {
+	//if($preview) %translate([-100,-100,-1]) cube([200,200,1]); // parts may not be on the preview plate
 	//carriage(1,0);	// makerslide x-carriage, set arg to 1 for a titan thumbwheel notch,
 					// second arg to shift notch (-# towards center)
 	//extruder(4);	// for BLTouch: 0 & 1, 2 is proximity, 3 is dc42 ir sensor, 4- none
-	//belt(); 		// x-carriage belt attachment with the clamps
-	//belt_drive();	// x-carriage belt attachment only
+	belt(0,1); 		// x-carriage belt attachment with the clamps
+	//belt(1,0); 		// x-carriage belt attachment with the clamps
+	//belt_drive(0);	// x-carriage belt attachment only
 	//extruderplatedrillguide();	// drill guide for using an AL plate instead of a printed one
 	//wireclamp();
 	//carriagebelt(1);
@@ -130,45 +138,49 @@ module partial() {
 
 module carriage(Titan=0,Tshift=0) { // wheel side
 	difference() {
-		color("cyan") cubeX([width,height,wall],radius=2,center=true); // makerslide side
-		notch_bottom();	// remove space used by extruder plate
+		color("cyan") cubeX([width,height,wall],radius=2); // makerslide side
+		notch_bottom();	// square bottom for an extruder plate
 		// wheel holes
-		color("red") hull() { // bevel the countersink to get easier access to adjuster
-			translate([0,tri_sep/2,-1]) cylinder(h = depth+10,r = screw_hd/2,$fn=50);
+		translate([width/2,42,0]) color("red") hull() { // bevel the countersink to get easier access to adjuster
+			translate([0,tri_sep/2,3]) cylinder(h = depth+10,r = screw_hd/2,$fn=50);
 			translate([0,tri_sep/2,10]) cylinder(h = depth,r = screw_hd/2+11,$fn=50);
 		}
-		translate([0,tri_sep/2,-10]) color("blue") cylinder(h = depth+10,r = adjuster/2,$fn=50);
-		translate([dual_sep/2,-tri_sep/2,-10]) color("yellow") cylinder(h = depth+10,r = screw/2,$fn=50);
-		translate([-dual_sep/2,-tri_sep/2,-10]) color("purple") cylinder(h = depth+10,r = screw/2,$fn=50);
-		translate([dual_sep/2,-tri_sep/2,0]) color("gray") cylinder(h = depth+10,r = screw_hd/2,$fn=50);
-		translate([-dual_sep/2,-tri_sep/2,0]) color("green") cylinder(h = depth+10,r = screw_hd/2,$fn=50);
-		color("red") hull() { // side notch
+		translate([width/2,42,0]) {
+			translate([0,tri_sep/2,-10]) color("blue") cylinder(h = depth+10,r = adjuster/2,$fn=50);
+			translate([dual_sep/2,-tri_sep/2,-10]) color("yellow") cylinder(h = depth+10,r = screw/2,$fn=50);
+			translate([-dual_sep/2,-tri_sep/2,-10]) color("purple") cylinder(h = depth+10,r = screw/2,$fn=50);
+			translate([dual_sep/2,-tri_sep/2,3]) color("gray") cylinder(h = depth+10,r = screw_hd/2,$fn=50);
+			translate([-dual_sep/2,-tri_sep/2,3]) color("green") cylinder(h = depth+10,r = screw_hd/2,$fn=50);
+		}
+		translate([38,45,2]) color("red") hull() { // side notch
 			translate([width/2-9,height,-5]) cylinder(h = wall+5, r = 10,$fn=50);
 			translate([width/2-9,-height/8,-5]) cylinder(h = wall+5, r = 10,$fn=50);
 			translate([width/2,height,-5]) cylinder(h = wall+5, r = 10,$fn=50);
 			translate([width/2,-height/8,-5]) cylinder(h = wall+5, r = 10,$fn=50);
 		}
-		color("black") hull() { // side notch
+		translate([38,45,2]) color("black") hull() { // side notch
 			translate([-(width/2-9),height,-5]) cylinder(h = wall+5, r = 10,$fn=50);
 			translate([-(width/2-9),-height/8,-5]) cylinder(h = wall+5, r = 10,$fn=50);
 			translate([-(width/2),height,-5]) cylinder(h = wall+5, r = 10,$fn=50);
 			translate([-(width/2),-height/8,-5]) cylinder(h = wall+5, r = 10,$fn=50);
 		}
-		color("cyan") hull() { // reduce usage of filament
+		//if(Titan) translate([20-Tshift,50,5]) color("yellow") cylinder(h=5,d=20,$fn=100); // Titan thumbwheel notch
+		translate([38,37,2]) color("gray") hull() { // reduce usage of filament
 			translate([0,height/8,-wall]) cylinder(h = wall+10, r = 6,$fn=50);
 			translate([0,-height/4,-wall]) cylinder(h = wall+10, r = 6,$fn=50);
 		}
-		if(Titan) translate([-20-Tshift,10,2]) color("yellow") cylinder(h=5,d=20,$fn=100); // Titan thumbwheel notch
 		// screw holes to mount extruder plate
-		translate([0,-20,0]) rotate([90,0,0]) color("red") cylinder(h = 25, r = screw2/2, $fn = 50);
-		translate([width/2-5,-20,0]) rotate([90,0,0]) color("blue") cylinder(h = 25, r = screw2/2, $fn = 50);
-		translate([-(width/2-5),-20,0]) rotate([90,0,0]) color("black") cylinder(h = 25, r = screw2/2, $fn = 50);
-		translate([width/4-2,-20,0]) rotate([90,0,0]) color("purple") cylinder(h = 25, r = screw2/2, $fn = 50);
-		translate([-(width/4-2),-20,0]) rotate([90,0,0]) color("gray") cylinder(h = 25, r = screw2/2, $fn = 50);
-		// screw holes in top (alternate location for a belt holder)
-		translate([width/4-5,height/2+2,0]) rotate([90,0,0]) color("red") cylinder(h = 25, r = screw2/2, $fn = 50);
-		translate([-(width/4-5),height/2+2,0]) rotate([90,0,0]) color("blue") cylinder(h = 25, r = screw2/2, $fn = 50);
-		color("red") CarridgeMount(); // mounting holes for a Prusa i3 style extruder
+		translate([38,45,4]) {
+			translate([0,-15,0]) rotate([90,0,0]) color("red") cylinder(h = 35, r = screw2/2, $fn = 50);
+			translate([width/2-5,-15,0]) rotate([90,0,0]) color("blue") cylinder(h = 35, r = screw2/2, $fn = 50);
+			translate([-(width/2-5),-15,0]) rotate([90,0,0]) color("black") cylinder(h = 35, r = screw2/2, $fn = 50);
+			translate([width/4-2,-15,0]) rotate([90,0,0]) color("purple") cylinder(h = 35, r = screw2/2, $fn = 50);
+			translate([-(width/4-2),-15,0]) rotate([90,0,0]) color("gray") cylinder(h = 35, r = screw2/2, $fn = 50);
+			// screw holes in top (alternate location for a belt holder)
+			translate([width/4-5,height/2+2,0]) rotate([90,0,0]) color("red") cylinder(h = 25, r = screw2/2, $fn = 50);
+			translate([-(width/4-5),height/2+2,0]) rotate([90,0,0]) color("blue") cylinder(h = 25, r = screw2/2, $fn = 50);
+			CarridgeMount(); // mounting holes for a Prusa i3 style extruder
+		}
 	}
 }
 
@@ -280,88 +292,117 @@ module extruder(recess=0) // bolt-on extruder platform, works for either makersl
 
 module notch_bottom()
 {
-	translate([0,-height/2,-0.5]) cube([width+1,wall,wall+2], true);
+	translate([38,-2,4]) cube([width+1,wall,wall+2], true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module belt_drive()	// corexy
+module belt_drive(Loop=0)	// corexy
 {
 	difference() {	// base
-		translate([-3,-0,0]) cubeX([47,40,wall],2);
-		hull() {	// nut slot
-			translate([-4,belt_adjust,8]) rotate([0,90,0]) nut(m3_nut_diameter,14); // make room for nut
-			translate([-4,belt_adjust,4]) rotate([0,90,0]) nut(m3_nut_diameter,14); // make room for nut
+		translate([-3,-0,0]) color("cyan") cubeX([47,40,wall],2);
+		if(!Loop) {
+			hull() {	// belt clamp nut access slot
+				translate([-4,belt_adjust,8]) rotate([0,90,0]) color("red") nut(m3_nut_diameter,14); // make room for nut
+				translate([-4,belt_adjust,4]) rotate([0,90,0]) color("blue") nut(m3_nut_diameter,14); // make room for nut
+			}
+			color("gray") hull() {	// belt clamp nut access slot
+				translate([31,belt_adjust,8]) rotate([0,90,0]) nut(m3_nut_diameter,14);
+				translate([31,belt_adjust,4]) rotate([0,90,0]) nut(m3_nut_diameter,14);
+			}
 		}
-		hull() {	// nut slot
-			translate([31,belt_adjust,8]) rotate([0,90,0]) nut(m3_nut_diameter,14);
-			translate([31,belt_adjust,4]) rotate([0,90,0]) nut(m3_nut_diameter,14);
-		}
-		// mounting screw holes
-		translate([6,wall/2,-1]) rotate([0,0,0]) cylinder(h = 15, r = screw3/2, $fn = 50);
-		translate([6+(width/4+8.5),wall/2,-1]) rotate([0,0,0]) cylinder(h = 15, r = screw3/2, $fn = 50);
-		hull() {
-			translate([21,16,-5]) cylinder(h= 20, r = 8,$fn=50); // access to the top screw
+		// mounting screw holes to x-carriage plate
+		translate([6,wall/2,-1]) rotate([0,0,0]) color("blue") cylinder(h = 15, r = screw3/2, $fn = 50);
+		translate([6+(width/4+8.5),wall/2,-1]) rotate([0,0,0]) color("black") cylinder(h = 15, r = screw3/2, $fn = 50);
+		color("white") hull() { // plastic reduction
+			translate([21,16,-5]) cylinder(h= 20, r = 8,$fn=50);
 			translate([21,25,-5]) cylinder(h= 20, r = 8,$fn=50);
 		}
-		translate([4,13,-5]) cylinder(h= 20, r = screw5t/2,$fn=50); // mounting holes for an endstop holder
-		translate([4,33,-5]) cylinder(h= 20, r = screw5t/2,$fn=50);
-		translate([37,13,-5]) cylinder(h= 20, r = screw5t/2,$fn=50);
-		translate([37,33,-5]) cylinder(h= 20, r = screw5t/2,$fn=50);
+		 // mounting holes for an endstop holder
+		translate([4,13,-5]) color("khaki") cylinder(h= 20, r = screw5t/2,$fn=50);
+		translate([4,33,-5]) color("plum") cylinder(h= 20, r = screw5t/2,$fn=50);
+		translate([37,13,-5]) color("gold") cylinder(h= 20, r = screw5t/2,$fn=50);
+		translate([37,33,-5]) color("red") cylinder(h= 20, r = screw5t/2,$fn=50);
 	}
 	difference() {	// right wall
-		translate([-wall/2-1,0,0]) cubeX([wall-2,40,29],2);
-		translate([-wall/2-2,belt_adjust,27]) rotate([0,90,0]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([-wall/2-2,belt_adjust,4]) rotate([0,90,0]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([-0.5,belt_adjust,27]) rotate([0,90,0]) nut(m3_nut_diameter,3);
-		translate([-0.5,belt_adjust,4]) rotate([0,90,0]) nut(m3_nut_diameter,3);
+		translate([-wall/2-1,0,0]) color("yellow") cubeX([wall-2,40,29],2);
+		if(!Loop) {
+			translate([-wall/2-2,belt_adjust,27]) rotate([0,90,0]) color("red") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			translate([-wall/2-2,belt_adjust,4]) rotate([0,90,0]) color("cyan") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			translate([-0.5,belt_adjust,27]) rotate([0,90,0]) color("blue") nut(m3_nut_diameter,3);
+			translate([-0.5,belt_adjust,4]) rotate([0,90,0]) color("gray") nut(m3_nut_diameter,3);
+		} else beltloopholder();
+		if(TestLoop) // add one of belt clamp holes for adjusting the belt loop holder mounting holes
+				translate([-wall/2-2,belt_adjust,4]) rotate([0,90,0]) color("cyan") cylinder(h = 2*wall, r = screw3/2,$fn=50);
 	}
-	beltbump(0);
+	if(!Loop) beltbump(0);
 	difference() {	// left wall
-		translate([36+wall/2,0,0]) cubeX([wall-2,40,29],2);
-		translate([32,belt_adjust,4]) rotate([0,90,0]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([32,belt_adjust,27]) rotate([0,90,0]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([38.5,belt_adjust,4]) rotate([0,90,0]) nut(m3_nut_diameter,3);
-		translate([32,belt_adjust,27]) rotate([0,90,0]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([38.5,belt_adjust,27]) rotate([0,90,0]) nut(m3_nut_diameter,3);
+		translate([36+wall/2,0,0]) color("pink") cubeX([wall-2,40,29],2);
+		if(!Loop) {
+			translate([32,belt_adjust,4]) rotate([0,90,0]) color("red") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			translate([32,belt_adjust,27]) rotate([0,90,0]) color("cyan") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			translate([38.5,belt_adjust,4]) rotate([0,90,0]) color("blue") nut(m3_nut_diameter,3);
+			translate([38.5,belt_adjust,27]) rotate([0,90,0]) color("gray") nut(m3_nut_diameter,3);
+		} else {
+			translate([32,belt_adjust,27]) rotate([0,90,0]) color("black") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			beltloopholder();
+		}
 	}
 	difference() {	// rear wall - adds support to walls holding the belts
-		translate([-wall/2+1,42-wall,0]) cubeX([47,wall-2,belt_adjust],2);
-		translate([4,33,-5]) cylinder(h= 25, r = screw5/2,$fn=50);	// clearance for endstop screws
-		translate([37,33,-5]) cylinder(h= 25, r = screw5/2,$fn=50);
+		translate([-wall/2+1,42-wall,0]) color("gray") cubeX([47,wall-2,belt_adjust],2);
+		translate([4,33,-5]) color("blue") cylinder(h= 25, r = screw5/2,$fn=50);	// clearance for endstop screws
+		translate([37,33,-5]) color("red") cylinder(h= 25, r = screw5/2,$fn=50);
+		if(Loop) beltloopholder();
 	}
-	beltbump(1);
+	if(!Loop) beltbump(1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+module beltloopholder() { // for beltholder.scad
+	// pink side
+	translate([35,10+LoopHOffset,17+LoopVOffset]) rotate([0,90,0])
+		color("black") cylinder(h = 2*wall, r = screw3t/2,$fn=50);
+	translate([35,4+LoopHoleOffset+LoopHOffset,17+LoopVOffset]) rotate([0,90,0])
+		color("white") cylinder(h = 2*wall, r = screw3t/2,$fn=50);
+	// yellow side
+	translate([-10,10+LoopHOffset,17+LoopVOffset]) rotate([0,90,0])
+		color("plum") cylinder(h = 2*wall, r = screw3t/2,$fn=50);
+	translate([-10,4+LoopHoleOffset+LoopHOffset,17+LoopVOffset]) rotate([0,90,0])
+		color("gray") cylinder(h = 2*wall, r = screw3t/2,$fn=50);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 module beltbump(Bump) { // add a little plastic at the belt clamp screw holes at the edge
 	if(Bump) {
 		difference() {	
-			translate([40,belt_adjust,27]) rotate([0,90,0]) cylinder(h = wall-2, r = screw3+0.5,$fn=50);
-			translate([32,belt_adjust,27]) rotate([0,90,0]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-			translate([38.5,belt_adjust,27]) rotate([0,90,0]) nut(m3_nut_diameter,3);
+			translate([40,belt_adjust,27]) rotate([0,90,0]) color("cyan") cylinder(h = wall-2, r = screw3+0.5,$fn=50);
+			translate([32,belt_adjust,27]) rotate([0,90,0]) color("red") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			translate([38.5,belt_adjust,27]) rotate([0,90,0]) color("gray") nut(m3_nut_diameter,3);
 		}
 	} else {
 		difference() {	
-			translate([-wall/2-1,belt_adjust,27]) rotate([0,90,0]) cylinder(h = wall-2, r = screw3+0.5,$fn=50);
-			translate([-wall/2-2,belt_adjust,27]) rotate([0,90,0]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-			translate([-0.5,belt_adjust,27]) rotate([0,90,0]) nut(m3_nut_diameter,3);
+			translate([-wall/2-1,belt_adjust,27]) rotate([0,90,0]) color("cyan") cylinder(h = wall-2, r = screw3+0.5,$fn=50);
+			translate([-wall/2-2,belt_adjust,27]) rotate([0,90,0]) color("red") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			translate([-0.5,belt_adjust,27]) rotate([0,90,0]) color("gray") nut(m3_nut_diameter,3);
 		}
 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module belt() // belt mount plate or if MkrSld: top plate
+module belt(Clamps=0,Loop=0) // belt mount plate - loop or clamps
 {
-	belt_drive();
-	translate([52,0,3.5]) belt_roundclamp();
-	translate([60,0,-0.5]) belt_adjuster();
-	translate([75,0,4]) belt_anvil();
-	translate([52,35,3.5]) belt_roundclamp();
-	translate([60,35,-0.5]) belt_adjuster();
-	translate([75,35,4]) belt_anvil();
+	belt_drive(Loop);
+	if(Clamps && !Loop) {
+		translate([60,0,-0.5]) belt_adjuster();
+		translate([60,35,-0.5]) belt_adjuster();
+		translate([52,0,3.5]) belt_roundclamp();
+		translate([75,0,4]) belt_anvil();
+		translate([52,35,3.5]) belt_roundclamp();
+		translate([75,35,4]) belt_anvil();
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -369,18 +410,23 @@ module belt() // belt mount plate or if MkrSld: top plate
 module belt_adjuster()
 {
 	difference() {
-		minkowski() {
-			translate([0,0,-wall/2+4.5]) cube([8,30,9]);
-			cylinder(h = 1,r = 1,$fn=50);
-		}
-		translate([-1.5,5.5,9]) cube([11,7,3.5]);
-		translate([-1.5,16.5,9]) cube([11,7,3.5]);
-		translate([4,3,-5]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([4,26,-5]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([-5,9,4.5]) rotate([0,90,0]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([-2,9,4.5]) rotate([0,90,0]) nut(m3_nut_diameter,3);
-		translate([-5,20,4.5]) rotate([0,90,0]) cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([7,20,4.5]) rotate([0,90,0]) nut(m3_nut_diameter,3);
+		translate([-1,0,0]) color("blue") cubeX([9,30,9],2);
+		translate([-1.5,5.5,7]) color("red") cube([11,7,3.5]);
+		translate([-1.5,16.5,7]) color("cyan") cube([11,7,3.5]);
+		translate([4,3,-5]) color("white") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+		translate([4,26,-5]) color("plum") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+		translate([-5,9,4.5]) rotate([0,90,0]) color("gray") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+		translate([-2,9,4.5]) rotate([0,90,0]) color("black") nut(m3_nut_diameter,3);
+		translate([-5,20,4.5]) rotate([0,90,0]) color("khaki") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+		translate([7,20,4.5]) rotate([0,90,0]) color("gold") nut(m3_nut_diameter,3);
+	}
+}
+
+module belt_adjuster_captive() {
+	difference() {
+		translate([-1,0,0]) color("blue") cubeX([9,30,9],2);
+		translate([4,3,-5]) color("white") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+		translate([4,26,-5]) color("plum") cylinder(h = 2*wall, r = screw3/2,$fn=50);
 	}
 }
 
@@ -411,11 +457,11 @@ module belt_roundclamp() // something round to let the belt smoothly move over w
 
 module CarridgeMount() { // four mounting holes for using seperate mounting extruder brcket
 	// lower
-	translate([mount_seperation/2,-height/4 + mount_height,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
-	translate([-mount_seperation/2,-height/4+ mount_height,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
+	translate([mount_seperation/2,-height/4 + mount_height,-5]) color("black") cylinder(h = wall+10, r = screw4/2,$fn = 50);
+	translate([-mount_seperation/2,-height/4+ mount_height,-5]) color("blue") cylinder(h = wall+10, r = screw4/2,$fn = 50);
 	// upper
-	translate([mount_seperation/2,-height/4 + mount_height + mount_seperation,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
-	translate([-mount_seperation/2,-height/4+ mount_height + mount_seperation,-5]) cylinder(h = wall+10, r = screw4/2,$fn = 50);
+	translate([mount_seperation/2,-height/4 + mount_height + mount_seperation,-5]) color("red") cylinder(h = wall+10, r = screw4/2,$fn = 50);
+	translate([-mount_seperation/2,-height/4+ mount_height + mount_seperation,-5]) color("plum") cylinder(h = wall+10, r = screw4/2,$fn = 50);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -477,17 +523,20 @@ module block_mount(Taller=0) // mounting screw holes for the ir sensor
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module carriagebelt(Clamps=0) {
-	rotate([0,180,0]) {
-		difference() { // back side carriage
-			translate([0,3,0]) color("cyan") cubeX([width,height+3,wall],radius=2,center=true); // makerslide side
-			// wheel holes
+module carriagebelt(Clamps=0,Loop=0) {
+	difference() { // back side carriage
+		color("cyan") cubeX([width,height+3,wall],2); // makerslide side
+		translate([38,45,2]) { // wheel holes
 			translate([0,tri_sep/2,-1]) color("red") cylinder(h = depth+10,r = screw_hd/2,$fn=50);
 			translate([0,tri_sep/2,-10]) color("black") cylinder(h = depth+10,r = adjuster/2,$fn=50);
 			translate([dual_sep/2,-tri_sep/2,-10]) color("yellow") cylinder(h = depth+10,r = screw/2,$fn=50);
 			translate([-dual_sep/2,-tri_sep/2,-10]) color("blue") cylinder(h = depth+10,r = screw/2,$fn=50);
 			translate([dual_sep/2,-tri_sep/2,0]) color("purple") cylinder(h = depth+10,r = screw_hd/2,$fn=50);
 			translate([-dual_sep/2,-tri_sep/2,0]) color("gray") cylinder(h = depth+10,r = screw_hd/2,$fn=50);
+			// hole supports
+			translate([0,tri_sep/2,-1]) color("red") cylinder(h = layer,r = screw_hd/2,$fn=50);
+			translate([dual_sep/2,-tri_sep/2,0]) color("black") cylinder(h = layer,r = screw_hd/2,$fn=50);
+			translate([-dual_sep/2,-tri_sep/2,0]) color("gray") cylinder(h = layer,r = screw_hd/2,$fn=50);
 			color("blue") hull() { // side notch
 				translate([width/2-6,height,-5]) cylinder(h = wall+5, r = 10,$fn=50);
 				translate([width/2-6,-height/8,-5]) cylinder(h = wall+5, r = 10,$fn=50);
@@ -505,62 +554,73 @@ module carriagebelt(Clamps=0) {
 				translate([0,-height/4,-wall]) cylinder(h = wall+10, r = 6,$fn=50);
 			}
 		}
-		// hole supports
-		translate([0,tri_sep/2,-1]) color("red") cylinder(h = layer,r = screw_hd/2,$fn=50);
-		translate([dual_sep/2,-tri_sep/2,0]) color("black") cylinder(h = layer,r = screw_hd/2,$fn=50);
-		translate([-dual_sep/2,-tri_sep/2,0]) color("gray") cylinder(h = layer,r = screw_hd/2,$fn=50);
 	}
-	difference() {
-		translate([20.5,53,36]) rotate([90,180,0]) belt_drive2();	// x-carriage belt attachment only
+	translate([38,45,2]) difference() {
+		translate([20.5,53,36]) rotate([90,180,0]) belt_drive2(Loop);	// x-carriage belt attachment only
 		translate([0,tri_sep/2,-10]) color("blue") cylinder(h = depth+10,r = adjuster/2,$fn=50);
-			rotate([0,180,0]) translate([0,tri_sep/2,-1]) color("gray") cylinder(h = depth+10,r = screw_hd/2,$fn=50);
+		rotate([0,180,0]) translate([0,tri_sep/2,-1]) color("gray") cylinder(h = depth+10,r = screw_hd/2,$fn=50);
 	}
-	if(Clamps) belt2();
+	if(Clamps && !Loop) translate([38,45,2]) belt2(Loop);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module belt_drive2()	// corexy
+module belt_drive2(Loop=0)	// corexy
 {
 	difference() {	// base
-		translate([-3,-10,0]) color("red") cubeX([47,50,wall],2);
-		color("blue") hull() {	// nut slot
-			translate([-4,belt_adjust-10,8]) rotate([0,90,0]) nut(m3_nut_diameter,14); // make room for nut
-			translate([-4,belt_adjust-10,4]) rotate([0,90,0]) nut(m3_nut_diameter,14); // make room for nut
+		translate([-3,-10,0]) color("red") cubeX([47,50,wall],2); // base (top)
+		if(!Loop) {
+			color("blue") hull() {	// belt clamp nut access slot
+				translate([-4,belt_adjust-10,8]) rotate([0,90,0]) nut(m3_nut_diameter,14); // make room for nut
+				translate([-4,belt_adjust-10,4]) rotate([0,90,0]) nut(m3_nut_diameter,14); // make room for nut
+			}
+			color("purple") hull() {	// belt clamp nut access slot
+				translate([31,belt_adjust-10,8]) rotate([0,90,0]) nut(m3_nut_diameter,14);
+				translate([31,belt_adjust-10,4]) rotate([0,90,0]) nut(m3_nut_diameter,14);
+			}
 		}
-		color("purple") hull() {	// nut slot
-			translate([31,belt_adjust-10,8]) rotate([0,90,0]) nut(m3_nut_diameter,14);
-			translate([31,belt_adjust-10,4]) rotate([0,90,0]) nut(m3_nut_diameter,14);
-		}
-		// mounting screw holes
+		// mounting screw holes to x-carriage plate
 		translate([7,wall/2-10,-1]) rotate([0,0,0]) color("gray") cylinder(h = 15, r = screw3/2, $fn = 50);
 		translate([7+(width/4+8.5),wall/2-10,-1]) rotate([0,0,0]) color("black") cylinder(h = 15, r = screw3/2, $fn = 50);
-		color("cyan") hull() {
-			translate([21,6,-5]) cylinder(h= 20, r = 8,$fn=50); // access to the top screw
+		color("cyan") hull() { // plastic reduction
+			translate([21,6,-5]) cylinder(h= 20, r = 8,$fn=50);
 			translate([21,23,-5]) cylinder(h= 20, r = 8,$fn=50);
 		}
-		translate([4,5,-5]) color("yellow") cylinder(h= 20, r = screw5t/2,$fn=50); // mounting holes for an endstop holder
+		 // mounting holes for an endstop holder
+		translate([4,5,-5]) color("yellow") cylinder(h= 20, r = screw5t/2,$fn=50);
 		translate([4,25,-5]) color("purple") cylinder(h= 20, r = screw5t/2,$fn=50);
 		translate([37,5,-5]) color("blue") cylinder(h= 20, r = screw5t/2,$fn=50);
 		translate([37,25,-5]) color("lightblue") cylinder(h= 20, r = screw5t/2,$fn=50);
 	}
 	difference() {	// right wall
 		translate([-wall/2-1,-10,0]) color("blue") cubeX([wall-2,50,29],2);
-		translate([-wall/2-2,belt_adjust-10,27]) rotate([0,90,0]) color("red") cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([-wall/2-2,belt_adjust-10,4]) rotate([0,90,0]) color("yellow") cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([-0.5,belt_adjust-10,27]) color("purple") rotate([0,90,0]) nut(m3_nut_diameter,3);
-		translate([-0.5,belt_adjust-10,4]) color("cyan") rotate([0,90,0]) nut(m3_nut_diameter,3);
+		if(!Loop) {
+			translate([-wall/2-2,belt_adjust-10,27]) rotate([0,90,0]) color("red") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			translate([-0.5,belt_adjust-10,27]) color("purple") rotate([0,90,0]) nut(m3_nut_diameter,3);
+			translate([-0.5,belt_adjust-10,4]) color("cyan") rotate([0,90,0]) nut(m3_nut_diameter,3);
+			translate([-wall/2-2,belt_adjust-10,4]) rotate([0,90,0]) color("yellow") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+		} else { 
+			translate([0,-7,0]) beltloopholder();
+			if(TestLoop)
+				translate([-wall/2-2,belt_adjust-10,4]) rotate([0,90,0]) color("yellow") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+		}
 	}
-	beltbump2(0);
+	if(!Loop) beltbump2(0);
 	difference() {	// left wall
 		translate([36+wall/2,-10,0]) color("purple") cubeX([wall-2,50,29],2);
-		translate([32,belt_adjust-10,4]) rotate([0,90,0]) color("red") cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([32,belt_adjust-10,27]) rotate([0,90,0]) color("yellow") cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([38.5,belt_adjust-10,4]) rotate([0,90,0]) color("cyan") nut(m3_nut_diameter,3);
-		translate([32,belt_adjust-10,27]) rotate([0,90,0]) color("black") cylinder(h = 2*wall, r = screw3/2,$fn=50);
-		translate([38.5,belt_adjust-10,27]) rotate([0,90,0]) color("gray") nut(m3_nut_diameter,3);
+		if(!Loop) {
+			translate([32,belt_adjust-10,4]) rotate([0,90,0]) color("pink") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			translate([32,belt_adjust-10,27]) rotate([0,90,0]) color("yellow") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			translate([38.5,belt_adjust-10,4]) rotate([0,90,0]) color("cyan") nut(m3_nut_diameter,3);
+			translate([32,belt_adjust-10,27]) rotate([0,90,0]) color("black") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+			translate([38.5,belt_adjust-10,27]) rotate([0,90,0]) color("gray") nut(m3_nut_diameter,3);
+		} else {
+			translate([0,-7,0]) beltloopholder();
+			if(TestLoop)
+				translate([32,belt_adjust-10,4]) rotate([0,90,0]) color("pink") cylinder(h = 2*wall, r = screw3/2,$fn=50);
+		}
 	}
-	beltbump2(1);
+	if(!Loop) beltbump2(1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

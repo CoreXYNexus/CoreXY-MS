@@ -1,26 +1,28 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-// corexy-motor-bearing.scad - hove the motors, belts & bearing bracket inside the frame
+// corexy-motor-bearing.scad - hold the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
-// created 7/5/2026
-// last update 8/19/18
+// created 7/5/2016
+// last update 12/8/18
 /////////////////////////////////////////////////////////////////////////////////////////
-// 7/7/16 - added built-in spacer to the bearing_bracket
-// 7/14/16 - adjusted 2002 mounting holes to have motor mount clear the makerslide rails
-//		   - mirrored bearing() for other side and it now makes all four parts
-// 7/15/16 - Made the bearing_bracket() bearing screw hole to be tap sized or not
-// 7/16/16 - Made makerslide rail notch in bearing_bracket() optional
-//           Added nut hole to bearing_bracket() to use M5x50 screw
-// 7/18/16 - Made motor_mount taller above the makerslide
-// 7/19/16 - Changed 3rd wall to a diagonal support on motor_mount() and removed notch on
-//			 the non-makerslide wall
-// 7/20/16 - Moved upper belt stepper motor up 10mm
-// 8/23/16 - Added Vthickness & Tthickness for bearing_support()
-// 1/10/17 - Added labels to motor mounts and colors to preview for easier editing
-// 2/14/17 - Adjusted bearing screw hole in bearing_support, noticed that it's off by 2mm when I replaced the
-//			 makerslide with a 2040 to use the makerslide for a three motor z axis.
-//			 Tapered the spacer on the bearing_bracket and added L/R labels.
+// 7/7/16	- added built-in spacer to the bearing_bracket
+// 7/14/16	- adjusted 2002 mounting holes to have motor mount clear the makerslide rails
+//			  mirrored bearing() for other side and it now makes all four parts
+// 7/15/16	- Made the bearing_bracket() bearing screw hole to be tap sized or not
+// 7/16/16	- Made makerslide rail notch in bearing_bracket() optional
+//            Added nut hole to bearing_bracket() to use M5x50 screw
+// 7/18/16	- Made motor_mount taller above the makerslide
+// 7/19/16	- Changed 3rd wall to a diagonal support on motor_mount() and removed notch on
+//			  the non-makerslide wall
+// 7/20/16	- Moved upper belt stepper motor up 10mm
+// 8/23/16	- Added Vthickness & Tthickness for bearing_support()
+// 1/10/17	- Added labels to motor mounts and colors to preview for easier editing
+// 2/14/17	- Adjusted bearing screw hole in bearing_support, noticed that it's off by 2mm when I replaced the
+//			  makerslide with a 2040 to use the makerslide for a three motor z axis.
+//			  Tapered the spacer on the bearing_bracket and added L/R labels.
 // 7/13/18	- Added a cube showing a 200x200 bed to all()
 // 8/19/18	- OpenSCAD 2018.06.01 for $preview
+// 12/8/18	- Changed stepper motor mount to slots for belt adjustment, adjusted diagonal supports
+//			  on the stepper motor mounts
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in bearing_bracket() must match stepper motor shaft in motor_mount()
 //       If the motors get hot, print it from something that can handle it
@@ -49,8 +51,8 @@ Vthickness = 7;		// thickness of bearing support vertical section
 Tthickness = 5;		// thickness of bearing support top and fillet
 /////////////////////////////////////////////////////////////////////////////////////////
 
-all(1); // all the needed parts
-//partial();
+//all(1); // all the needed parts
+partial();
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -67,10 +69,10 @@ module all(MS) {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module partial() { // uncomment the parts you want and adjust translates as needed
-	//motor_mount(1);
-	//translate([0,70,0]) motor_mount(0);
-	bearing_bracket(0,"Right");
-	translate([-5,0,0]) mirror() bearing_bracket(0,"Left"); // mirror it for the other side
+	motor_mount(1);
+	translate([0,65,0]) motor_mount(0);
+	//bearing_bracket(0,"Right");
+	//translate([-5,0,0]) mirror() bearing_bracket(0,"Left"); // mirror it for the other side
 	//rotate([0,180,0]) 
 	//	bearing_support(0);
 	//translate([0,50,0]) rotate([0,180,0]) bearing_support(0);
@@ -81,7 +83,7 @@ module partial() { // uncomment the parts you want and adjust translates as need
 module motor_mount(Side=0) {	// 0 - lower belt motor; 1 = upper belt motor
 	difference() {	// motor mounting holes
 		color("blue") cubeX([59,59,5],radius=2,center=true);
-		translate([0,0,-4]) rotate([0,0,45])  color("red") NEMA17_x_holes(7, 2);
+		translate([-2,0,-4]) color("red") NEMA17_parallel_holes(7,8);
 		//translate([0,0,10]) notchit(Side);
 	}
 	if(!Side) {
@@ -222,15 +224,15 @@ module bearing_support(NotchIt=0) {	// keep the bearing from tilting on the brac
 module diag_side(Side) {
 	if(Side) {
 		difference() {
-			translate([-2,24.5,-7]) rotate([0,-45,0]) color("gray") cubeX([50,5,10],2);
-			translate([-20,23.5,-10]) color("white") cube([50,10,10],2);
-			translate([27,23.5,40]) rotate([0,90,0]) color("black") cube([50,10,10],2);
+			translate([-20,24.5,-7]) rotate([0,-45,0]) color("gray") cubeX([75,5,10],2);
+			translate([-30,23.5,-10]) color("white") cube([60,10,10],2);
+			translate([27,23.5,55]) rotate([0,90,0]) color("black") cube([60,10,10],2);
 		}
 	} else {
 		difference() {
-			translate([-2,-29.5,-7]) rotate([0,-45,0]) color("lightgray") cubeX([50,5,10],2);
-			translate([-20,-30.5,-10]) color("white") cube([50,10,10],2);
-			translate([27,-30.5,40]) rotate([0,90,0]) color("black") cube([50,10,10],2);
+			translate([-20,-29.5,-7]) rotate([0,-40,0]) color("lightgray") cubeX([75,5,10],2);
+			translate([-30,-30.5,-10]) color("white") cube([50,10,10],2);
+			translate([27,-30.5,55]) rotate([0,90,0]) color("black") cube([50,10,10],2);
 		}
 	}
 }
