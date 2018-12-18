@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////
-// corexy-motor-bearing.scad - hold the motors, belts & bearing bracket inside the frame
+// CoreXY-Motor-Bearing.scad - hold the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
 // last update 12/8/18
@@ -35,17 +35,13 @@
 //		 Bearing brackets at inside front corners & supports on outside
 //		 Install one M5 nut in each bearing bracket
 /////////////////////////////////////////////////////////////////////////////////////////
-include <inc/screwsizes.scad>
-use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
-use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
-$fn=50;
+include <CoreXY-MSv1-h.scad>
 /////////////////////////////////////////////////////////////////////////////////////////
-// vars
+// vars for this file
 b_posY = 29.5;		// bearing position X
 b_posX = 20;		// bearing position Y
 b_height = 10;		// amount to raise bearings
 one_stack = 11.78;	// just the length of two washers & two F625Z bearings
-nut5_d = 9.5;		// diameter of z rod nut (point to point + a little)
 layer_t = 0.2;		// layer thickness used to print
 Vthickness = 7;		// thickness of bearing support vertical section
 Tthickness = 5;		// thickness of bearing support top and fillet

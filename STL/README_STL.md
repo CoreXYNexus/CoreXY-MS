@@ -1,3 +1,2 @@
-STL files for CXY-MSv1
-
-There may be few extra stls made during testing.
+Contains the STL files for CXY-MSv1
+Files are created as needed.

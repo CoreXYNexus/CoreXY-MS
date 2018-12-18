@@ -1,5 +1,6 @@
 // yBeltBlamp.scad - https://www.thingiverse.com/thing:863408
-// added comments, move inline modules to main to allow use <>, pretty upped code and added color()
+// used by Belt_Holder.scad
+// 12/2018 - Added comments, move inline modules to main to allow use <>, pretty upped code and added color()
 
 $fn=32 * 4;
 

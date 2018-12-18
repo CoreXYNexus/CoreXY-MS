@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// corexy-z-axis.scad --  z-axis motor mount for corexy makerslide
+// CoreXY-Z-Axis.scad --  z-axis motor mount for corexy makerslide
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,6 +30,7 @@ include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
 use <corner-tools.scad>
+use <Z-Motor_Leadscrew-Coupler.scad>
 $fn=100;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // Another idea: single bearing and a coupler to make the flexible z bed mounts.
@@ -103,7 +104,7 @@ layer = 0.25;				// printed layer thickness
 //all_belt_1();  // z leadscrews for belt version
 //all_belt_2();  // z motor mount for belt version
 //all_belt_3();  // z idler and makerslide brackets to 2040 and backside of makerslide, idler may not be needed
-all_1();  // direct drive for z
+//all_1();  // direct drive for z
 //all_2();  // makerslide brackets
 
 // uses a 300x400 large bed
@@ -111,10 +112,22 @@ all_1();  // direct drive for z
 //all(1,1,0,0); // two leadscrews, belt, idler may not be needed
 //all(0,1,0,1); // three leadscrews, direct drive
 //all(0,1,0,0); // two leadscrews, direct drive
-
+Leveling(1,5,8); 	// three motor Z axis for bed leveling
+					// 1st arg: printable couplers; 2nd arg is motor shaft diameter; 3rd arg is leadscrew diameter
 //partial();
 	
 //////////////////////////////////////////////////////////////////////////////
+
+module Leveling(Couplers,Motorshaft,LeadScrewDiameter) {
+	motor_mount(1);
+	translate([60,0,0]) motor_mount(1);
+	translate([-60,0,0]) motor_mount(1);
+	if(Couplers) { // printed couplers
+		translate([-60,60,0]) coupler(Motorshaft,LeadScrewDiameter);
+		translate([0,60,0]) coupler(Motorshaft,LeadScrewDiameter);
+		translate([60,60,0]) coupler(Motorshaft,LeadScrewDiameter);
+	}
+}
 
 module all_belt_1() {
 	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
