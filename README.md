@@ -1,7 +1,7 @@
 # CXY-MSv1
 A corexy printer using Makerslide and a DuetWifi on 24vdc. Please ignore the messy wiring in the photos. :-)
 
-This is also available at http://www.thingiverse.com/thing:1470253\
+This is also available at http://www.thingiverse.com/thing:1470253
 
 https://creativecommons.org/licenses/by-sa/3.0/
 
@@ -22,6 +22,10 @@ https://youtu.be/llArYEVT2ow
 7/12/18 - Now uses corner-tools.scad and aded a plate for the x carridge stuff
 
 8/19/18 - OpenSCAD 2018.06.01 for #preview and added a dual Titan mount(not tested)
+
+12/18 - Renamed files
+
+The STL & SCAD files with multiple parts are setup for a 200x200 bed.
 
 All the horizontal 2020/2040, and the vertical & horizontal makerslide ends are tapped for 5mm.
 Vertical 2020 is drilled with a 5.5mm bit for access to the screws that hold everything together. Four in the top and two in the bottom. Use drillguide.stl for drilling the holes.
@@ -49,7 +53,9 @@ The 400mm x 300mm 1/4" MIC-6 AL plate bed uses three short 2020 to support the b
 
 Cover for the SSR: http://www.thingiverse.com/thing:1001385
 
-Fans are 24vdc 5015 blowers.
+Spool holder: http://www.thingiverse.com/thing:1647748
+
+Parts cooling fan: 5015 blower.
 
 FancapL.stl is for the power supply fan to make it blow to the side.
 

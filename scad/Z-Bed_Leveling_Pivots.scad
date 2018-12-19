@@ -22,7 +22,7 @@ dia_625z = 16;	// diameter of a 625z
 layer = 0.2;	// printed layer thickness
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-z_pivots(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+z_pivots(2,0,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
 //spacer_pivot(6);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
