@@ -1,22 +1,20 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dual-Titan-E3DV6.scad - to mount two titans with a e3dv6 or two e3dv6 in bowden on the x carridge
 // created: 8/17/2018
-// last modified: 9/15/2018
+// last modified: 12/20/2018
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/17/18	- dual filament setup using two Titan extruders on the x carridge and a couple of modules from
 //			  corxy-x-carridge.scad
-//			  Uses two stl files from https://www.thingiverse.com/thing:2065461
-//			  Print two of each for dual: SE_Titan_i3mk2_-_nozzle_fan_mount_radial_v1.2x.stl or
-//									 	  SE_Titan_i3mk2_-_nozzle_fan_mount_axial.stl
-//			  Titan mount (print two): SE_Titan_i3mk2_-_extruder_mount_v1.1.stl
 // 8/19/18	- Changed to Development Snapshot of OpenSCAD 2018.06.01 to be able to use $preview
 //			- Added a bowden setup for single or dual using the bowden setup from my CXY-MGNv2
 // 8/23/18	- Redid titan_motor() supports; added sensor mounts
 // 9/15/18	- Added missing m4 screwholes and nut holders on dualmountblock()
 //			  Added just_extruders() and sensor_mount()
+// 12/20/18	- Removed the version thst used Titan mounted on the x carriage
+//			  Dual hotends only
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// For some reason OpenSCAD thinks the dual titan bowden, in titan(), may not be a valid 2-manifold, Slic3r PE doesn't
 // Not printed as of 8/23/18
+// Bowden only
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad> // http://github.com/prusajr/PrusaMendel, which also uses functions.scad & metric.scad
 $fn=50; // Compiling does take a while at 100, even with a 1950X, 32GB & 1080ti
@@ -31,51 +29,17 @@ Shift_BL_Touch = 10; // move bl_touch up/down
 Shift_Proximity = 10; // move proximity up/down
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//titan(2,1,4);	// first arg is quanity of 1 or 2, second arg is 0 no bowden, 1 for bowden (default is 1, no bowden, no sensor)
-				// third arg is for sensor (0-ir,1=blt,2=blt recessed,3=proximity,>=4-none
-newtitan(3,1);	// dual hotends that are closer together than the other version
+dualtitan(3,1);	// dual hotends that are closer together
 				// 1st arg is for sensor type (0-ir,1=blt,2=blt recessed,3=proximity,>=4-none
 				// 2nd arg: 0=no titan extruder mounts,1=titan extruder mounts
 //just_extruders(); // just the two titan extruder mounts
-//sensor_mount(0); // sensor mount only; arg is for sensor type (0-ir,1=blt,2=blt recessed,3=proximity,>=4-nothing
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module titan(Qty = 1,Bowden=0,Sensor=4) {
-	if(Bowden) titanbowden(Qty,Sensor);
-	else {
-		if($preview) %titanbracket(Qty); // show the titan mounts
-		mountingblock(Qty);
-	}
-}
+//sensor_mount(0);	// sensor mount only; arg is for sensor type (0-ir,1=blt,2=blt recessed,3=proximity,>=4-nothing
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module newtitan(Sensor=0,Extruders=0) {
+module dualtitan(Sensor=0,Extruders=0) {
 	if($preview) %translate([-100,-100,-5]) cube([200,200,5]);
 	translate([33,30,5]) rotate([0,-90,0]) dualmountingblock(Sensor,Extruders);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module mountingblock(Qty=1,X=0,Y=0,Z=0,TMountholes=1) {
-	if(Qty == 1) {
-		translate([X,Y,Z]) {
-			difference() {
-				translate([-5,-30,33]) bracketmount(TMountholes);
-				translate([20,-15,33]) CarriageMount();
-			}
-		}
-	}
-	if(Qty == 2) {
-		translate([X,Y,Z]) {
-			difference() {
-				translate([-5,-30,33]) bracketmount(TMountholes); // left side
-				translate([20,-15,33]) CarriageMount();	// carriage mount is behind left titan
-			}
-			translate([-5,19,33]) color("purple") cubeX([60,13,8],2); // center that connects the two bracketmounts together
-			translate([-5,28,33]) bracketmount(); // right side
-		}
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,13 +142,6 @@ module CarriageMount() { // four mounting holes
 	translate([-mount_bolt_seperation/2,mount_bolt_seperation,6]) color("white") nut(m3_nut_diameter,14);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module titanbracket(Qty) {	// render fails on two of them
-	import("SE_Titan_i3mk2_-_extruder_mount_v1.1.stl");
-	if(Qty ==2) translate([0,58,0]) import("SE_Titan_i3mk2_-_extruder_mount_v1.1.stl");
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Newtitanbowden(Dual=2,Sensor=0,Extruders) { // defaults to two bowden hotends
@@ -210,63 +167,6 @@ module Newtitanbowden(Dual=2,Sensor=0,Extruders) { // defaults to two bowden hot
 module just_extruders() {
 	translate([-5,-90,-20]) bowden_titan();  // Titan extruder frame mount
 	translate([-5,-90,40]) bowden_titan();  // Titan extruder frame mount
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module titanbowden(Dual=2,Sensor=0) { // defaults to two bowden hotends
-	if(Dual == 2) { // two bowden hotends
-		if($preview) %translate([-30,-80,-5]) cubeX([200,200,5],2); // show a 200x200 bed in preview
-		translate([100,-40,0]) bowden_titan();  // Titan extruder frame mount
-		translate([100,30,0]) bowden_titan();  // Titan extruder frame mount
-		e3dv6_bowden(AdjustE3DV6_UD/2,Sensor);  // move one up, one down, so that they both make the total offset
-	}	
-	if(Dual == 1) { // one bowen hotend
-		if($preview) %translate([-80,-80,-5]) cubeX([200,200,5],2); // show a 200x200 bed in preview
-		translate([50,-40,0]) bowden_titan();  // Titan extruder frame mount
-		e3dv6_bowden_single(Sensor);
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module e3dv6_bowden(Adjust=0,Sensor=0,Type=0) {
-	difference() {
-		translate([0,puck_w/2-e3dv6_total/2+10,0]) rotate([90,0,0]) bowden_mount(-Adjust);
-		translate([40,puck_w/2-e3dv6_total/2-17,-5]) color("lightgrey") cube([20,20,20]);
-		translate([-2,7,-1]) cube([80,20,20]);
-	}
-	difference() {
-		translate([32,puck_w/2-e3dv6_total/2+10,0]) rotate([-90,180,180]) bowden_mount(Adjust);
-		translate([20,puck_w/2-e3dv6_total/2-17,-5]) color("lightgrey") cube([20,20,20]);
-		translate([0,7,]) cube([80,20,20]);
-	}
-	difference() {
-		rotate([180,90,90]) mountingblock(2,-55,15,-45,0);
-		translate([0,30,0]) rotate([90,0,0]) bowden_screws();
-		translate([32,30,0]) rotate([90,0,0]) bowden_screws();
-		translate([0,20,0]) rotate([90,0,0]) bowden_nuts();
-		translate([32,20,0]) rotate([90,0,0]) bowden_nuts();
-		translate([-7.5,0,7.5]) bowden_ir(0);
-		translate([-7.5,0,7.5]) bowden_ir(0);
-		translate([-(hole1x+iroffset-1.5-fan_spacing),irmounty,14]) rotate([90,0,0]) color("yellow") cylinder(h=100,r=screw3t/2,$fn=50);  // put a mounting hole at fan_spacing
-	}
-	difference() {
-		translate([-1,1,0]) bowden_fan();
-		translate([-10,6,-1]) cube([80,20,20]);
-	}
-	difference() {
-		translate([-70,1,0]) bowden_fan();
-		translate([-10,6,-1]) cube([80,20,20]);
-	}
-	// sensor (0-ir,1=blt,2=blt recessed,3=proxmtity
-	if(Sensor==0) translate([20,20,0]) iradapter(IR_Adapter_Length);
-	if(Sensor==1) translate([20,20,0]) blt_mount(1,Shift_BL_Touch);
-	if(Sensor==2) translate([20,20,0]) blt_mount(0,Shift_BL_Touch);
-	if(Sensor==3) translate([20,20,0]) prox_mount(Shift_Proximity);
-		
-	translate([10,20,0]) rotate([0,0,90]) bowden_clamp(-Adjust);
-	translate([80,20,0]) rotate([0,0,90]) bowden_clamp(Adjust);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -315,32 +215,6 @@ module sensor_mount(Sensor) {
 	if(Sensor==1) rotate([0,90,0]) blt_mount(1,Shift_BL_Touch);
 	if(Sensor==2) rotate([0,90,0]) blt_mount(0,Shift_BL_Touch);
 	if(Sensor==3) rotate([0,90,0]) prox_mount(Shift_Proximity);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-module e3dv6_bowden_single(Sensor=0) {
-	difference() {
-		translate([-12,puck_w/2-e3dv6_total/2+10,0]) rotate([90,0,0]) bowden_mount(0);
-		translate([-14,7,-1]) color("black") cube([50,20,20]);
-	}
-	difference() {
-		rotate([180,90,90]) mountingblock(1,-55,15,-45,0);
-		translate([-12.5,20,0]) rotate([90,0,0]) bowden_nuts();
-		translate([-7.5,0,7.5]) bowden_ir();
-		translate([-(hole1x+iroffset-1.5-fan_spacing),irmounty,14]) rotate([90,0,0]) color("yellow")
-			cylinder(h=100,r=screw3t/2,$fn=50);  // put a mounting hole at fan_spacing
-	}
-	translate([-83,10,0]) bowden_fan(); // bowden_fan();
-	difference() {
-		translate([-45,8,0]) bowden_fan();
-		translate([0,6,0]) cube([80,20,20]);
-	}
-	// sensor (0-ir,1=blt,2=blt recessed,3=proxitity
-	if(Sensor==0) translate([30,20,0]) iradapter(IR_Adapter_Length);
-	if(Sensor==1) translate([30,20,0]) blt_mount(1,Shift_BL_Touch);
-	if(Sensor==2) translate([30,20,0]) blt_mount(0,Shift_BL_Touch);
-	if(Sensor==3) translate([30,20,0]) prox_mount(Shift_Proximity);
-	translate([30,30,0]) rotate([0,0,180]) bowden_clamp(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

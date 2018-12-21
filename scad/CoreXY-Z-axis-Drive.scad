@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 8/19/2018
+// Last Update: 12/20/2018
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/28/16	- modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
 // 7/3/16	- added assembly info
@@ -25,6 +25,7 @@
 //			  added bearing_ider() to all()
 // 7/13/18	- Made plates to fit a 200x200 bed
 // 8/19/18	- OpenSCAD 2018.06.01 for $preview
+// 12/20/18	- Removed redundant modules and added for loops for quanities
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -33,8 +34,6 @@ use <corner-tools.scad>
 use <Z-Motor_Leadscrew-Coupler.scad>
 $fn=100;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-// Another idea: single bearing and a coupler to make the flexible z bed mounts.
-//-----------------------------------------------------------------------------------------------------
 // Multi-motor z for bed leveling.  Makerslide carriage mount: two 525z bearings, M5 screw & nut,
 // washer in between, four m5 screws.  The center pivot uses two 625z bearings, three M5 screws & nuts.
 // 2040 mount uses four M5 screws & nuts to mount on the 2040. Uses two 2040 connected together in a
@@ -47,7 +46,6 @@ $fn=100;
 // Uses M3x6 screws & washers for the stepper motor
 // Uses M5x6 screws & t-nuts for mounting to makerslide & extrusion
 //-----------------------------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------------------------
 // For the belt version, you move the stepper motor mount to tension belt
 // Uses one 40 tooth GT2 belt pulley, 1 608 bearing, 2 washers, one lockring
 // on each z axis leadscrew.  Each bearing mount uses two F625Z, M5x30, M5 nut on the side
@@ -58,7 +56,7 @@ $fn=100;
 // Washers used are 1/32" (~0.75mm) thick precision washers
 // Motor uses a 20 tooth GT2 pulley (2:1 ratio to the leadscrews)
 // After printing belt version, clean out the support in the screw & bearing holes
-// If the motor gets hot, then the mount needs to printed with ABS, PETG or better
+// If the motor gets hot, then the mount needs to printed with PETG or better
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // variables
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,9 +78,9 @@ clearance = 0.7;		// allow threaded rod to slide without problem
 zrod = 5 + clearance;	// z rod thread size
 znut_d = 9.5;			// diameter of z rod nut (point to point + a little)
 z_height = zrod + 10 - clearance;	// height is zrod dependent
-zshift = 18;	// move the zrod hole
-zadjust = 9.5;	// move inner cylinder hull to make connection to bar
-znut_depth = 5; // how deep to make the nut hole
+zshift = 18;			// move the zrod hole
+zadjust = 9.5;			// move inner cylinder hull to make connection to bar
+znut_depth = 5; 		// how deep to make the nut hole
 // Sizes below are for a TR8 flanged nut
 flange_screw = 4;		// screw hole
 flangenut_d = 10.7;		// threaded section outside diameter
@@ -100,49 +98,36 @@ idler_spacer_thickness = GT2_40t_h + 0.9;	// thickness of idler bearing spacer
 layer = 0.25;				// printed layer thickness
 ////////////////////////////////////////////////////////////////////////////
 
-// These are setup for three leadscrews
-//all_belt_1();  // z leadscrews for belt version
-//all_belt_2();  // z motor mount for belt version
-//all_belt_3();  // z idler and makerslide brackets to 2040 and backside of makerslide, idler may not be needed
-//all_1();  // direct drive for z
-//all_2();  // makerslide brackets
-
-// uses a 300x400 large bed
-//all(1,1,0,1); // three leadscrews, belt, idler may not be needed
-//all(1,1,0,0); // two leadscrews, belt, idler may not be needed
-//all(0,1,0,1); // three leadscrews, direct drive
-//all(0,1,0,0); // two leadscrews, direct drive
-//outside_makerslide(); // znut nut holder for third rail where Z makerslide is mounted on outside of makerslide
-Leveling(3,1,5,8); 	// Z axis for bed leveling
+direct_drive(3,1,5,8); 	// Z axis for bed leveling
 					// 1st arg: quantiy;2nd arg: printable couplers; 3rd arg is motor shaft diameter; 4th arg is leadscrew diameter
+//belt_drive(3);	// arg is quanity, belt drive leadscrew mounts and znut
+//belt_motor_Mount();  // z motor mount for belt version
 //plates(3); // arg is quanity*2
 //partial();
 	
 //////////////////////////////////////////////////////////////////////////////
 
-module Leveling(Quanity=1,Coupler,Motorshaft,LeadScrewDiameter) { // set for makerslide
+module direct_drive(Quanity=1,Coupler,Motorshaft,LeadScrewDiameter) { // set for makerslide
 	if($preview) %translate([-100,-100,-2]) cube([200,200,2]);
 	for(a=[0:Quanity-1]) {
 		translate([a*65-65,0,thickness/2]) motor_mount(1);
 		if(Coupler) translate([a*65-65,50,0]) coupler(Motorshaft,LeadScrewDiameter); // printed coupler
-		translate([-a*65-8,-50,0]) single(1); // one znut nut holder
+		translate([(a*65)-142,-50,0]) single(); // one znut nut holder
 	}
 	echo("-----------------Don't forget the plates-------------------"); // adding plates makes it bigger than a 200x200 bed
 }
 
-module all_belt_1() {
+module belt_drive(Quanity=1) {
 	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
 	// a motor driving leadscrew via a belt
-	translate([-50,-50,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
-	translate([20,-50,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
-	translate([-30,50,0]) rotate([0,0,90]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
-	translate([30,130,-2.5]) rotate([0,0,-90]) single(1); // znut holder
-	translate([65,-25,-2.5]) rotate([0,0,90]) single(1); // znut holder
-	translate([70,-110,-2.5]) rotate([0,0,90]) single(1); // znut holder
+	for(a=[0:Quanity-1]) {
+		translate([a*65-65,0,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
+		translate([(a*65)-142,-50,0]) single(); // znut holder
+	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module all_belt_2() {
+module belt_motor_Mount() {
 	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
 	translate([-30,-30,0]) belt_motor(1);	// one stepper motor mount with idler
 	translate([10,-30,-2.5]) lockring();	// something to hold leadscrew in bearing
@@ -150,75 +135,12 @@ module all_belt_2() {
 	translate([10,30,-2.5]) lockring();	// something to hold leadscrew in bearing
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module all_belt_3(MS=0) {	//if(Plate) {
+module motor_direct(Quanity=1) {  // z motor mount for 3 z motors
 	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
-	translate([50,-40,-2.5]) bearing_idler();
-	translate([-60,-20,0]) plates(1,MS);
-	translate([-60,30,0]) plates(1,MS);
-	translate([-60,-70,0]) plates(1,MS);
-}
-
-module all_1() {  // z motor mount for 3 z motors
-	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
-	translate([-40,30,2.5]) motor_mount(1);
-	translate([40,35,0]) motor_mount(1);
-	translate([-40,-40,2.5]) motor_mount(1);
-	translate([20,50,-2.5]) rotate([0,0,-90]) single(1); // znut holder
-	translate([130,-70,-2.5]) rotate([0,0,180]) single(1); // znut holder
-	translate([70,50,-2.5]) rotate([0,0,-90]) single(1); // znut holder
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module all_2(MS=0) {  // makerslide brackets
-	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
-	translate([-60,-20,0]) plates(1,MS);
-	translate([-60,30,0]) plates(1,MS);
-	translate([-60,-70,0]) plates(1,MS);
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-
-module all(belt,Plate=0,MS=0,Third=0) {
-	if($preview) %translate([70,0,-5]) cube([300,400,2],center=true);
-	if(!belt) { // two motor direct drive setup (initial design)
-		motor_mount(1); // motor mount
-		translate([60,0,0]) motor_mount(1); // 2nd motor mount
-		if(Third) translate([120,0,0]) motor_mount(1); // 3rd motor mount
-		translate([51,-10,-2.5]) rotate([0,0,90]) double(1); // two znut holders
-		if(Third) translate([101,-10,-2.5]) rotate([0,0,90]) single(1); // 3rd znut holder
-		if(Plate) {
-			translate([-20,100,0]) plates(1,MS);
-			translate([70,100,0]) plates(1,MS);
-			if(Third) translate([0,-75,0]) plates(1,MS);
-		}
+	for(a=[0:Quanity-1]) {
+		translate([a*65-65,0,0]) motor_mount(1);
+		translate([(a*65)-142,-50,0]) single(); // znut holder
 	}
-	if(belt) { // a motor driving leadscrew via a belt (defaults to two)
-		bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
-		translate([70,0,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
-		if(Third) translate([30,-60,0]) rotate([0,0,90]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
-		translate([130,0,0]) belt_motor(1);	// one stepper motor mount with idler
-		translate([0,78,-2.5]) lockring();	// something to hold leadscrew in bearing
-		translate([0,94,-2.5]) lockring();	// something to hold leadscrew in bearing
-		if(Third) translate([0,110,-2.5]) lockring();	// something to hold leadscrew in bearing
-		translate([40,170,-2.5]) rotate([0,0,-90]) single(1); // znut holder
-		translate([80,15,-2.5]) rotate([0,0,90]) single(1); // znut holder
-		translate([165,-50,-2.5]) bearing_idler();
-		if(Third) translate([75,-135,-2.5]) rotate([0,0,90]) single(1); // znut holder
-		if(Plate) {
-			translate([-20,125,0]) plates(1,MS);
-			translate([70,125,0]) plates(1,MS);
-			if(Third) translate([80,-115,0]) plates(1,MS);
-		}
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////
-module outside_makerslide() { // znut nut holder for third rail where Z makerslide is mounted on outside of makerslide
-	translate([-57,-20,0]) single(1,25);
-	translate([0,0,0]) third_z_spacer();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -226,9 +148,8 @@ module outside_makerslide() { // znut nut holder for third rail where Z makersli
 module partial() { // this is here just to make it easier to print a single item
 	//translate([0,0,2.5]) motor_mount(1);
 	//translate([60,0,0]) motor_mount(1);
-	//translate([-40,65,-2.5]) double(1); // two znut holders
-	//translate([-65,0,0]) single(1); // one znut nut holder
-	//translate([-15,30,0]) single(1,25); // znut nut holder for third rail where Z makerslide is mounted on outside of makerslide
+	//translate([-65,0,0]) single(); // one znut nut holder
+	//translate([-15,30,0]) single(25); // znut nut holder for third rail where Z makerslide is mounted on outside of makerslide
 	//test();  // test print for checking motor alignment
 	//rotate([-90,0,0]) testnut(1);	// print a shortened nut section for test fitting
 	//translate([0,0,2.5]) bearing_mount(0);
@@ -268,6 +189,7 @@ module mount(makerslide=0) {
 		if(makerslide) notchit();
 	}
 	side_support();
+	translate([-b_width+thickness,0,0]) side_support(); 
 	if(makerslide) { // inside support at ns notches
 		translate([-5+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("blue") cubeX([10,thickness-1,m_height-2],2);
 		translate([-48+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("red") cubeX([10,thickness-1,m_height-2],2);
@@ -284,20 +206,17 @@ module notchit() {
 
 module side_support() {
 	difference() {	// side support
-		translate([b_width/2-thickness,-(b_length-28.5),-38]) color("gray") cubeX([thickness,b_width,m_height],2);
-		translate([b_width/2-thickness-0.5,-(b_length-45.5),-90]) rotate([60,0,0]) color("cyan") cube([6,60,60]);
+		union() {
+			translate([b_width/2-thickness,-(b_length-29),-8]) rotate([-30,0,0])
+				color("gray") cubeX([thickness,b_width+6,m_height],2);
+			translate([b_width/2-thickness,-(b_length-22),-4]) rotate([-30,0,0])
+				color("gray") cubeX([thickness,b_width+6,m_height],2);
+		}
+		translate([b_width/2-thickness-0.5,-(b_length-20),1]) color("cyan") cube([6,90,60]);
+		translate([b_width/2-thickness-0.5,-(b_length-82),-50]) color("pink") cube([6,50,60]);
 		color("yellow") hull() {
 			translate([b_width/2-thickness-0.5,7,-14]) rotate([0,90,0]) cylinder(h=6,r=10,$fn=100);
 			translate([b_width/2-thickness-0.5,-12,-9]) rotate([0,90,0]) cylinder(h=6,r=5,$fn=100);
-		}
-		notchit();
-	}
-	difference() { // side support
-		translate([-(b_width/2),-(b_length-28.5),-38]) color("lightgray") cubeX([thickness,b_width,m_height],2);
-		translate([-(b_width/2+0.5),-(b_length-45.5),-90]) rotate([60,0,0]) color("cyan") cube(size=[6,60,60]);
-		color("pink") hull() {
-			translate([-(b_width/2+0.5),7,-14]) rotate([0,90,0]) cylinder(h=6,r=10,$fn=100);
-			translate([-(b_width/2+0.5),-12,-9]) rotate([0,90,0]) cylinder(h=6,r=5,$fn=100);
 		}
 		notchit();
 	}
@@ -308,6 +227,7 @@ module side_support() {
 module nema_plate(makerslide=0) {
 	difference() {
 		translate([0,-(shaft_offset-base_offset),0]) color("red") cubeX([b_width,b_length,thickness],2,center=true);
+		//translate([0,-shaft_offset+2,-4]) rotate([0,0,90])  NEMA17_parallel_holes(b_width,8);
 		translate([0,-shaft_offset,-4]) rotate([0,0,45]) color("white") NEMA17_x_holes(7, 2);
 		if(makerslide) notchit();
 	}
@@ -330,67 +250,15 @@ module ms_notch() {
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-module double(Type) { // two of the z-nut mounts
-	if(!Type) {
-		translate([0,0,thicknessZ]) rotate([-90,0,0])	// all coordinates in modules are without this line
-			znut(0);	// lay it on the side for max print strength
-		translate([175,70,thicknessZ]) rotate([-90,0,180])	// all coordinates in modules are without this line
-			znut(0);	// lay it on the side for max print strength
-	}
-	if(Type) {
-		translate([0,0,thicknessZ]) rotate([-90,0,0])	// all coordinates in modules are without this line
-			znut2(1);
-		translate([155,40,thicknessZ]) rotate([-90,0,180])	// all coordinates in modules are without this line
-			znut2(1);
-	}
+module single(,AddOffset=0) { // one z-nut mount
+	translate([0,0,thicknessZ]) rotate([-90,0,0])	// all coordinates in modules are without this line
+		znut(1,AddOffset);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////
-
-module single(Type=1,AddOffset=0) { // one z-nut mount
-	if(!Type) {
-		translate([0,0,thicknessZ]) rotate([-90,0,0])	// all coordinates in modules are without this line
-			znut(0,AddOffset);	// lay it on the side for max print strength
-	}
-	if(Type) {
-		translate([0,0,thicknessZ]) rotate([-90,0,0])	// all coordinates in modules are without this line
-			znut2(1,AddOffset);
-	}
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////
-// Outside the printer, over the makerslide version (not used)
-
-module znut(Type=0,AddOffset=0) {	// 0 = nut, 1 = TR8 leadscrew
-	difference() {
-		color("cyan") cubeX([outside_d,thicknessZ,z_height],2);
-		platemounthole(0,screw5);
-		platemountholeCS(0,screw5hd);
-		platemounthole(1,screw5);
-		platemountholeCS(1,screw5hd);
-		zhole(Type);
-		znuthole(Type);
-	}
-	zholesupport(Type);	// may need some extra around zrod hole
-	difference() {
-		translate([0,0,z_height-shift1]) color("red") cubeX([z_height,thicknessZ,raise],2);
-		platemounthole(0,screw5);
-		platemountholeCS(0,screw5hd);
-	}
-	difference() {
-		translate([0,0,z_height-shift1]) translate([outside_d-z_height,0,0])
-			color("blue") cubeX([z_height,thicknessZ,raise],2);
-		platemounthole(1,screw5);
-		platemountholeCS(1,screw5hd);
-	}
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// inside the printer directly on the carriage plate version
 
-module znut2(Type=0,AddOffset=0) {	// 0 = nut, 1 = TR8 leadscrew
+module znut(Type=0,AddOffset=0) {	// 0 = nut, 1 = TR8 leadscrew
 	difference() {
 		translate([outside_d/3-1,0,0]) color("cyan") cubeX([outside_d/3+2,thicknessZ,z_height],2);
 		platemounthole2(0,screw5);
@@ -521,7 +389,7 @@ module bearing_mount(Spc=0,SpcThk=idler_spacer_thickness) { // bearing holder at
 		mount(1);
 		difference() {
 			translate([0,-(shaft_offset-base_offset),0]) color("navy") cubeX([b_width,b_length,thickness],2,center=true);
-		translate([0,-shaft_offset,-6]) color("red") cylinder(h=10,d=dia_608,$fn=100);
+			translate([0,-shaft_offset,-6]) color("red") cylinder(h=10,d=dia_608,$fn=100);
 			notchit();
 		}
 		translate([0,-shaft_offset,0]) bearing_hole();
@@ -599,6 +467,7 @@ module belt_motor_mount_support() {	// print support for inner hole
 module mountbelt() { // the three sides of the motor mount; same as mount(), but no screw holes
 	translate([0,22,-18]) color("white") cubeX([b_width,thickness,m_height],2, center=true);
 	side_support();
+	translate([-b_width+thickness,0,0]) side_support(); 
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -679,18 +548,15 @@ module single_attached_idler(Spc=1) { // Spc = spacers, Spt = add support to att
 	difference() { // needs to be a bit wider with Spt==1
 		translate([-27.5,30,-2.5]) color("white") cubeX([55,25,thickness],2);
 		translate([0,63-dia_f625z,-5]) color("red") cylinder(h=10,d=screw5);
-		//translate([dia_f625z-dia_f625z/2+2,60-dia_f625z,-5]) color("cyan") cylinder(h=10,d=screw5);
-		//translate([dia_f625z-30,60-dia_f625z,-5]) color("gray") cylinder(h=10,d=screw5);
 	}
-	translate([22.5,26,-2.5]) color("salmon") cubeX([thickness,29,thickness*3],2);
-	translate([-27.5,26,-2.5]) color("pink") cubeX([thickness,29,thickness*3],2);
-	if(Spc) translate([-35.5,50,-2.5]) idler_spacers(0,idler_spacer_thickness);
+	translate([22.5,25,-2.5]) color("salmon") cubeX([thickness,30,thickness+7],2);
+	translate([-27.5,25,-2.5]) color("pink") cubeX([thickness,30,thickness+7],2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module plates(Qty=1,MS=0) { // mouting plates for z axis makerslide (instead of drilling access holes)
-	if($preview) %translate([-100,-100,-2]) cube([200,200,2]);
+	if($preview) %translate([-50,-50,-2]) cube([200,200,2]);
 	for(i=[0:Qty-1]){
 		translate([0,i*45,0]) plate1();
 		translate([45,i*45,0]) {
