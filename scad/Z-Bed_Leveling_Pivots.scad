@@ -22,13 +22,13 @@ dia_625z = 16;	// diameter of a 625z
 layer = 0.2;	// printed layer thickness
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-z_pivots(2,0,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+z_pivots(1,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
 //spacer_pivot(6);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module z_pivots(Qty,Bearing=0,Round=1) {
-	if($preview) %translate([-40,-30,-5]) cubeX([200,200,5]);
+	//if($preview) %translate([-40,-30,-5]) cubeX([200,200,5]);
 	for(i=[0:Qty-1]){
 		translate([0,i*45,15]) z_pivot_2040(Bearing,1);
 		if(Round)
@@ -61,7 +61,8 @@ module z_pivot_2040(Bearing=1,RoundPivot=1) { // 3 625 bearing pivot mounts on t
 			side_screws_2040(16.5);
 		else
 			side_screws_2040(20);
-	}
+}
+
 	difference() {
 		translate([-5,0,-15]) color("blue") cubeX([10,40,40],2);
 		if(RoundPivot) 
@@ -114,6 +115,7 @@ module center_pivot2(Bearing) {
 		translate([dia_625z/2+2.5,dia_625z/2+2.5,dia_625z-3]) color("yellow") cylinder(h=40,d=screw5,$fn=100);
 		translate([-5,dia_625z/2-2,dia_625z/2+13]) color("green") cube([40,8.6,4]);
 	}
+	translate([14.8,9,9]) color("plum") rotate([0,90,0]) cylinder(h=layer,d=dia_625z+1); // support
 	double_bearing_mount(Bearing);
 	//screw_hole_spport(dia_625z/2+2.5,dia_625z/2+2.5,dia_625z/2+13-layer);
 }
@@ -160,6 +162,8 @@ module side_screws_2040(PivotZpos=20) {
 	translate([-7,10,-8]) rotate([0,90,0]) color("white") cylinder(h=50,d=screw5,$fn=100);
 	translate([-7,30,-8]) rotate([0,90,0]) color("gray") cylinder(h=50,d=screw5,$fn=100);
 	translate([-7,20,PivotZpos]) rotate([0,90,0]) color("salmon") cylinder(h=50,d=screw5,$fn=100); // pivot
+	translate([16,10,-8])color("white") cylinder(h=50,d=screw5,$fn=100);
+	translate([16,30,-8]) color("gray") cylinder(h=50,d=screw5,$fn=100);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
