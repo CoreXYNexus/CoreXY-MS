@@ -77,7 +77,7 @@ raise = 30 + shift1;	// zrod distance from the carriage plate
 clearance = 0.7;		// allow threaded rod to slide without problem
 zrod = 5 + clearance;	// z rod thread size
 znut_d = 9.5;			// diameter of z rod nut (point to point + a little)
-z_height = zrod + 10 - clearance;	// height is zrod dependent
+z_height = zrod + 5 - clearance;	// height is zrod dependent
 zshift = 18;			// move the zrod hole
 zadjust = 9.5;			// move inner cylinder hull to make connection to bar
 znut_depth = 5; 		// how deep to make the nut hole
@@ -98,12 +98,12 @@ idler_spacer_thickness = GT2_40t_h + 0.9;	// thickness of idler bearing spacer
 layer = 0.25;				// printed layer thickness
 ////////////////////////////////////////////////////////////////////////////
 
-direct_drive(3,1,5,8); 	// Z axis for bed leveling
+//direct_drive(3,0,5,8); 	// Z axis for bed leveling
 					// 1st arg: quantiy;2nd arg: printable couplers; 3rd arg is motor shaft diameter; 4th arg is leadscrew diameter
 //belt_drive(3);	// arg is quanity, belt drive leadscrew mounts and znut
 //belt_motor_Mount();  // z motor mount for belt version
 //plates(3); // arg is quanity*2
-//partial();
+partial();
 	
 //////////////////////////////////////////////////////////////////////////////
 
@@ -146,9 +146,9 @@ module motor_direct(Quanity=1) {  // z motor mount for 3 z motors
 /////////////////////////////////////////////////////////////////////////////
 
 module partial() { // this is here just to make it easier to print a single item
-	//translate([0,0,2.5]) motor_mount(1);
+	motor_mount(1);
 	//translate([60,0,0]) motor_mount(1);
-	//translate([-65,0,0]) single(); // one znut nut holder
+	//single(); // one znut nut holder
 	//translate([-15,30,0]) single(25); // znut nut holder for third rail where Z makerslide is mounted on outside of makerslide
 	//test();  // test print for checking motor alignment
 	//rotate([-90,0,0]) testnut(1);	// print a shortened nut section for test fitting
@@ -181,7 +181,7 @@ module motor_mount(makerslide=0) { // motor mount
 
 module mount(makerslide=0) {
 	difference() {
-		translate([0,22,-18]) color("cyan") cubeX([b_width,thickness,m_height],2, center=true);
+		translate([0,22,-18]) color("cyan") cubeX([b_width,thickness,m_height],1, center=true);
 		translate([10,30,-10]) rotate([90,0,0]) color("red") cylinder(h=20,d=screw5); // top screw hole
 		translate([10,30,-30]) rotate([90,0,0]) color("white") cylinder(h=20,d=screw5); // bottom screw hole
 		translate([-10,30,-10]) rotate([90,0,0]) color("blue") cylinder(h=20,d=screw5);	// top screw hole
@@ -191,8 +191,8 @@ module mount(makerslide=0) {
 	side_support();
 	translate([-b_width+thickness,0,0]) side_support(); 
 	if(makerslide) { // inside support at ns notches
-		translate([-5+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("blue") cubeX([10,thickness-1,m_height-2],2);
-		translate([-48+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("red") cubeX([10,thickness-1,m_height-2],2);
+		translate([-5+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("blue") cubeX([10,thickness-1,m_height-2],1);
+		translate([-48+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("red") cubeX([10,thickness-1,m_height-2],1);
 	}
 }
 
@@ -208,9 +208,9 @@ module side_support() {
 	difference() {	// side support
 		union() {
 			translate([b_width/2-thickness,-(b_length-29),-8]) rotate([-30,0,0])
-				color("gray") cubeX([thickness,b_width+6,m_height],2);
+				color("gray") cubeX([thickness,b_width+6,m_height],1);
 			translate([b_width/2-thickness,-(b_length-22),-4]) rotate([-30,0,0])
-				color("gray") cubeX([thickness,b_width+6,m_height],2);
+				color("gray") cubeX([thickness,b_width+6,m_height],1);
 		}
 		translate([b_width/2-thickness-0.5,-(b_length-20),1]) color("cyan") cube([6,90,60]);
 		translate([b_width/2-thickness-0.5,-(b_length-82),-50]) color("pink") cube([6,50,60]);
@@ -226,9 +226,9 @@ module side_support() {
 
 module nema_plate(makerslide=0) {
 	difference() {
-		translate([0,-(shaft_offset-base_offset),0]) color("red") cubeX([b_width,b_length,thickness],2,center=true);
+		translate([-27.5,-(shaft_offset-base_offset)-29.5,-1]) color("red") cubeX([b_width,b_length,thickness+1],1);
 		//translate([0,-shaft_offset+2,-4]) rotate([0,0,90])  NEMA17_parallel_holes(b_width,8);
-		translate([0,-shaft_offset,-4]) rotate([0,0,45]) color("white") NEMA17_x_holes(7, 2);
+		translate([0,-shaft_offset,-3]) rotate([0,0,45]) color("white") NEMA17_x_holes(10, 2);
 		if(makerslide) notchit();
 	}
 }
@@ -260,7 +260,7 @@ module single(,AddOffset=0) { // one z-nut mount
 
 module znut(Type=0,AddOffset=0) {	// 0 = nut, 1 = TR8 leadscrew
 	difference() {
-		translate([outside_d/3-1,0,0]) color("cyan") cubeX([outside_d/3+2,thicknessZ,z_height],2);
+		translate([outside_d/3-1,0,0]) color("cyan") cubeX([outside_d/3+2,thicknessZ,z_height],1);
 		platemounthole2(0,screw5);
 		platemountholeNut(0,nut5);
 		platemounthole2(1,screw5);
@@ -347,6 +347,7 @@ module zholesupport(Type,AddOffset=0) { // will it need extra width at the zrod?
 					cylinder(h=thicknessZ,r = flangenut_od/1.5,$fn=100);
 			}
 		}
+		translate([outside_d/2+-15,thicknessZ-25,z_height/2-zshift+zadjust+10]) color("blue")  cube([30,30,20]);
 		zhole(Type,AddOffset);
 		znuthole(Type,AddOffset);
 	}
@@ -388,12 +389,12 @@ module bearing_mount(Spc=0,SpcThk=idler_spacer_thickness) { // bearing holder at
 	rotate([180,0,0]) {										// didn't bother to make a left/right versions
 		mount(1);
 		difference() {
-			translate([0,-(shaft_offset-base_offset),0]) color("navy") cubeX([b_width,b_length,thickness],2,center=true);
+			translate([0,-(shaft_offset-base_offset),0]) color("navy") cubeX([b_width,b_length,thickness],1,center=true);
 			translate([0,-shaft_offset,-6]) color("red") cylinder(h=10,d=dia_608,$fn=100);
 			notchit();
 		}
 		translate([0,-shaft_offset,0]) bearing_hole();
-		translate([-5+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("white") cubeX([10,thickness-1,m_height-2],2);
+		translate([-5+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("white") cubeX([10,thickness-1,m_height-2],1);
 		translate([-48+ms_notch_offset,20-ms_notch_depth,-m_height+3])
 			color("green") cubeX([10,thickness-1,m_height-2],2);
 	}
@@ -440,7 +441,7 @@ module belt_motor(idler=0) { // motor mount for belt drive
 		mountbelt();	// motor mount base
 	}
 	difference() {	// mount to 2020
-		translate([-b_width/2,-45,-thickness/2-shiftbm]) color("cyan") cubeX([b_width,24.5,21],2);	// base
+		translate([-b_width/2,-45,-thickness/2-shiftbm]) color("cyan") cubeX([b_width,24.5,21],1);	// base
 		translate([-b_width/2-1,-38,-21-shiftbm]) rotate([45,0,0]) color("gray") cube([b_width+2,22,40]); // remove half
 		translate([-b_width/2+10,-35,-thickness/2-shiftbm])
 			color("red") cylinder(h=40,d=screw5);	// mounting screw holes
@@ -465,7 +466,7 @@ module belt_motor_mount_support() {	// print support for inner hole
 ////////////////////////////////////////////////////////////////////////////
 
 module mountbelt() { // the three sides of the motor mount; same as mount(), but no screw holes
-	translate([0,22,-18]) color("white") cubeX([b_width,thickness,m_height],2, center=true);
+	translate([0,22,-18]) color("white") cubeX([b_width,thickness,m_height],1, center=true);
 	side_support();
 	translate([-b_width+thickness,0,0]) side_support(); 
 }
@@ -474,12 +475,12 @@ module mountbelt() { // the three sides of the motor mount; same as mount(), but
 
 module bearing_idler() {	// belt idler (currently not used)
 	difference() {
-		color("cyan") cubeX([20,100,20],2);
+		color("cyan") cubeX([20,100,20],1);
 		translate([10,90,-1]) color("red") cylinder(h=50,d=screw5,$fn=100);
 		translate([10,90-dia_f625z-12,-1]) color("black") cylinder(h=50,d=screw5,$fn=100);
 	}
 	difference() {
-		translate([-b_width/3,-19,0]) color("green") cubeX([b_width,23,20],2);
+		translate([-b_width/3,-19,0]) color("green") cubeX([b_width,23,20],1);
 		translate([-b_width/3-1,-36,14]) rotate([-45,0,0]) color("blue") cube([b_width+2,22,40]);
 		translate([-b_width/2+18,-8,-thickness/2]) color("white") cylinder(h=40,d=screw5);
 		translate([b_width/2,-8,-thickness/2]) color("pink") cylinder(h=40,d=screw5);
@@ -514,7 +515,7 @@ module attached_idler(Spc=0,Spt=0) { // Spc = spacers, Spt = add support to atta
 			translate([dia_f625z-dia_f625z/2+2,60-dia_f625z,-5]) color("pink") cylinder(h=10,d=screw5);
 		}
 	}
-	if(Spt) translate([22.5,26,-2.5]) color("blue") cubeX([thickness,44,thickness*3],2);
+	if(Spt) translate([22.5,26,-2.5]) color("blue") cubeX([thickness,44,thickness*3],1);
 	if(Spc) translate([-7.5,10,-2.5]) idler_spacers(1,idler_spacer_thickness);
 }
 
@@ -546,11 +547,11 @@ module testf625z() { // used to check fit
 
 module single_attached_idler(Spc=1) { // Spc = spacers, Spt = add support to attached idler plate
 	difference() { // needs to be a bit wider with Spt==1
-		translate([-27.5,30,-2.5]) color("white") cubeX([55,25,thickness],2);
+		translate([-27.5,30,-2.5]) color("white") cubeX([55,25,thickness],1);
 		translate([0,63-dia_f625z,-5]) color("red") cylinder(h=10,d=screw5);
 	}
-	translate([22.5,25,-2.5]) color("salmon") cubeX([thickness,30,thickness+7],2);
-	translate([-27.5,25,-2.5]) color("pink") cubeX([thickness,30,thickness+7],2);
+	translate([22.5,25,-2.5]) color("salmon") cubeX([thickness,30,thickness+7],1);
+	translate([-27.5,25,-2.5]) color("pink") cubeX([thickness,30,thickness+7],1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -581,7 +582,7 @@ module plate1() { // no notch for makerslide
 
 module plate2() { // no notch for makerslide
 	difference() {
-		color("cyan") cubeX([40,40,5],2);
+		color("cyan") cubeX([40,40,5],1);
 		plate_screws();
 		translate([-5,20,-11]) ms_notch2();
 	}
@@ -617,7 +618,7 @@ module ms_notch2() {
 
 module third_z_spacer() { // allow z makerslide to mount to the outside of a makerslide
 	difference() {
-		color("cyan") cubeX([40,25,15],2);
+		color("cyan") cubeX([40,25,15],1);
 		translate([10,30,7.5]) rotate([90,0,0]) color("red") cylinder(h=40,d=screw5,$fn=100);
 		translate([30,30,7.5]) rotate([90,0,0]) color("blue") cylinder(h=40,d=screw5,$fn=100);
 	}
