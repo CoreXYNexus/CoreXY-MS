@@ -29,8 +29,8 @@ ht_625z = 5+layer;
 body_ht_625z=4;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//z_pivots(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
-z_pivot_carriage(0);
+z_pivots(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+//z_pivot_carriage(0);
 //center_pivot2(1);
 //z_pivot_2040(1,1);
 
@@ -59,7 +59,6 @@ module z_pivot_carriage(Spacer=0,Holes_offset=42.5) { // bearing between bolt ho
 		translate([51.5-Holes_offset,12,-2]) color("white") cylinder(h=20,d=screw5,$fn=100); // mounting hole
 		translate([51.5-Holes_offset,12,5.5]) rotate([0,0,90]) color("plum") cylinder(h=10,d=nut5+0.5,$fn=6);
 	}
-	//translate([30,4,0+flange_625z+ht_625z]) color("black") cylinder(h=ht_625z,d=2,$fn=100); // used to set height o cyan cube
 	if(Spacer) difference() { // spacer to hold bearing in place
 		translate([30,-10,0]) color("gray") cylinder(h=3.5,d=out_dia_625z-1,$fn=100);
 		translate([30,-10,-1]) color("plum") cylinder(h=5,d=screw5hd,$fn=100);
