@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 1/29/2017
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 12/21/2018
+// Last Update: 1/29/2019
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/15/17	- Added bearing pivot style carriage & 2040 mounts for multi-motor leveling
 // 1/29/17	- Added pivot version using just a M5 screw
@@ -14,12 +14,17 @@
 // 8/19/19	- OpenSCAD 2018.06.01 for $preview, added 200x200 bed in preview
 // 12/21/18	- Added to countersinks and nut holders
 //			  Changed to 625Z bearings (they're what I have)
+// 1/29/19	- Fixed z_pivots() so all parts are on the same z0
+//			  Added z_pivot_2040_v2(), it uses less plastic, it only attaches to the end of a 2040
+//			  Added screw size to extrusion slots option to z_pivot_2040()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
 $fn=50;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
+// Requires good bridging for z_pivot_2040()
+/////////////////////////////////////////////////////////////////////////////////////////////////
 clearance = 0.5;
 layer = 0.2;	// printed layer thickness
 dia_625z = 16+clearance;	// diameter of a 625z
@@ -29,18 +34,33 @@ ht_625z = 5+layer;
 body_ht_625z=4;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-z_pivots(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+//z_pivots(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+//z_pivots_v2(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
 //z_pivot_carriage(0);
 //center_pivot2(1);
-//z_pivot_2040(1,1);
+//z_pivot_2040(1,1,screw5);
+z_pivot_2040_v2(1,1);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module z_pivots(Qty,Bearing=0,Round=1) {
 	if($preview) %translate([-40,-30,-5]) cubeX([200,200,5]);
 	for(i=[0:Qty-1]){
-		translate([0,i*45,15]) z_pivot_2040(Bearing,1);
-		if(Round) translate([75,i*45+20,21]) rotate([180,90,0]) center_pivot2(Bearing);
+		translate([0,i*45,15]) z_pivot_2040(Bearing,Round);
+		if(Round) translate([75,i*45+20,21.6]) rotate([180,90,0]) center_pivot2(Bearing);
+		else translate([45,i*45,0]) center_pivot(Bearing); // non-rounded version
+		if(Bearing)	translate([80,i*45,0])z_pivot_carriage(1);
+		else translate([15,i*45+10,0]) spacer_pivot();
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module z_pivots_v2(Qty,Bearing=0,Round=1) {
+	if($preview) %translate([-40,-30,-5]) cubeX([200,200,5]);
+	for(i=[0:Qty-1]){
+		translate([0,i*45,15]) z_pivot_2040_v2(Bearing,Round);
+		if(Round) translate([75,i*45+20,21.6]) rotate([180,90,0]) center_pivot2(Bearing);
 		else translate([45,i*45,0]) center_pivot(Bearing); // non-rounded version
 		if(Bearing)	translate([80,i*45,0])z_pivot_carriage(1);
 		else translate([15,i*45+10,0]) spacer_pivot();
@@ -67,21 +87,21 @@ module z_pivot_carriage(Spacer=0,Holes_offset=42.5) { // bearing between bolt ho
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module z_pivot_2040(Bearing=1,RoundPivot=1) { // 3 625 bearing pivot mounts on the 2040 holding the bed
+module z_pivot_2040(Bearing=1,RoundPivot=1,Screw=screw5) { // 3 625 bearing pivot mounts on the 2040 holding the bed
 	difference() {
 		translate([1.5,0,-15]) color("cyan") cubeX([29,40,20],1);
 		translate([5.75,-2,-23]) color("plum") cube([20.5,45,25]);
 		if(RoundPivot) 
-			side_screws_2040(16.5);
+			side_screws_2040(16.5,Screw);
 		else
-			side_screws_2040(20);
+			side_screws_2040(20,Screw);
 	}
 	difference() {
 		translate([-0.5,0,-15]) color("blue") cubeX([5,40,40],1);
 		if(RoundPivot) 
-			side_screws_2040(16.5);
+			side_screws_2040(16.5,Screw);
 		else
-			side_screws_2040(20);
+			side_screws_2040(20,Screw);
 		roundover();
 	}
 	translate([16,10,2])color("red") cylinder(h=layer,d=screw5hd,$fn=100); // hole supports
@@ -89,15 +109,43 @@ module z_pivot_2040(Bearing=1,RoundPivot=1) { // 3 625 bearing pivot mounts on t
 	difference() {
 		translate([28,0,-15]) color("red") cubeX([5,40,40],1);
 		if(RoundPivot) 
-			side_screws_2040(16.5);
+			side_screws_2040(16.5,Screw);
 		else
-			side_screws_2040(20);
+			side_screws_2040(20,Screw);
 		roundover();
 	}
 	if(!RoundPivot) // test center_pivot, should never need to tilt this far
 		if($preview) %translate([6,19.7,5.5]) rotate([45,0,0]) center_pivot(Bearing);
 	else
 		if($preview) %translate([6,9.7,6.5]) center_pivot2(Bearing);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module z_pivot_2040_v2(Bearing=1,RoundPivot=1) { // 3 625 bearing pivot mounts on the 2040 holding the bed
+	difference() {
+		translate([1.5,0,-15]) color("cyan") cubeX([29,40,5],1);
+		translate([0,0,-15]) if(RoundPivot) 
+			side_screws_2040(16.5);
+		else
+			side_screws_2040(20);
+	}
+	difference() {
+		translate([-0.5,0,-15]) color("blue") cubeX([5,40,25],1);
+		translate([-0.5,0,-15]) if(RoundPivot) 
+			side_screws_2040(16.5);
+		else
+			side_screws_2040(20);
+		translate([-0.5,0,-15]) roundover();
+	}
+	difference() {
+		translate([28,0,-15]) color("red") cubeX([5,40,25],1);
+		translate([-0.5,0,-15]) if(RoundPivot) 
+			side_screws_2040(16.5);
+		else
+			side_screws_2040(20);
+		translate([-0.5,0,-15]) roundover();
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,20 +160,20 @@ module roundover() { // roundover a corner
 	translate([15,-10,15]) {
 		difference() {
 			color("plum") cube([20,20,20]);
-			translate([-5,20,0]) rotate([0,90,0]) color("gray") cylinder(h=30,d=20,$fn=100);
+			translate([-5,20,0]) rotate([0,90,0]) color("lightgray") cylinder(h=30,d=20,$fn=100);
 		}
 	}
 	translate([25,40,0]) rotate([0,0,180]) {
 		translate([-10,-10,15]) {
 			difference() {
 				color("pink") cube([20,20,20]);
-				translate([-5,20,0]) rotate([0,90,0]) color("gray") cylinder(h=30,d=20,$fn=100);
+				translate([-5,20,0]) rotate([0,90,0]) color("black") cylinder(h=30,d=20,$fn=100);
 			}
 		}
 		translate([10,-10,15]) {
 			difference() {
 				color("gold") cube([20,20,20]);
-				translate([-5,20,0]) rotate([0,90,0]) color("gray") cylinder(h=30,d=20,$fn=100);
+				translate([-5,20,0]) rotate([0,90,0]) color("white") cylinder(h=30,d=20,$fn=100);
 			}
 		}
 	}
@@ -210,11 +258,11 @@ module double_bearing_mount_hole() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module side_screws_2040(PivotZpos=20) {
-	translate([-7,10,-8]) rotate([0,90,0]) color("white") cylinder(h=50,d=screw5,$fn=100);
+module side_screws_2040(PivotZpos=20,Screw=screw5) {
+	translate([-7,10,-8]) rotate([0,90,0]) color("white") cylinder(h=50,d=Screw,$fn=100);
 	translate([-9,10,-8]) rotate([0,90,0]) color("red") cylinder(h=10,d=screw5hd,$fn=100);
 	translate([31,10,-8]) rotate([0,90,0]) color("plum") cylinder(h=10,d=screw5hd,$fn=100);
-	translate([-7,30,-8]) rotate([0,90,0]) color("gray") cylinder(h=50,d=screw5,$fn=100);
+	translate([-7,30,-8]) rotate([0,90,0]) color("gray") cylinder(h=50,d=Screw,$fn=100);
 	translate([-9,30,-8]) rotate([0,90,0]) color("cyan") cylinder(h=10,d=screw5hd,$fn=100);
 	translate([31,30,-8]) rotate([0,90,0]) color("pink") cylinder(h=10,d=screw5hd,$fn=100);
 	translate([-7,20,PivotZpos]) rotate([0,90,0]) color("salmon") cylinder(h=50,d=screw5,$fn=100); // pivot
@@ -237,6 +285,8 @@ module bearing_hole2(Xpos=0,Ypos=0,Zpos=0,Bearing=0) {
 		translate([Xpos,Ypos,-2]) color("black") cylinder(h=30,d=screw5,$fn=100);
 	}
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module bearing_flange(Xpos,Ypos,Zpos) {
 	translate([Xpos,Ypos,Zpos]) color("red") cylinder(h=15,d=out_dia_625z,$fn=100);
