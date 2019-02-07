@@ -2,7 +2,7 @@
 // Parts-Blower.scad - adapter for blower fan to an AL plate
 //////////////////////////////////////////////////////////////////////////
 // created 5/21/2016
-// last update 8/20/18
+// last update 1/31/19
 //////////////////////////////////////////////////////////////////////////
 // 6/29/16 Made fan mount a bit thicker
 // 7/19/16 Added adapter3() for corexy x-carriage extruder plate
@@ -44,23 +44,13 @@ servo_offset = 20; // adjust to move servo mount
 screw_depth = 25;
 //////////////////////////////////////////////////////////////////////////
 
-//titan_version();
-NewTitanDualBowden();
+titan_version();
 
 ///////////////////////////////////////////////////////////////////////////
 module titan_version() {
 	translate([0,-20,-1.45]) adaptertitan();
-	translate([0,45,-1.45]) adaptertitan2();
-	translate([-15,0,0]) color("cyan") FanDuct();
-	translate([-45,0,0]) color("red") FanDuct();
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-module NewTitanDualBowden() {  // make fan mounts for the bowden Daul hotend
-	translate([0,-20,-1.45]) adaptertitan();
-	translate([0,45,-1.45]) adaptertitan();
-	translate([-15,0,0]) color("cyan") FanDuct();
+	//translate([0,45,-1.45]) adaptertitan2();
+	//translate([-15,0,0]) color("cyan") FanDuct();
 	translate([-45,0,0]) color("red") FanDuct();
 }
 
@@ -73,19 +63,6 @@ module adaptertitan() { // stepper motor side
 	}
 	translate([-42,-Fwidth+9,0]) color("cyan") cubeX([Fwidth,Fwidth-6,thickness3]);
 	translate([-74,-4.55,0]) rotate([90,0,0]) fanmounttitan();
-}
-
-module adaptertitan2() { // extruder cooling fan side
-	translate([0,Mheight3,0]) rotate([0,0,180]) difference() {
-		color("cyan") cubeX([Mwidth3,Mheight3+4,thickness3],2);
-		translate([0,-25,48]) rotate([90,0,90]) mountingholes();
-		translate([9,-9,-2]) color("red") cubeX([35,Fwidth-6,thickness3+4],2);
-	}
-	difference() {
-		translate([-68,6,0]) rotate([90,0,0]) fanmounttitan(14);
-		translate([-45,0,-2]) color("blue") cubeX([35,Fwidth-6,thickness3+4],2);
-		translate([-45,5,0.5]) rotate([40,0,0]) color("black") cubeX([35,Fwidth-6,thickness3+2],2);
-	}
 }
 
 module fanmounttitan(Add=0) { // mount the blower
