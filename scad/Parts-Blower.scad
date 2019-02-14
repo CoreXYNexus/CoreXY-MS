@@ -1,8 +1,8 @@
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 // Parts-Blower.scad - adapter for blower fan to an AL plate
 //////////////////////////////////////////////////////////////////////////
 // created 5/21/2016
-// last update 1/31/19
+// last update 2/14/19
 //////////////////////////////////////////////////////////////////////////
 // 6/29/16 Made fan mount a bit thicker
 // 7/19/16 Added adapter3() for corexy x-carriage extruder plate
@@ -12,80 +12,86 @@
 //		   corexy-x-carriage.scad
 // 7/13/18 Added color to preview
 // 8/20/18 Removed unused code
+// 2/13/19 Changed to current extruder with titan
+// 2/14/19 Removed and renamed variables used.
 //////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>
 use <fanduct.scad> // http://www.thingiverse.com/thing:387301
-$fn=50;
+$fn=100;
 //////////////////////////////////////////////////////////////////////////
 // vars
 //////////////////////////////////////////////////////////////////////////
-thickness = 6.5;
-Mheight = 6;
-Mwidth = 40;
-Fspace = 15;
-Fwidth = Fspace + 6;
-Fheight = 15;
-thickness3 = 6.5;
-Mheight3 = 6;
-Mwidth3 = 60;
-Fheight3 = 10;
-// from corexy-x-carriage.scad ------------------------------------------------
-wall = 8;		// thickness of the plates
-width = 75;		// width of back/front/extruder plates
-depthE = wall;	// thickness of the extruder plate
-heightE = 60; 	// screw holes may need adjusting when changing the front to back size
-extruder = 50;	// mounting hole distance
-extruder_back = 18; // adjusts extruder mounting holes from front edge
-fan_spacing = 32;	// hole spaceing for a 40mm fan
-fan_offset = -6;  // adjust to align fan with extruder
-servo_spacing = fan_spacing;
-servo_offset = 20; // adjust to move servo mount
-screw_depth = 25;
+Thickness = 6.5;
+MHeight = 6;
+MWidth = 60;
+FHeight = 10;
+MountingHoleHeight = 60; 	// screw holes may need adjusting when changing the front to back size
+ExtruderOffset = 18;		// adjusts extruder mounting holes from front edge
+FanSpacing = 32;			// hole spacing for a 40mm fan
 //////////////////////////////////////////////////////////////////////////
 
-titan_version();
+//Long_Motor_version(1,0,24,6);
+Short_Motor_version(1,7,24,6); // 1st arg: fan duct;
+								// 2nd arg is offset
+								// 3rd arg: move up/down M4 blower mounting hole
+								// 4th arg: move front/rear M4 blower mounting hole
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Short_Motor_version(Duct=0,Move=0,Raise=0,Back=0) {
+	difference() {
+		color("cyan") cubeX([FanSpacing+Move/2,MHeight,Thickness],1);
+		BracketMount();
+	}
+	difference() {
+		FanBlowerMount(Move,Raise,Back);
+		BracketMount();
+	}
+	if(Duct) translate([-5,-12,1.5]) color("red") FanDuct();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module FanBlowerMount(Move=0,Raise=0,Back=0,X=0,Y=0,Z=0) {
+	difference() {
+		translate([Move,-16+Back,0]) color("gray") cubeX([21,21-Back,Raise+4],1);
+		RemoveForBlower(Move,Raise);
+		translate([Move+X,-Back+Y,Raise+Z]) rotate([0,90,0]) color("purple") cylinder(h=42,r=screw4/2,$fn=50);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BracketMount() {
+	translate([3,10,FHeight/4+0.5]) rotate([90,0,0]) color("red") cylinder(h = 18,r = screw3/2,$fn=50);
+	translate([3,1,FHeight/4+0.5]) rotate([90,0,0]) color("gray") cylinder(h = 18,r = screw3hd/2,$fn=50);
+	translate([3+FanSpacing,10,FHeight/4+0.5]) rotate([90,0,0]) color("blue") cylinder(h = 18,r = screw3/2,$fn=50);
+	translate([3+FanSpacing,1,FHeight/4+0.5]) rotate([90,0,0]) color("plum") cylinder(h = 18,r = screw3hd/2,$fn=50);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module RemoveForBlower(Move=0,Raise=0) {
+	translate([Move+3,-45,-10]) color("yellow") cubeX([15,45,Raise*2],1);
+}
 
 ///////////////////////////////////////////////////////////////////////////
-module titan_version() {
-	translate([0,-20,-1.45]) adaptertitan();
-	//translate([0,45,-1.45]) adaptertitan2();
-	//translate([-15,0,0]) color("cyan") FanDuct();
-	translate([-45,0,0]) color("red") FanDuct();
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-module adaptertitan() { // stepper motor side
-	translate([0,Mheight3,0]) rotate([0,0,180]) difference() {
-		color("cyan") cubeX([Mwidth3,Mheight3,thickness3],2);
-		translate([0,-25,48]) rotate([90,0,90]) mountingholes();
-	}
-	translate([-42,-Fwidth+9,0]) color("cyan") cubeX([Fwidth,Fwidth-6,thickness3]);
-	translate([-74,-4.55,0]) rotate([90,0,0]) fanmounttitan();
-}
-
-module fanmounttitan(Add=0) { // mount the blower
+module Long_Motor_version(Duct=0,Move=0,Raise=0,Back=0) { // stepper side
 	difference() {
-		translate([Mwidth3/2+2,0,thickness3-1]) color("gray") cubeX([Fwidth,thickness3*2.7,Fheight3*1.7+Add]);
-		translate([Mwidth3/2+5,-1,Fheight3]) color("yellow") cubeX([Fspace,thickness3*3.5+2,Fspace*2]);
-		translate([Mwidth3/2,13,Fheight3*2-3+Add]) rotate([0,90,0]) color("purple") cylinder(h=Fwidth*2,r=screw4/2,$fn=50);
+		color("cyan") cubeX([FanSpacing+7,MHeight,Thickness],1);
+		translate([0,0,0.5]) BracketMount();
 	}
+	difference() {
+		translate([Move+6,-12,0]) color("lightgray") cubeX([21,15,Thickness],1);
+		translate([0,0,0.5]) BracketMount();
+	}
+	difference() {
+		translate([Move+6,-14,0]) FanBlowerMount(Move,Raise,6,0,0);
+		translate([0,0,0.5]) BracketMount();
+	}
+	if(Duct) translate([-5,-15,0]) color("red") FanDuct();
 }
 
-module mountingholes(Inner=0) {	// mounting holes (copied from fan() & servo() modules in corexy-x-carriage.scad)
-	// outer holes
-	translate([extruder/2-12,-heightE/2 - 1.8*wall,heightE - extruder_back - servo_spacing/2 - servo_offset])
-		rotate([0,90,0]) color("red") cylinder(h = depthE+screw_depth,r = screw3/2,$fn=50);
-	translate([extruder/2-12,-heightE/2 - 1.8*wall,heightE - extruder_back + fan_spacing/2 + fan_offset])
-		rotate([0,90,0]) color("blue") cylinder(h = depthE+screw_depth,r = screw3/2,$fn=50);
-	// inner holes
-	if(Inner) {
-		translate([extruder/2-12,-heightE/2 - 1.8*wall,heightE - extruder_back + servo_spacing/2 - servo_offset])
-			rotate([0,90,0]) color("black") cylinder(h = depthE+screw_depth,r = screw3/2,$fn=50);
-		translate([extruder/2-12,-heightE/2 - 1.8*wall,heightE - extruder_back - fan_spacing/2 + fan_offset])
-			rotate([0,90,0]) color("green") cylinder(h = depthE+screw_depth,r = screw3/2,$fn=50);
-	}
-}
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////end of parts-blower.scad///////////////////////////////////////////////////////////////////////

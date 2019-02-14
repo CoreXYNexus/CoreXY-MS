@@ -37,7 +37,7 @@ module beltLoop(){ // the loop that holds the belt
 
 module beltOpening(){  // both belt loops
 	beltLoop();
-	translate([38,0,0]) mirror(1,0,0) beltLoop();
+	translate([38,0,0]) mirror([1,0,0]) beltLoop();
 	translate([17.5,2.5,0])  color("khaki") cube([3,8,12]); // remove section between bosses
 	translate([19,7,0]) rotate([0,0,45])  color("white") cube([4,4,12]); // remove section between bosses
 }
@@ -50,6 +50,3 @@ module platform(){
 		translate([45.5,-1,6]) rotate([-90,0,0])  color("salmon") cylinder(h=30, r=1.7); //, $fn=100);
 	}
 }
-
-translate([6,platformHeight-6.5,0]) beltClamp();
-platform();

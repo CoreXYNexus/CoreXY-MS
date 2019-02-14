@@ -103,13 +103,13 @@ idler_spacer_thickness = GT2_40t_h + 0.9;	// thickness of idler bearing spacer
 layer = 0.25;				// printed layer thickness
 ////////////////////////////////////////////////////////////////////////////
 
-//direct_drive(3,0,5,8); 	// Z axis for bed leveling
+direct_drive(3,0,5,8); 	// Z axis for bed leveling
 				// 1st arg: quantiy; 2nd arg: printable couplers; 3rd arg: motor shaft diameter; 4th arg is leadscrew diameter
 //direct_drive_motor_mount(2); // arg is quanity
 //motor_direct_with_znut(3); // motor mounts and the znut holder
 //belt_drive();	// arg is quanity, belt drive leadscrew mounts and znut
 //belt_motor_Mount();  // z motor mount for belt version
-plates(1,screw5); // arg is quanity*2
+//plates(1,screw5); // arg is quanity*2
 //partial();
 	
 //////////////////////////////////////////////////////////////////////////////
