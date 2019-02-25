@@ -32,7 +32,7 @@ FanSpacing = 32;			// hole spacing for a 40mm fan
 //////////////////////////////////////////////////////////////////////////
 
 //Long_Motor_version(1,0,24,6);
-Short_Motor_version(1,7,24,6); // 1st arg: fan duct;
+Short_Motor_version(0,6,25,6); // 1st arg: fan duct;
 								// 2nd arg is offset
 								// 3rd arg: move up/down M4 blower mounting hole
 								// 4th arg: move front/rear M4 blower mounting hole
@@ -40,7 +40,7 @@ Short_Motor_version(1,7,24,6); // 1st arg: fan duct;
 
 module Short_Motor_version(Duct=0,Move=0,Raise=0,Back=0) {
 	difference() {
-		color("cyan") cubeX([FanSpacing+Move/2,MHeight,Thickness],1);
+		color("cyan") cubeX([FanSpacing+Move/2+4,MHeight,Thickness],1);
 		BracketMount();
 	}
 	difference() {
