@@ -84,7 +84,7 @@
 include <CoreXY-MSv1-h.scad>
 use <ybeltclamp.scad>	// modified https://www.thingiverse.com/thing:863408
 $fn=75;
-TestLoop=1; // have original belt clamp mount hole visible
+TestLoop=0; // 1 = have original belt clamp mount hole visible
 LoopHoleOffset=28;	// distance between the belt lopp mounting holes (same as in belt_holder.scad)
 LoopHOffset=0;		// shift horizontal the belt loop mounting holes
 LoopVOffset=-2;		// shift vertical the belt loop mounting holes
@@ -397,10 +397,10 @@ module CarriageBeltDrive(Loop=0) {
 			translate([21,25,-5]) cylinder(h= 20, r = 8);
 		}
 		 // mounting holes for an endstop holder
-		translate([4,13,-5]) color("khaki") cylinder(h= 20, r = screw5t/2,$fn=6);
-		translate([4,33,-5]) color("plum") cylinder(h= 20, r = screw5t/2,$fn=6);
-		translate([37,13,-5]) color("gold") cylinder(h= 20, r = screw5t/2,$fn=6);
-		translate([37,33,-5]) color("red") cylinder(h= 20, r = screw5t/2,$fn=6);
+		translate([4,13,-5]) color("khaki") cylinder(h= 20, r = screw5t/2);
+		translate([4,33,-5]) color("plum") cylinder(h= 20, r = screw5t/2);
+		translate([37,13,-5]) color("gold") cylinder(h= 20, r = screw5t/2);
+		translate([37,33,-5]) color("red") cylinder(h= 20, r = screw5t/2);
 	}
 	difference() {	// right wall
 		translate([-wall/2-1,0,0]) color("yellow") cubeX([wall-2,40,29],2);
@@ -439,14 +439,14 @@ module CarriageBeltDrive(Loop=0) {
 module BeltLoopHolderMountingHoles() { // for beltholder
 	// pink side
 	translate([35,8+LoopHOffset,17+LoopVOffset]) rotate([0,90,0])
-		color("black") cylinder(h = 2*wall, r = screw3t/2,$fn=6);
+		color("black") cylinder(h = 2*wall, r = screw3t/2);
 	translate([35,4+LoopHoleOffset+LoopHOffset,17+LoopVOffset]) rotate([0,90,0])
-		color("white") cylinder(h = 2*wall, r = screw3t/2,$fn=6);
+		color("white") cylinder(h = 2*wall, r = screw3t/2);
 	// yellow side
 	translate([-10,8+LoopHOffset,17+LoopVOffset]) rotate([0,90,0])
-		color("plum") cylinder(h = 2*wall, r = screw3t/2,$fn=6);
+		color("plum") cylinder(h = 2*wall, r = screw3t/2);
 	translate([-10,4+LoopHoleOffset+LoopHOffset,17+LoopVOffset]) rotate([0,90,0])
-		color("gray") cylinder(h = 2*wall, r = screw3t/2,$fn=6);
+		color("gray") cylinder(h = 2*wall, r = screw3t/2);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
