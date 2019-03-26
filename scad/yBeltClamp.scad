@@ -31,7 +31,7 @@ module beltLoop(){ // the loop that holds the belt
 			translate([13.5,5.5,0]) cylinder(h = 12, r1 = 4, r2 = 4);
 		}
 	}
-	 color("gray") cube([8,3,12]); // belt exit slot
+	 color("gray") cube([8,2.5,12]); // belt exit slot
 }
 
 

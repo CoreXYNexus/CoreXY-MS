@@ -62,7 +62,7 @@ FancapL.stl is for the power supply fan to make it blow to the side.
 Use your favorite coupler for the direct drive on the z axis, not needed for belt drive.
 
 Uses:
-		OPENSCAD https://www.openscad.org/downloads.html (use a version later than 2015.03-3)
+		OPENSCAD https://www.openscad.org/downloads.html (use a version later than 2015.03-3, like: OpenSCAD 2019.01-RC4)
 
 		cubeX from http://www.thingiverse.com/thing:112008
 		

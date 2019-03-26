@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CXY-MSv1 Nameplate - nameplate for the printer
 // created: 7/11/2018
-// last modified: 7/11/18
+// last modified: 2/28/19
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 
+// 2/28/19	- Bugfix in printchar()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/configuration.scad> // http://github.com/prusajr/PrusaMendel, which also uses functions.scad & metric.scad
 include <inc/screwsizes.scad>
@@ -34,7 +34,7 @@ module plate() {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 module printchar(String,TxtHeight=1,TxtSize=3.5) { // print something
-	color("darkgray") linear_extrude(height = TxtHeight) text(String, font = "Babylon5:style=Regular",size=TxtSize,align="center");
+	color("darkgray") linear_extrude(height = TxtHeight) text(String, font = "Babylon5:style=Regular",size=TxtSize);
 }
 
 

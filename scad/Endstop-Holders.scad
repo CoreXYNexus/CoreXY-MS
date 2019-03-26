@@ -22,17 +22,19 @@ Switch_thk = 5;			// thickness of holder
 Switch_thk2 = 7;		// thickness of spacer
 HolderWidth = 33;	// width of holder
 SwitchShift = 6;	// move switch mounting holes along width
-MountScrew=screw5;
-StikeMountScrew=screw5;
+MountScrew=screw4;	// part that holds the switch
+StikeMountScrew=screw5; // the part the switch hits
 ////////////////////////////////////////////////////////////////////////////
 
 //thing(hole distance,hole diagonal offset,amount to move from edge,screw hole size);
 
 thing(22,10,3,screw3t,MountScrew);	// TEMCo CN0097: 22,10,screw3t ; Little green/black: 9,0,screw2
-translate([0,40,0]) thing(10,0,7,screw2,MountScrew); // black microswitch inline mount
-translate([0,-40,0]) clamp(MountScrew);
-translate([-40,-40,0])strikeY(StikeMountScrew);
-translate([-40,-12,0]) strikeX(StikeMountScrew);
+//translate([0,40,0]) thing(22,10,3,screw3t,MountScrew);	// TEMCo CN0097: 22,10,screw3t ; Little green/black: 9,0,screw2
+//translate([0,40,0]) thing(10,0,7,screw2,MountScrew); // black microswitch inline mount
+//translate([0,0,0]) thing(10,0,7,screw2,MountScrew); // black microswitch inline mount
+//translate([0,-40,0]) clamp(MountScrew);
+//translate([-40,-40,0])strikeY(StikeMountScrew);
+translate([-30,-12,0]) strikeX(StikeMountScrew);
 
 ///////////////////////////////////////////////////////////////////////////
 

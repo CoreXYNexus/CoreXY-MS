@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 1/29/2017
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 1/29/2019
+// Last Update: 2/28/2019
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/15/17	- Added bearing pivot style carriage & 2040 mounts for multi-motor leveling
 // 1/29/17	- Added pivot version using just a M5 screw
@@ -17,6 +17,7 @@
 // 1/29/19	- Fixed z_pivots() so all parts are on the same z0
 //			  Added z_pivot_2040_v2(), it uses less plastic, it only attaches to the end of a 2040
 //			  Added screw size to extrusion slots option to z_pivot_2040()
+// 2/28/19	- Added z_pivot_2040_v2x3() for three z_pivot_2040_v2()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -39,7 +40,8 @@ body_ht_625z=4;
 //z_pivot_carriage(0);
 //center_pivot2(1);
 //z_pivot_2040(1,1,screw5);
-z_pivot_2040_v2(1,1);
+//z_pivot_2040_v2(1,1);
+z_pivot_2040_v2x3(1,1);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,19 +49,6 @@ module z_pivots(Qty,Bearing=0,Round=1) {
 	if($preview) %translate([-40,-30,-5]) cubeX([200,200,5]);
 	for(i=[0:Qty-1]){
 		translate([0,i*45,15]) z_pivot_2040(Bearing,Round);
-		if(Round) translate([75,i*45+20,21.6]) rotate([180,90,0]) center_pivot2(Bearing);
-		else translate([45,i*45,0]) center_pivot(Bearing); // non-rounded version
-		if(Bearing)	translate([80,i*45,0])z_pivot_carriage(1);
-		else translate([15,i*45+10,0]) spacer_pivot();
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module z_pivots_v2(Qty,Bearing=0,Round=1) {
-	if($preview) %translate([-40,-30,-5]) cubeX([200,200,5]);
-	for(i=[0:Qty-1]){
-		translate([0,i*45,15]) z_pivot_2040_v2(Bearing,Round);
 		if(Round) translate([75,i*45+20,21.6]) rotate([180,90,0]) center_pivot2(Bearing);
 		else translate([45,i*45,0]) center_pivot(Bearing); // non-rounded version
 		if(Bearing)	translate([80,i*45,0])z_pivot_carriage(1);
@@ -148,6 +137,14 @@ module z_pivot_2040_v2(Bearing=1,RoundPivot=1) { // 3 625 bearing pivot mounts o
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module z_pivot_2040_v2x3(Bearing=1,RoundPivot=1) {
+	z_pivot_2040_v2(Bearing,RoundPivot);
+	translate([0,50,0]) z_pivot_2040_v2(Bearing,RoundPivot);
+	translate([0,100,0]) z_pivot_2040_v2(Bearing,RoundPivot);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module roundover() { // roundover a corner
@@ -207,7 +204,7 @@ module center_pivot(Bearing=0) {
 module center_pivot2(Bearing) {
 	difference() {
 		translate([0,0.5,dia_625z/2]) color("cyan") cubeX([dia_625z+5,dia_625z+4,dia_625z+5],1);
-		double_bearing_mount_hole(Bearing);
+		double_bearing_mount_hole();
 		translate([dia_625z/2+2.5,dia_625z/2+2.5,dia_625z-3]) color("yellow") cylinder(h=40,d=screw5,$fn=100);
 		translate([-5,dia_625z/2-2,dia_625z/2+13]) color("green") cube([40,8.6,4]);
 		rotate([0,90,0]) bearing_flange(-10.5,11,22-flange_625z);
@@ -270,9 +267,9 @@ module side_screws_2040(PivotZpos=20,Screw=screw5) {
 	translate([30,20,PivotZpos]) rotate([0,90,0]) color("lime") cylinder(h=10,d=nut5+0.5,$fn=6); // pivot
 	// end screw holes
 	translate([16,10,-8])color("white") cylinder(h=50,d=screw5,$fn=100);
-	translate([16,10,4.25])color("lightgray") cylinder(h=10,d=screw5hd,$fn=100);
+	translate([16,10,4])color("lightgray") cylinder(h=10,d=screw5hd,$fn=100);
 	translate([16,30,-8]) color("gray") cylinder(h=50,d=screw5,$fn=100);
-	translate([16,30,4.25])color("tan") cylinder(h=10,d=screw5hd,$fn=100);
+	translate([16,30,4])color("tan") cylinder(h=10,d=screw5hd,$fn=100);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 // CoreXY-Motor-Bearing.scad - hold the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
-// last update 12/8/18
+// last update 2/28/19
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16	- added built-in spacer to the bearing_bracket
 // 7/14/16	- adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -23,6 +23,7 @@
 // 8/19/18	- OpenSCAD 2018.06.01 for $preview
 // 12/8/18	- Changed stepper motor mount to slots for belt adjustment, adjusted diagonal supports
 //			  on the stepper motor mounts
+// 2/28/18	- Bugfix in all() and bearing_bracket()
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in bearing_bracket() must match stepper motor shaft in motor_mount()
 //       If the motors get hot, print it from something that can handle it
@@ -47,18 +48,18 @@ Vthickness = 7;		// thickness of bearing support vertical section
 Tthickness = 5;		// thickness of bearing support top and fillet
 /////////////////////////////////////////////////////////////////////////////////////////
 
-//all(1); // all the needed parts
-partial();
+all(1); // all the needed parts
+//partial();
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module all(MS) {
 	if($preview) %translate([20,10,-5]) cube([200,200,2],center=true); // show the 200x200 bed
 	translate([0,-5,0]) motor_mount(1);
-	translate([35,94.5,-2.5]) rotate([0,0,-90]) bearing_bracket(0,"Right");
+	translate([35,60,-2.5]) rotate([0,0,0]) bearing_bracket(0,"Right");
 	translate([85,21,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
 	translate([0,65,0]) motor_mount(0);
-	translate([35,-29.5,-2.5]) rotate([0,0,-90]) mirror() bearing_bracket(0,"Left"); // mirror it for the other side
+	translate([80,-26,-2.5]) rotate([0,0,0]) mirror([1,0,0]) bearing_bracket(0,"Left"); // mirror it for the other side
 	translate([60,-66,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
 }
 
@@ -164,12 +165,12 @@ module bearing_bracket(TapIt=0,Label="") {
 		translate([20,25,30]) rotate([90,0,0]) color("yellow") cylinder(h=45,r=screw5hd/2);
 		translate([-2,10,10]) rotate([0,90,0]) color("snow") cylinder(h=45,r=screw5/2);
 		translate([5,10,10]) rotate([0,90,0]) color("lawngreen") cylinder(h=45,r=screw5hd/2);
-		if(!TapIt) translate([b_posY,b_posX,-b_height-8]) color("lightcyan") cylinder(h=50,d=nut5_d,$fn=6); // nut hole
+		if(!TapIt) translate([b_posY,b_posX,-b_height-8]) color("lightcyan") cylinder(h=50,d=nut5,$fn=6); // nut hole
 	}
-	if(!TapIt) translate([b_posY-4,b_posX-4.5,b_height+30-8]) color("salmon")cube([10,10,layer_t]); // nut hole support
+	if(!TapIt) translate([b_posY-4,b_posX-4.5,b_height+30-8]) color("salmon") cube([10,10,layer_t]); // nut hole support
 	translate([b_posY,b_posX,40]) spacer(TapIt);
 	if(Label=="Right") translate([4,0.1,20]) rotate([90,0,0]) printchar(Label);
-	if(Label=="Left") translate([14,-1.4,20]) rotate([90,0,180]) printchar(Label);
+	if(Label=="Left") translate([14,-1.4,20]) rotate([90,0,0]) mirror([1,0,0]) printchar(Label);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
