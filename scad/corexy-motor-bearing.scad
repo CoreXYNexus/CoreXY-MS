@@ -2,7 +2,7 @@
 // CoreXY-Motor-Bearing.scad - hold the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
-// last update 2/28/19
+// last update 4/16/19
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16	- added built-in spacer to the bearing_bracket
 // 7/14/16	- adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -23,7 +23,9 @@
 // 8/19/18	- OpenSCAD 2018.06.01 for $preview
 // 12/8/18	- Changed stepper motor mount to slots for belt adjustment, adjusted diagonal supports
 //			  on the stepper motor mounts
-// 2/28/18	- Bugfix in all() and bearing_bracket()
+// 2/28/19	- Bugfix in all() and bearing_bracket()
+// 4/16/19	- Changed the angle support for the motor mounts to match the Z motor mounts
+//			  Changed the bearing_support() to match the motor mount notch supports
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in bearing_bracket() must match stepper motor shaft in motor_mount()
 //       If the motors get hot, print it from something that can handle it
@@ -199,7 +201,7 @@ module bearing_support(NotchIt=0) {	// keep the bearing from tilting on the brac
 	}
 	if(NotchIt) {
 		difference() {	// extra support at notch
-			translate([0,28.5,40]) rotate([90,0,0]) color("cyan") cylinder(h=37,d=12,$fn=100); // strengthen the vertical
+			translate([-2,30,35]) rotate([90,0,0]) color("cyan") cubeX([5,10,40],2); // strengthen at the notch
 			translate([-5,0,30]) rotate([0,90,0]) color("red") cylinder(h=5,d=screw5hd);	// screw head clearance
 			translate([-5,20,30]) rotate([0,90,0]) color("blue") cylinder(h=5,d=screw5hd);
 			translate([2,-15,35]) color("black") cube([10,50,10]); // remove any of the cylinder on notch side
@@ -221,16 +223,32 @@ module bearing_support(NotchIt=0) {	// keep the bearing from tilting on the brac
 module diag_side(Side) {
 	if(Side) {
 		difference() {
-			translate([-20,24.5,-7]) rotate([0,-45,0]) color("gray") cubeX([75,5,10],2);
-			translate([-30,23.5,-10]) color("white") cube([60,10,10],2);
-			translate([27,23.5,55]) rotate([0,90,0]) color("black") cube([60,10,10],2);
+			translate([6,24.5,-35]) rotate([0,-45,0]) color("gray") cubeX([80,5,50],2);
+			translate([-30,23.5,-35]) color("white") cube([60,10,35],2);
+			translate([27,23.5,57]) rotate([0,90,0]) color("black") cube([70,10,35],2);
+			color("plum") hull() {
+				translate([-7,33,7]) rotate([90,0,0]) cylinder(h=10,r=5);
+				translate([20,33,35]) rotate([90,0,0]) cylinder(h=10,r=5);
+				translate([20,33,7]) rotate([90,0,0]) cylinder(h=10,r=5);
+			}
 		}
 	} else {
-		difference() {
-			translate([-20,-29.5,-7]) rotate([0,-40,0]) color("lightgray") cubeX([75,5,10],2);
-			translate([-30,-30.5,-10]) color("white") cube([50,10,10],2);
-			translate([27,-30.5,55]) rotate([0,90,0]) color("black") cube([50,10,10],2);
+		translate([0,-54,0]) difference() {
+			translate([3,24.5,-38]) rotate([0,-40,0]) color("gray") cubeX([85,5,50],2);
+			translate([-30,23.5,-40]) color("white") cube([70,10,40],2);
+			translate([26,23.5,55]) rotate([0,90,0]) color("black") cube([70,10,48],2);
+		
+			color("plum") hull() {
+				translate([-7,33,6]) rotate([90,0,0]) cylinder(h=10,r=5);
+				translate([20,33,28]) rotate([90,0,0]) cylinder(h=10,r=5);
+				translate([20,33,7]) rotate([90,0,0]) cylinder(h=10,r=5);
+			}
 		}
+//		difference() {
+//			translate([-20,-29.5,-7]) rotate([0,-40,0]) color("lightgray") cubeX([75,5,10],2);
+//			translate([-30,-30.5,-10]) color("white") cube([50,10,10],2);
+//			translate([27,-30.5,55]) rotate([0,90,0]) color("black") cube([50,10,10],2);
+//		}
 	}
 }
 
