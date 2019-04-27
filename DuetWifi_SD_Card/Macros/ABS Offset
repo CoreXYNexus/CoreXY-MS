@@ -1,0 +1,3 @@
+; set z offset for ABS
+G31 P500 X0 Y-30 Z1.3 ; Set Z probe trigger value, offset and trigger height; increase to get closer
+M117 ABS Offset

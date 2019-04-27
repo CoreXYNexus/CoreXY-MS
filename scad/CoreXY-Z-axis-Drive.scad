@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 2/3/2019
+// Last Update: 4/27/2019
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/28/16	- modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
 // 7/3/16	- added assembly info
@@ -30,6 +30,7 @@
 // 2/3/19	- Changed NEMA17 holes to a set motor position, shaft_offset is now taken into account with z_shift
 //			  Now using OPENSCAD version 2019.01.24.ci1256 (git 7fa2c8f1)
 //			  Added M3 version to plates()
+// 4/27/19	- Added a belt drive version of the direct drive mount in direct_belt_drive_motor_mount()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -103,13 +104,14 @@ idler_spacer_thickness = GT2_40t_h + 0.9;	// thickness of idler bearing spacer
 layer = 0.25;				// printed layer thickness
 ////////////////////////////////////////////////////////////////////////////
 
-direct_drive(3,0,5,8); 	// Z axis for bed leveling
+//direct_drive(3,0,5,8); 	// Z axis for bed leveling
 				// 1st arg: quantiy; 2nd arg: printable couplers; 3rd arg: motor shaft diameter; 4th arg is leadscrew diameter
-//direct_drive_motor_mount(2); // arg is quanity
+//direct_drive_motor_mount(1); // arg is quanity
 //motor_direct_with_znut(3); // motor mounts and the znut holder
 //belt_drive();	// arg is quanity, belt drive leadscrew mounts and znut
 //belt_motor_Mount();  // z motor mount for belt version
 //plates(1,screw5); // arg is quanity*2
+direct_belt_drive_motor_mount(3); // arg is quanity
 //partial();
 	
 //////////////////////////////////////////////////////////////////////////////
@@ -128,9 +130,24 @@ module direct_drive(Quanity=1,Coupler,Motorshaft,LeadScrewDiameter) { // set for
 
 module direct_drive_motor_mount(Quanity=1) { // set for makerslide
 	if($preview) %translate([-100,-100,-4.5]) cube([200,200,2]);
-	for(a=[0:Quanity-1]) translate([a*65-65,0,thickness/2]) motor_mount(1);
+	for(a=[0:Quanity-1]) translate([a*65-65,0,thickness/2]) belt_motor_mount(1);
 	echo("-----------------Don't forget the plates, if needed-------------------"); // adding plates makes it bigger than a 200x200 bed
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module direct_belt_drive_motor_mount(Quanity=1) { // arg is quanity
+	//if($preview) %translate([-100,-100,-4.5]) cube([200,200,2]);
+	for(a=[0:Quanity-1]) {
+		translate([a*77-65,0,thickness/2]) belt_motor_Mount(0);
+		translate([a*77-93,50,0]) bearing_mount(0,0,0,1);
+	}
+	echo("-----------------Don't forget the plates, if needed-------------------"); // adding plates makes it bigger than a 200x200 bed
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module belt_drive(Quanity=1) {
 	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
@@ -142,13 +159,15 @@ module belt_drive(Quanity=1) {
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module belt_motor_Mount() {
+module belt_motor_Mount(Idler=1) {
 	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
-	translate([-30,-30,0]) belt_motor(1);	// one stepper motor mount with idler
+		translate([-30,-30,0]) belt_motor(Idler);	// one stepper motor mount with idler
 	translate([10,-30,-2.5]) lockring();	// something to hold leadscrew in bearing
-	translate([10,0,-2.5]) lockring();	// something to hold leadscrew in bearing
-	translate([10,30,-2.5]) lockring();	// something to hold leadscrew in bearing
+	//translate([10,0,-2.5]) lockring();	// something to hold leadscrew in bearing
+	//translate([10,30,-2.5]) lockring();	// something to hold leadscrew in bearing
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module motor_direct_with_znut(Quanity=1) {  // z motor mount for 3 z motors
 	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
@@ -192,6 +211,17 @@ module motor_mount(makerslide=0) { // motor mount
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module belt_mount(makerslide=0) { // motor mount
+	rotate([180,0,0]) {
+		nema_plate(0,1);
+		mount(0);
+		translate([50,0,2.5]) rotate([0,180,180]) bearing_mount(0,0,0,0);
+
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////
 
 module mount(makerslide=0) {
@@ -219,7 +249,7 @@ module notchit() {
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 
-module side_support() {
+module side_support(MSupport=1) {
 	difference() {	// side support
 		union() {
 			translate([b_width/2-thickness,-(b_length-27),-6.9]) rotate([-30,0,0])
@@ -239,10 +269,13 @@ module side_support() {
 
 ////////////////////////////////////////////////////////////////////////////
 
-module nema_plate(makerslide=0) {
+module nema_plate(makerslide=0,HSlot=0) {
 	difference() {
 		translate([-27.5,-(shaft_offset-base_offset)-29.5,-1]) color("red") cubeX([b_width,b_length,thickness+1],1);
-		translate([0,-shaft_offset,-3]) rotate([0,0,90]) color("white") NEMA17_parallel_holes(10,0);
+		if(HSlot)
+			translate([0,-shaft_offset,-3]) color("white") NEMA17_parallel_holes(10,10);
+		else
+			translate([0,-shaft_offset,-3]) rotate([0,0,90]) color("white") NEMA17_parallel_holes(10,0);
 		if(makerslide) notchit();
 	}
 	if(CheckMotorPosition) translate([12,24.5,3]) color("black") rotate([90,0,0]) cylinder(h=51,d=screw5); // used to help set nema17 position, the 51 is measured off an actual print
@@ -396,21 +429,21 @@ module testnut(Type) { 	// a shortened nut section for test fitting of the nut &
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module bearing_mount(Spc=0,SpcThk=idler_spacer_thickness) { // bearing holder at bottom of z-axis
+module bearing_mount(Spc=0,SpcThk=idler_spacer_thickness,Idler=1,Makerslide=1) { // bearing holder at bottom of z-axis
 	rotate([180,0,0]) {										// didn't bother to make a left/right versions
-		mount(1);
+		mount(Makerslide);
 		difference() {
 			translate([0,-(shaft_offset-base_offset),0]) color("navy") cubeX([b_width,b_length,thickness],1,center=true);
 			translate([0,-shaft_offset,-6]) color("red") cylinder(h=10,d=dia_608,$fn=100);
 			notchit();
 		}
 		translate([0,-shaft_offset,0]) bearing_hole();
-		translate([-5+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("white") cubeX([10,thickness-1,m_height-2],1);
-		translate([-48+ms_notch_offset,20-ms_notch_depth,-m_height+3])
-			color("green") cubeX([10,thickness-1,m_height-2],2);
+		//translate([-5+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("white") cubeX([10,thickness-1,m_height-2],1);
+		//translate([-48+ms_notch_offset,20-ms_notch_depth,-m_height+3])
+		//	color("green") cubeX([10,thickness-1,m_height-2],2);
 	}
 	if(Spc) translate([0,10,-2.5]) idler_spacers(0,SpcThk);
-	single_attached_idler(1);
+	if(Idler) single_attached_idler(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -446,7 +479,7 @@ module test_bearing_hole() { // test to see if it really fits
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module belt_motor(idler=0) { // motor mount for belt drive
+module belt_motor(idler=0,HSlot=1) { // motor mount for belt drive
 	rotate([180,0,0]) {
 		nema_plate(0);	// nema17 mount
 		mountbelt();	// motor mount base

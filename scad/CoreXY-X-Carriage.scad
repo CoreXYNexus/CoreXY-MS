@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CoreXY-X-Carriage - x carriage for makerslide
 // created: 2/3/2014
-// last modified: 3/9/2019
+// last modified: 4/23/2019
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to carriage and put it into a seperate module
@@ -54,6 +54,8 @@
 // 2/23/19	- Combined carriagebelt() into carriage(), bug fixes, removed unused modules, renamed modules for a better
 //			  description of what they do
 // 3/9/19	- Added a m3 nut holder on the titanextrudermount() at the end since tapping that hole may not be strong enough
+// 4/20/19	- Added a nut holder on the proximity sensor holder.
+// 4/23/19	- Added nut holders for fan adapter mount on titanextrudermount()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -117,7 +119,7 @@ partial();
 //ExtruderPlateMount(0,2); 	// 1st arg: 0 - old style hotend mount, 1 - drill guide for old style, 2 - titan/e3dv6 mount
 							//			3 - combo of 2 and x-carriage
 							// 2nd arg: 0 | 1 bltouch, 2 - round proxmity, 3 - dc42's ir sensor
-TitanCarriage(0,0); // 1st arg: 1-one piece titan/e3dv6 on x-carriage + belt drive holder
+//TitanCarriage(0,0); // 1st arg: 1-one piece titan/e3dv6 on x-carriage + belt drive holder
 					// 2ng arg: 0 - bltouch thru hole mount; 1 - bltouch surface mount; 2 - proximity sensor hole in psensord size
 							 // 3 - dc42's ir sensor; 4 - all; 5 - none (default)
 
@@ -166,7 +168,7 @@ module partial() {
 	//translate([-50,0,0]) CarriageBeltDrive(1);	// 1 - belt loop style
 	//ExtruderPlateDriilGuide();	// drill guide for using an AL plate instead of a printed one
 	//wireclamp();
-	//TitanExtruderPlatform(5,1,1);	// 1st arg: extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
+	TitanExtruderPlatform(5,1,1);	// 1st arg: extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
 					// 4 - all sensor brackets; 5 - no sensor brackets
 					// 2nd arg: InnerSupport ; 3rd arg: Mounting Holes
 	//TitanCarriage(); // one piece titan/e3dv6 on x-carriage + belt drive holder
@@ -187,7 +189,7 @@ module TitanCarriage(One=0,Sensor=5) {
 		Carriage(1,0,0,1,1,0,2);
 		if(One) {
 			translate([-5,46,0]) {	
-				rotate([90,90,90]) FanMountHoles(screw3t); // mounting holes for bltouch & prox sensor
+				rotate([90,90,90]) FanMountHoles(screw3); // mounting holes for bltouch & prox sensor
 				translate([40,-44.4,95]) rotate([90,0,0]) IRMountHoles(); // mounting holes for irsensor bracket
 			}
 		}
@@ -283,7 +285,7 @@ module ExtruderMountHolesFn(Screw=screw3,Fragments=100) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module FanMountHoles(Screw=screw3t,Left=1) {	// fan mounting holes
+module FanMountHoles(Screw=screw3,Left=1) {	// fan mounting holes
 	if(Left) {
 		translate([-extruder/2-22,-heightE/2 - 1.8*wall,heightE - extruder_back - fan_spacing/2 + fan_offset])
 			rotate([0,90,0]) color("pink") cylinder(h = 3*(depthE+screw_depth),d = Screw);
@@ -295,6 +297,24 @@ module FanMountHoles(Screw=screw3t,Left=1) {	// fan mounting holes
 		translate([-extruder/2+35,-heightE/2 - 1.8*wall,heightE - extruder_back + fan_spacing/2 + fan_offset])
 			rotate([0,90,0]) color("skyblue") cylinder(h = depthE+screw_depth,d = Screw);
 
+	}
+	translate([-38,-44.5,20]) rotate([0,90,0]) color("plum") nut(nut3,5);	// nut trap for fan
+	translate([-38.5,-44.5,52]) rotate([0,90,0]) color("blue") hull() {	// nut trap for fan
+		nut(nut3,2.55);
+		translate([0,8,0]) nut(nut3,2.5);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module FanNutHoles(Nut=nut3,Left=1) {	// fan mounting holes
+	rotate([0,90,0]) color("blue") hull() {	// nut trap for fan
+		nut(nut3,2.55);
+		translate([0,8,0]) nut(nut3,2.5);
+	}
+	translate([0,0,fan_spacing]) rotate([0,90,0]) color("plum") hull() {	// nut trap for fan
+		nut(nut3,2.55);
+		translate([0,8,0]) nut(nut3,2.5);
 	}
 }
 
@@ -335,7 +355,7 @@ module ExtruderPlatform(recess=0) // bolt-on extruder platform
 			translate([-extruder/2-2,-heightE/2+14,-8]) cylinder(h = depthE+10,r = screw4/2);
 		}
 		translate([0,26,41+wall/2]) rotate([90,0,0]) FanMountHoles();
-		translate([0,-6,0.6]) rotate([0,0,90]) IRMountHoles(screw3t);
+		translate([0,-6,0.6]) rotate([0,0,90]) IRMountHoles(screw3);
 		if(recess != 4) {
 			BLTouch_Holes(recess);
 			if(recess == 2) { // proximity sensor
@@ -355,16 +375,16 @@ module BLTouch_Holes(recess=0) {
 				translate([-bltl/2+3,bltw/2+3,bltdepth]) color("cyan") minkowski() { // depression for BLTouch
 				// it needs to be deep enough for the retracted pin not to touch bed
 				cube([bltl-6,bltw-6,wall]);
-				cylinder(h=1,r=3,$fn=100);
+				cylinder(h=1,r=3);
 			}
 			translate([-bltl/2+8,bltw/2,-5]) color("blue") cube([bltd,bltd+1,wall+3]); // hole for BLTouch
-			translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,r=screw2/2,$fn=100);
-			translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,r=screw2/2,$fn=100);
+			translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,r=screw2/2);
+			translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,r=screw2/2);
 			}
 			if(recess == 0) {	// for mounting on top of the extruder plate
 				translate([-bltl/2+8,bltw/2,-5]) color("blue") cube([bltd,bltd+1,wall+3]); // hole for BLTouch
-				translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,r=screw2/2,$fn=100);
-				translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,r=screw2/2,$fn=100);
+				translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,r=screw2/2);
+				translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,r=screw2/2);
 			}
 }
 
@@ -559,18 +579,14 @@ module ReduceIR(Taller=0) { // reduce plastic usage and gives somewhere for air 
 
 module IRMountingHoles(Taller=0) // mounting screw holes for the ir sensor
 {
-	translate([hole1x+iroffset-1.5,irmounty+Taller,-5]) rotate([0,0,0]) color("black") cylinder(h=20,r=screw3t/2);
-	translate([hole2x+iroffset-1.5,irmounty+Taller,-5]) rotate([0,0,0]) color("white") cylinder(h=20,r=screw3t/2);
+	translate([hole1x+iroffset-1.5,irmounty+Taller,-5]) rotate([0,0,0]) color("black") cylinder(h=20,r=screw3/2);
+	translate([hole2x+iroffset-1.5,irmounty+Taller,-5]) rotate([0,0,0]) color("white") cylinder(h=20,r=screw3/2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module TitanTensionHole() {
 	color("pink") cylinder(h=10,d=20);
-	//color("black") hull() {
-	//	translate([0,00,15]) cylinder(h=1,d=3);
-	//	translate([0,0,9]) cylinder(h=1,d=20);
-	//}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -599,10 +615,10 @@ module TitanExtruderPlatform(recess=3,InnerSupport=0,MountingHoles=1) { // extru
 	    translate([0,-5,wall/2]) color("purple") fillet_r(2,23/2,-1,$fn);	// round top edge
 	    translate([0,-5,-wall/2]) color("purple") rotate([180]) fillet_r(2,23/2,-1,$fn);	// round bottom edge
 	    
-		translate([-15,20,44]) rotate([90,0,0]) FanMountHoles(screw3t,0); // fan adapeter mounting holes
-		translate([-50,0,44.5]) rotate([90,0,90]) FanMountHoles(screw3t); // mounting holes for bltouch & prox sensor
-		translate([-10,70,0]) IRMountHoles(screw3t); // mounting holes for irsensor bracket
-		translate([-30,-33,0]) rotate([90,0,0]) color("plum") nut(nut3,5);
+		translate([-15,20,44]) rotate([90,0,0]) FanMountHoles(screw3t,0); // fan adapter mounting holes
+		translate([16,0,0]) rotate([90,0,0]) FanNutHoles(screw3t,0);
+		translate([-50,0,44.5]) rotate([90,0,90]) FanMountHoles(screw3); // mounting holes for bltouch & prox sensor
+		translate([-10,70,0]) IRMountHoles(screw3); // mounting holes for irsensor bracket
 	}
 	difference() {
 	if(InnerSupport!=2) 
@@ -611,23 +627,23 @@ module TitanExtruderPlatform(recess=3,InnerSupport=0,MountingHoles=1) { // extru
 		translate([shifthotend2,-32,0]) rotate([90,0,90]) TitanMotorMount(0,0,1);
 	
 		translate([-50,0,44.5]) rotate([90,0,90]) FanMountHoles(); // mounting holes for bltouch & prox sensor
-		translate([-10,0,0]) IRMountHoles(screw3t); // mounting holes for irsensor bracket
+		translate([-10,0,0]) IRMountHoles(screw3); // mounting holes for irsensor bracket
 	}
 	if(recess != 5) {
 		if(recess == 0 || recess == 1) translate([-13,40,-wall/2]) BLTouchMount(recess,shiftblt); // BLTouch mount
-		if(recess == 2) translate([10,45,0]) ProximityMount(shiftprox); // mount proximity sensor
+		if(recess == 2) translate([10,45,-wall/2]) ProximityMount(shiftprox); // mount proximity sensor
 		if(recess == 3) { // ir mount
 			translate([0,33,-wall/2]) difference() {
 				IRAdapter(0,ir_height);
-				translate([25,4,40]) rotate([90,0,0]) IRMountHoles(screw3t);
+				translate([25,4,40]) rotate([90,0,0]) IRMountHoles(screw3);
 			}
 		}
 		if(recess==4) {
 			translate([-50,37,-wall/2]) BLTouchMount(0,shiftblt); // BLTouch mount
-			translate([39,55,0]) ProximityMount(shiftprox); // mount proximity sensor
+			translate([39,55,-wall/2]) ProximityMount(shiftprox); // mount proximity sensor
 			translate([10,35,-wall/2]) difference() { // ir mount
 				IRAdapter(0,ir_height);
-				translate([25,4,40]) rotate([90,0,0]) IRMountHoles(screw3t);
+				translate([25,4,40]) rotate([90,0,0]) IRMountHoles(screw3);
 			}
 		}
 	}
@@ -648,8 +664,9 @@ module E3Dv6Hole() {
 
 module ProximityMount(Shift) {
 	difference() {
-		color("red") cubeX([30,30,5],2);
+		translate([-1,-2.5,0]) color("red") cubeX([32,32,8],2);
 		translate([15,12,-2]) color("olive") cylinder(h=wall*2,d=psensord); // proximity sensor hole
+		translate([15,12,4.5]) color("blue") cylinder(h=5,d=psensornut,$fn=6); // proximity nut
 	}
 	difference() {
 		translate([-20,26,0]) color("cyan") cubeX([63,5,13+Shift],2);
@@ -778,10 +795,14 @@ module TitanMotorMount(WallMount=0,Screw=screw4,InnerSupport=1) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module IRMountHoles(Screw=screw3t) // ir screw holes for mounting to extruder plate
+module IRMountHoles(Screw=screw3) // ir screw holes for mounting to extruder plate
 {
 	translate([spacing+shiftir+shifthotend,-25,0]) rotate([90,0,0]) color("red") cylinder(h=3*(depthE+screw_depth),d=Screw);
 	translate([shiftir+shifthotend,-25,0]) rotate([90,0,0]) color("blue") cylinder(h=3*(depthE+screw_depth),d=Screw);
+		translate([-3,-108.5,8]) rotate([0,90,90]) color("red") hull() {	// nut trap for sensor
+			rotate([0,0,0]) nut(nut3,2.55);
+			translate([8,0,0]) rotate([0,0,0]) nut(nut3,2.55);
+		}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

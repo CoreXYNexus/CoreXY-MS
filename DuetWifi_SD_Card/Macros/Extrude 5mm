@@ -1,0 +1,3 @@
+; Extrude 5mm filament
+M83 ; extruder relative
+G1 E5 F300

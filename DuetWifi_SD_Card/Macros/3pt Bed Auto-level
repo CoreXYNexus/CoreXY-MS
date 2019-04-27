@@ -1,0 +1,10 @@
+; Clear any bed transform
+M561
+G28 ; home all
+
+; Probe the bed at 3 points
+G30 P0 X10 Y156 H0 Z-99999
+G30 P1 X380 Y286 H0 Z-99999 
+G30 P2 X380 Y26 H0 Z-99999 S
+
+G1 X200 Y150 F6000 ; move to more or less the center of the bed

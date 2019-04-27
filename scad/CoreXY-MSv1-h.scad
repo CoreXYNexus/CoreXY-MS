@@ -44,7 +44,8 @@ vertx_distance = 70; // distance between x rods for vertical x axis
 ps_spacer = 10.5; // don't need to print support between lm8uu holders, adjust this when width changes
 mount_seperation = 23;	// mount for Prusa i3 stlye extruder; Wilson is 23, Prusa i3 is 30
 mount_height = 11.5;	// move the Prusa i3 extruder mounting holes up/down
-psensord = 19;	// diameter of proximity sensor (x offset is 0)
+psensord = 19;	// diameter of proximity sensor
+psensornut = 28; // size of proximity sensor nut
 layer = 0.2;	// printed layer thickness
 // BLTouch variables - uses the screw2 size for the mounting holes, which work fine with the provided screws or can
 // ----------------   tapped for 3mm screws

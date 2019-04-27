@@ -1,0 +1,2 @@
+G31 P400 X0 Y-30 Z1.3 ; Set Z probe trigger value, offset and trigger height; increase to get closer
+;M117 PETG Offset
