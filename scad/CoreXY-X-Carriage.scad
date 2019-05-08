@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CoreXY-X-Carriage - x carriage for makerslide
 // created: 2/3/2014
-// last modified: 4/23/2019
+// last modified: 5/4/2019
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to carriage and put it into a seperate module
@@ -56,6 +56,7 @@
 // 3/9/19	- Added a m3 nut holder on the titanextrudermount() at the end since tapping that hole may not be strong enough
 // 4/20/19	- Added a nut holder on the proximity sensor holder.
 // 4/23/19	- Added nut holders for fan adapter mount on titanextrudermount()
+// 5/4/19	- Added v2 of carriage(), a simpler squared off version made with cubeX()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -116,6 +117,7 @@ ir_height = (hotend_length - irboard_length - ir_gap) - irmount_height;	// heigh
 partial();
 //FrontCarridge(0,1,1);	// 1st:0-no clamps,1-clamps;2nd:clamps style,2-belt loop style
 //RearCarridge(0,0);	// 1st:0-no clamps,1-clamps;2nd:clamps style,2-belt loop style
+//BothCarriages(0,1,0);
 //ExtruderPlateMount(0,2); 	// 1st arg: 0 - old style hotend mount, 1 - drill guide for old style, 2 - titan/e3dv6 mount
 							//			3 - combo of 2 and x-carriage
 							// 2nd arg: 0 | 1 bltouch, 2 - round proxmity, 3 - dc42's ir sensor
@@ -127,7 +129,7 @@ partial();
 
 module FrontCarridge(Clamps=1,Loop=0,Titan=0) {
 	if($preview) %translate([-70,-50,-1]) cube([200,200,1]);
-	translate([-40,0,0]) Carriage(Titan,0,Clamps,Loop,1,1,2);
+	Carriage_v2(Titan,0,Clamps,Loop,1,0,2);
 							// Titan,Tshift,Clamps,Loop,DoBeltDrive
 }
 
@@ -135,8 +137,16 @@ module FrontCarridge(Clamps=1,Loop=0,Titan=0) {
 
 module RearCarridge(Clamps=0,Loop=0) {
 	if($preview) %translate([-10,-70,-1]) cube([200,200,1]);
-	translate([150,100,0]) rotate([0,0,180]) Carriage(0,1,Clamps,Loop,0); // rear x-carriage plate
+	Carriage_v2(0,1,Clamps,Loop,0,1); // rear x-carriage plate
 										// Titan,Tshift,Clamps,Loop,DoBeltDrive
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BothCarriages(Clamps=0,Loop=0,Titan=0) {
+	if($preview) %translate([-70,-50,-1]) cube([200,200,1]);
+	Carriage_v2(Titan,0,Clamps,Loop,1,0,2);
+	translate([15,height,0]) rotate([0,0,180]) Carriage_v2(0,1,Clamps,Loop,0,1); // rear x-carriage plate
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,11 +174,15 @@ module partial() {
 					// 3rd arg: belt clamps; 4th arg: Loop style belt holders
 					// 5:arg DoBeltDrive if 1; 6th arg: Rear carriage plate if 1; 7th arg: 1 or 2 Moves the Belt loops
 					// defaults: Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLoops=0
+	Carriage_v2(1,0,0,1,0,0,0);	// x-carriage, 1st arg: Titan mount; 2nd arg:Shift Titan mount;
+					// 3rd arg: belt clamps; 4th arg: Loop style belt holders
+					// 5:arg DoBeltDrive if 1; 6th arg: Rear carriage plate if 1; 7th arg: 1 or 2 Moves the Belt loops
+					// defaults: Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLoops=0
 	//ExtruderPlatform(0);	// for BLTouch: 0 & 1, 2 is proximity, 3 is dc42 ir sensor, 4- none
 	//translate([-50,0,0]) CarriageBeltDrive(1);	// 1 - belt loop style
 	//ExtruderPlateDriilGuide();	// drill guide for using an AL plate instead of a printed one
 	//wireclamp();
-	TitanExtruderPlatform(5,1,1);	// 1st arg: extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
+	//TitanExtruderPlatform(5,1,1);	// 1st arg: extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
 					// 4 - all sensor brackets; 5 - no sensor brackets
 					// 2nd arg: InnerSupport ; 3rd arg: Mounting Holes
 	//TitanCarriage(); // one piece titan/e3dv6 on x-carriage + belt drive holder
@@ -213,6 +227,7 @@ module Carriage(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLo
 	difference() {
 		color("cyan") cubeX([width,height,wall],radius=2);
 		NotchBottom();	// square bottom for an extruder plate
+		BeltDriveNotch(Loop);
 		// wheel holes
 		if(!Rear) { // top wheel hole, if rear, don't bevel it
 			translate([width/2,42,0]) color("red") hull() { // bevel the countersink to get easier access to adjuster
@@ -273,7 +288,83 @@ module Carriage(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLo
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+widthC=37.2;
+heightB=20;
+
+module Carriage_v2(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLoops=0) { // extruder side
+	difference() {
+		union() {
+			translate([widthC/2,0,0]) color("cyan") cubeX([widthC,height,wall],1);
+			color("blue") cubeX([width,heightB,wall],1);
+			translate([widthC/2+2,12,0]) rotate([0,0,45]) color("red") cubeX([10,10,wall],1);
+			translate([widthC/2+35,12,0]) rotate([0,0,45]) color("yellow") cubeX([10,10,wall],1);
+		}
+		BeltDriveNotch(Loop);
+		// wheel holes
+		if(!Rear) { // top wheel hole, if rear, don't bevel it
+			translate([widthC,tri_sep+10,0]) color("red") hull() { // bevel the countersink to get easier access to adjuster
+				translate([0,0,3]) cylinder(h = depth+10,r = screw_hd/2);
+				translate([0,0,10]) cylinder(h = depth,r = screw_hd/2+11);
+			}
+		} else
+			translate([width/2,tri_sep/2+42,3]) color("lightgray") cylinder(h = depth+10,r = screw_hd/2);
+		translate([width/2,tri_sep/2+42,-10]) color("blue") cylinder(h = depth+10,r = adjuster/2);
+		translate([dual_sep/2+width/2,-tri_sep/2+42,-10]) color("yellow") cylinder(h = depth+10,r = screw/2);
+		translate([-dual_sep/2+width/2,-tri_sep/2+42,-10]) color("purple") cylinder(h = depth+10,r = screw/2);
+		translate([dual_sep/2+width/2,-tri_sep/2+42,3]) color("gray") cylinder(h = depth+10,r = screw_hd/2);
+		translate([-dual_sep/2+width/2,-tri_sep/2+42,3]) color("green") cylinder(h = depth+10,r = screw_hd/2);
+		translate([38,height/2+8,-wall/2]) color("gray") hull() { // reduce usage of filament
+			cylinder(h = wall+10, r = 6);
+			translate([0,-40,0]) cylinder(h = wall+10, r = 6);
+		}
+		// screw holes to mount extruder plate
+		translate([37.5,45,4]) ExtruderMountHolesFn(screw3t,6);
+			// screw holes in top (alternate location for a belt holder)
+		translate([38,45,4]) TopMountBeltHoles(screw3t);
+		if(!Titan) translate([38,45,4]) CarridgeMount(); // 4 mounting holes for an extruder
+	}
+	if(DoBeltDrive) {
+		difference() {
+			translate([70,30,0]) CarriageBeltDrive(Loop);	// belt attachment to above
+			translate([128,3,30]) rotate([0,90,0]) TitanTensionHole();
+		}
+	}
+	BeltClamps(Clamps,Loop);
+	if(Loop) {
+		if(MoveBeltLoops==1) {
+			translate([80,0,0]) BeltLoopHolder();
+			translate([15,50,0]) rotate([0,0,180]) BeltLoopHolder();
+		} 
+		if(MoveBeltLoops==2) {
+			translate([60,120,0]) BeltLoopHolder();
+			translate([90,100,0]) rotate([0,0,180]) BeltLoopHolder();
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module TopMountBeltHoles(screw3t) {
+	translate([width/4-5,height/2+2,0]) rotate([90,0,0]) color("red") cylinder(h = 25, r = screw3t/2, $fn = 5);
+	translate([-(width/4-5),height/2+2,0]) rotate([90,0,0]) color("blue") cylinder(h = 25, r = screw3t/2, $fn = 5);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BeltDriveNotch(Belt=1) {
+	if(Belt) {
+		difference() {
+			color("pink") hull() {
+				translate([15,height-10,1]) rotate([0,90,0]) color("pink") cylinder(h=widthC+10,d=screw3);
+				translate([15,height-6,1]) rotate([0,90,0]) color("pink") cylinder(h=widthC+10,d=screw3);
+			}
+			translate([23,height-13,-3]) color("plum") cube([30,10,10]);
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module ExtruderMountHolesFn(Screw=screw3,Fragments=100) {
 	translate([0,-15,0]) rotate([90,0,0]) color("red") cylinder(h = 35, d = Screw, $fn = Fragments);

@@ -2,15 +2,16 @@
 // Power-Socket.scad - uses a pc style power socket with switch
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 7/4/2016
-// last update 8/19/18
+// last update 5/8/19
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/4/16	- Added cover
 // 8/5/16	- adjusted cover & 2020 mounting holes
 // 1/10/17	- Added colors for easier editing in preview and added mount for a power switch
 // 1/11/17	- Added label to power switch mount
 // 8/19/18	- OpenSCAD 2018.06.01 for $preview
+// 5/8/19	- Added a rear cover on the power switch holder
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// NOTE: Originally used Digi-Key Part number: CCM1666-ND
+// NOTE: Used Digi-Key Part number: CCM1666-ND
 //		 http://www.digikey.com/product-detail/en/te-connectivity-corcom-filters/1609112-3/CCM1666-ND/758835
 //		 ---------------------------------------------------------------------------------------------------
 //		 If the socket hole size changes, then the size & postions of the walls/wings & socket may need adjusting
@@ -134,20 +135,21 @@ module cover() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module switch(Flip=0,s_w=13,s_l=19.5,s_t=2) {
-	difference() {
+	difference() { // front with switch hole
 		color("cyan") cubeX([s_l+15,s_w+15,5],2);
 		translate([s_l/2-2,s_w/2+1,-2]) color("pink") cube([s_l,s_w,8]);
 		translate([s_l/2-3.5,s_w/2+1,s_t]) color("red") cube([s_l+3,s_w,8]);
 		switch_label(Flip);
 	}
-	translate([0,-2,0]) color("blue") cubeX([5,s_l+11,s_w+15],2);
-	translate([s_l+10,-2,0]) color("salmon") cubeX([5,s_l+11,s_w+15],2);
-	translate([s_l-18,s_w+10.5,0]) color("tan") cubeX([s_l+13,5,s_w+15],2);
-	difference() {
-		translate([s_l-18,-2,0]) color("brown") cubeX([s_l+13,5,s_w+15],2);
-		switch_label(Flip);
+	translate([0,-2,0]) color("blue") cubeX([5,s_l+11,s_w+25],2); // left wall
+	translate([s_l+10,-2,0]) color("salmon") cubeX([5,s_l+11,s_w+25],2); // right wall
+	translate([s_l-18,s_w+10.5,0]) color("tan") cubeX([s_l+13,5,s_w+15],2); // bottom wall with space for the wire exit
+	difference() { 
+		translate([s_l-18,-2,0]) color("brown") cubeX([s_l+13,5,s_w+25],2); // top wall
+		switch_label(Flip); // remove the bit it fills in the text
 	}
-	translate([0,-22,0]) sw_mount(Flip,s_l+15);
+	translate([0,0,33]) color("plum") cubeX([s_l+15,s_w+15,5],2); // rear cover
+	translate([0,-22,0]) sw_mount(Flip,s_l+15); // 2020 bracket
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
