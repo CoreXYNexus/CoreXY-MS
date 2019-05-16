@@ -174,7 +174,7 @@ module partial() {
 					// 3rd arg: belt clamps; 4th arg: Loop style belt holders
 					// 5:arg DoBeltDrive if 1; 6th arg: Rear carriage plate if 1; 7th arg: 1 or 2 Moves the Belt loops
 					// defaults: Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLoops=0
-	Carriage_v2(1,0,0,1,0,0,0);	// x-carriage, 1st arg: Titan mount; 2nd arg:Shift Titan mount;
+	//Carriage_v2(1,0,0,1,0,0,0);	// x-carriage, 1st arg: Titan mount; 2nd arg:Shift Titan mount;
 					// 3rd arg: belt clamps; 4th arg: Loop style belt holders
 					// 5:arg DoBeltDrive if 1; 6th arg: Rear carriage plate if 1; 7th arg: 1 or 2 Moves the Belt loops
 					// defaults: Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLoops=0
@@ -182,7 +182,7 @@ module partial() {
 	//translate([-50,0,0]) CarriageBeltDrive(1);	// 1 - belt loop style
 	//ExtruderPlateDriilGuide();	// drill guide for using an AL plate instead of a printed one
 	//wireclamp();
-	//TitanExtruderPlatform(5,1,1);	// 1st arg: extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
+	TitanExtruderPlatform(5,1,1);	// 1st arg: extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
 					// 4 - all sensor brackets; 5 - no sensor brackets
 					// 2nd arg: InnerSupport ; 3rd arg: Mounting Holes
 	//TitanCarriage(); // one piece titan/e3dv6 on x-carriage + belt drive holder
@@ -356,10 +356,10 @@ module BeltDriveNotch(Belt=1) {
 	if(Belt) {
 		difference() {
 			color("pink") hull() {
-				translate([15,height-10,1]) rotate([0,90,0]) color("pink") cylinder(h=widthC+10,d=screw3);
-				translate([15,height-6,1]) rotate([0,90,0]) color("pink") cylinder(h=widthC+10,d=screw3);
+				translate([15,height-10,1]) rotate([0,90,0]) cylinder(h=widthC+10,d=screw3);
+				translate([15,height-6,1]) rotate([0,90,0]) cylinder(h=widthC+10,d=screw3);
 			}
-			translate([23,height-13,-3]) color("plum") cube([30,10,10]);
+			translate([22,height-13,-3]) color("plum") cube([30,10,10]);
 		}
 	}
 }

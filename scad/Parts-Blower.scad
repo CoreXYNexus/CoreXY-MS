@@ -63,7 +63,7 @@ module Long_Motor_version(Duct=0,Move=0,Raise=0,Back=0,Offset=0) { // stepper si
 //		translate([0,0,0.5]) BracketMount();
 //	}
 	difference() {
-		translate([0,Offset+10,0]) FanBlowerMount(Move,Raise,6,0,0,0,1,Offset);
+		translate([0,Offset+10,0]) FanBlowerMount(Move,Raise,6,0,0,4,1,Offset);
 		translate([0,0,0.5]) BracketMount();
 	}
 	if(Duct) translate([-5,-15,0]) color("red") FanDuct();
@@ -74,9 +74,11 @@ module Long_Motor_version(Duct=0,Move=0,Raise=0,Back=0,Offset=0) { // stepper si
 module FanBlowerMount(Move=0,Raise=0,Back=0,X=0,Y=0,Z=0,Spacer=0,Offset=0) {
 	if(Spacer) {
 		difference() {
-			translate([Move+6,-30+Back,0]) color("gray") cubeX([21,21-Back,Raise+4],1);
+			translate([Move+6,-30+Back,0]) color("gray") cubeX([21,21-Back,Raise+Z+5],1);
 			RemoveForBlower(Move+6,Raise,Spacer);
 			translate([Move+X,-14-Back+Y,Raise+Z]) rotate([0,90,0]) color("purple") cylinder(h=42,r=screw4/2,$fn=50);
+			translate([Move+5,-31+Back,-2]) cubeX([5,5,8],2);
+			translate([Move+22.5,-31+Back,-2]) cubeX([5,5,8],2);
 		}
 		difference() {
 			translate([Move+6,Offset,0]) color("lightgray") cubeX([21,Offset,Thickness],1);
