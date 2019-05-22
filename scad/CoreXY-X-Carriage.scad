@@ -55,7 +55,7 @@
 //			  description of what they do
 // 3/9/19	- Added a m3 nut holder on the titanextrudermount() at the end since tapping that hole may not be strong enough
 // 4/20/19	- Added a nut holder on the proximity sensor holder.
-// 4/23/19	- Added nut holders for fan adapter mount on titanextrudermount()
+// 4/23/19	- Added nut holders for fan/sensor mount on titanextrudermount()
 // 5/4/19	- Added v2 of carriage(), a simpler squared off version made with cubeX()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
