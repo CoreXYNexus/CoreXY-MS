@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CoreXY-X-Carriage - x carriage for makerslide
 // created: 2/3/2014
-// last modified: 6/22/2019
+// last modified: 7/10/2019
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to carriage and put it into a seperate module
@@ -59,6 +59,8 @@
 // 5/26/19 	- Added nut holes for the extruder & belt mounts on the Carriage();
 // 5/28/18	- Rounded the corner fillers between the bottom and vertical parts of the carriage
 // 6/14/19	- Added a third version of the carriage with belt as a single part
+// 7/2/19	- Adjusted beltloop belt position
+// 7/19/19	- Added a mirror version of the titan extruder platform, so that the adjusting screw faces the front
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -90,13 +92,17 @@
 include <CoreXY-MSv1-h.scad>
 use <ybeltclamp.scad>	// modified https://www.thingiverse.com/thing:863408
 use <inc/corner-tools.scad>
+//-------------------------------------------------------------------------------------------------------------
 $fn=75;
 TestLoop=0; // 1 = have original belt clamp mount hole visible
-LoopHoleOffset=28;	// distance between the belt lopp mounting holes (same as in belt_holder.scad)
+LoopHoleOffset=28;	// distance between the belt loop mounting holes (same as in belt_holder.scad)
 LoopHOffset=0;		// shift horizontal the belt loop mounting holes
 LoopVOffset=-2;		// shift vertical the belt loop mounting holes
-LoopHeight = 20;
 MountThickness=5;
+BeltSpacing=7;
+BeltMSSpacing=10;
+BeltWidth=6;
+LoopHeight = 18;
 //---------------------------------------------------------------------------------------------------------------
 e3dv6 = 36.5;		// hole for e3dv6 with fan holder
 shifttitanup = 2.5;	// move motor +up/-down
@@ -117,14 +123,14 @@ ir_gap = 0;		// adjust edge of board up/down
 ir_height = (hotend_length - irboard_length - ir_gap) - irmount_height;	// height of the mount
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-partial();
+//partial();
 //FrontCarridge(0,1,2);	// Clamps,Loop,Titan
 //CarridgeInOne(0,1,2);	// Clamps,Loop,Titan
 //RearCarridge(0,0);	// Clamps,Loop
 //BothCarriages(0,1,0);
-//ExtruderPlateMount(0,2); 	// 1st arg: 0 - old style hotend mount, 1 - drill guide for old style, 2 - titan/e3dv6 mount
+ExtruderPlateMount(2,5); 	// 1st arg: 0 - old style hotend mount, 1 - drill guide for old style, 2 - titan/e3dv6 mount
 							//			3 - combo of 2 and x-carriage
-							// 2nd arg: 0 | 1 bltouch, 2 - round proxmity, 3 - dc42's ir sensor
+							// 2nd arg: 0 | 1 bltouch, 2 - round proxmity, 3 - dc42's ir sensor, 4 - all, 5 - None
 //TitanCarriage(1,5,0);	// 1st arg: 0: two piece; 1-one piece titan/e3dv6 on x-carriage + belt drive holder
 						// 2ng arg: 0 - bltouch thru hole mount; 1 - bltouch surface mount; 2 - proximity sensor
 						// 			3 - dc42's ir sensor; 4 - all; 5 - none (default)
@@ -174,7 +180,8 @@ module ExtruderPlateMount(Extruder=0,Sensor=0) {
 		rotate([0,0,90]) ExtruderPlateDrillGuide();
 	}
 	if(Extruder == 2) // titan/e3dv6 combo
-		translate([5,5,0]) rotate([0,0,-90]) TitanExtruderPlatform(Sensor,1,1);
+		//rotate([0,0,-90]) // not needed with mirror version
+			MirrorTitanExtruderPlatform(Sensor,1,1,1);
 	if(Extruder == 3)
 		TitanCarriage();
 }
@@ -191,14 +198,17 @@ module partial() {
 					// 3rd arg: belt clamps; 4th arg: Loop style belt holders
 					// 5:arg DoBeltDrive if 1; 6th arg: Rear carriage plate if 1; 7th arg: 1 or 2 Moves the Belt loops
 					// defaults: Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLoops=0
-	Carriage_v3(1,0,0,1,1,0);
+	//Carriage_v3(1,0,0,1,1,0);
 	//ExtruderPlatform(0);	// for BLTouch: 0 & 1, 2 is proximity, 3 is dc42 ir sensor, 4- none
 	//translate([-50,0,0]) CarriageBeltDrive(1);	// 1 - belt loop style
 	//ExtruderPlateDrillGuide();	// drill guide for using an AL plate instead of a printed one
 	//wireclamp();
-	//TitanExtruderPlatform(5,1,1);	// 1st arg: extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
-					// 4 - all sensor brackets; 5 - no sensor brackets
-					// 2nd arg: InnerSupport ; 3rd arg: Mounting Holes
+	MirrorTitanExtruderPlatform(5,1,1,1); // reverse the platform to have the titan adjusting screw to the front
+	//TitanExtruderPlatform(5,1,1); // reverse the platform to have the titan adjusting screw to the front
+	//TitanExtruderPlatform(5,1,1);	// 1st arg: extruder platform for e3d titan with (0,1)BLTouch or
+									// (2)Proximity or (3)dc42's ir sensor
+									// 4 - all sensor brackets; 5 - no sensor brackets
+									// 2nd arg: InnerSupport ; 3rd arg: Mounting Holes
 	//TitanCarriage(); // one piece titan/e3dv6 on x-carriage + belt drive holder
 	//TitanExtruderBowdenMount(); // right angle titan mount to 2020 for bowden
 	//TitanMotorMount(0);
@@ -210,6 +220,16 @@ module partial() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module MirrorTitanExtruderPlatform(recess=3,InnerSupport=0,MountingHoles=1,Mirror=0) {
+	if(Mirror) {
+		mirror([1,1,0]) // reverse the platform to have the titan adjusting screw to the front
+			rotate([0,0,90]) TitanExtruderPlatform(recess,InnerSupport<MountingHoles);
+	} else {
+		TitanExtruderPlatform(recess,InnerSupport<MountingHoles);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module TitanCarriage(One=0,Sensor=5,Belt=0) {
 	if($preview) %translate([-80,-20,-1]) cube([200,200,1]);
@@ -236,8 +256,8 @@ module TitanCarriage(One=0,Sensor=5,Belt=0) {
 		}
 		translate([-35,40,wall/2]) TitanExtruderPlatform(Sensor,1,1);
 	}
-	//translate([60,120,0]) BeltLoopHolder();
-	//translate([60,80,0]) BeltLoopHolder();
+	//translate([60,120,-(BeltMSSpacing-BeltWidth)]]) BeltLoopHolder();
+	//translate([60,80,-(BeltMSSpacing-BeltWidth)]]) BeltLoopHolder();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -323,8 +343,8 @@ module Carriage(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLo
 			translate([15,50,0]) rotate([0,0,180]) BeltLoopHolder();
 		} 
 		if(MoveBeltLoops==2) {
-			translate([60,120,0]) BeltLoopHolder();
-			translate([90,100,0]) rotate([0,0,180]) BeltLoopHolder();
+			translate([60,120,-(BeltMSSpacing-BeltWidth)]) BeltLoopHolder();
+			translate([90,100,-(BeltMSSpacing-BeltWidth)]) rotate([0,0,180]) BeltLoopHolder();
 		}
 	}
 }
@@ -383,8 +403,8 @@ module Carriage_v2(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBel
 			translate([15,50,0]) rotate([0,0,180]) BeltLoopHolder();
 		} 
 		if(MoveBeltLoops==2) {
-			translate([60,120,0]) BeltLoopHolder();
-			translate([90,100,0]) rotate([0,0,180]) BeltLoopHolder();
+			translate([60,120,-(BeltMSSpacing-BeltWidth)]) BeltLoopHolder();
+			translate([90,100,-(BeltMSSpacing-BeltWidth)]) rotate([0,0,180]) BeltLoopHolder();
 		}
 	}
 }
@@ -448,8 +468,8 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1) 
 	}
 	BeltClamps(Clamps,Loop);
 	if(LoopMounts) {
-			translate([60,50,0]) BeltLoopHolder();
-			translate([10,50,0]) BeltLoopHolder();
+			translate([50,55,-(BeltMSSpacing-BeltWidth)]) BeltLoopHolder();
+			translate([0,55,-(BeltMSSpacing-BeltWidth)]) BeltLoopHolder();
 	}
 }
 
@@ -884,13 +904,17 @@ module TitanExtruderPlatform(recess=3,InnerSupport=0,MountingHoles=1) { // extru
 		translate([-50,0,44.5]) rotate([90,0,90]) FanMountHoles(screw3); // mounting holes for bltouch & prox sensor
 		translate([-10,70,0]) IRMountHoles(screw3); // mounting holes for irsensor bracket
 	}
-	difference() {
-		if(InnerSupport!=2) 
+	//if(!InnerSupport) { 
+		difference() {
 			translate([shifthotend2,-32,0]) rotate([90,0,90]) TitanMotorMount(0,0,InnerSupport);
-		else
-			translate([shifthotend2,-32,0]) rotate([90,0,90]) TitanMotorMount(0,0,1);
-		translate([-50,0,44.5]) rotate([90,0,90]) FanMountHoles(); // mounting holes for bltouch & prox sensor
-	}
+			translate([-50,0,44.5]) rotate([90,0,90]) FanMountHoles(); // mounting holes for bltouch & prox sensor
+		}
+	//} else {
+	//	difference() {
+	//		translate([shifthotend2,-32,0]) rotate([90,0,90]) TitanMotorMount(0,0,InnerSupport);
+	//		translate([-50,0,44.5]) rotate([90,0,90]) FanMountHoles(); // mounting holes for bltouch & prox sensor
+	//	}
+	//}
 	if(recess != 5) {
 		if(recess == 0 || recess == 1) translate([-13,40,-wall/2]) BLTouchMount(recess,shiftblt); // BLTouch mount
 		if(recess == 2) translate([10,45,-wall/2]) ProximityMount(shiftprox); // mount proximity sensor
@@ -1041,7 +1065,7 @@ module TitanMotorMount(WallMount=0,Screw=screw4,InnerSupport=1) {
 		}
 	}
 	if(WallMount) {
-		difference() { // rear support
+		difference() { // front support
 			translate([52,0,0]) color("cyan") cubeX([4,45+shifttitanup,45],2);
 			// lower mounting screw holes
 			translate([40,15,11]) rotate([0,90,0]) color("cyan") cylinder(h=20,d=Screw);
@@ -1052,7 +1076,7 @@ module TitanMotorMount(WallMount=0,Screw=screw4,InnerSupport=1) {
 			}
 		}
 	} else {
-		if(InnerSupport) {
+		if(!InnerSupport) {
 			difference() { // rear support
 				translate([49,24,-48]) rotate([60]) color("cyan") cubeX([4,60,60],2);
 				translate([47,0,-67]) cube([7,70,70]);
@@ -1080,13 +1104,21 @@ module IRMountHoles(Screw=screw3) // ir screw holes for mounting to extruder pla
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+//BeltSpacing=7;
+//BeltMSSpacing=10;
+//BeltWidth=6;
 
 module BeltLoopHolder() {
 	difference() {
-		color("blue") cubeX([23,16,LoopHeight],1);
-		translate([-1,3,-4]) beltLoop(); // lower
-		translate([-1,3,12]) beltLoop(); // upper
+		translate([0,0,BeltMSSpacing-BeltWidth]) color("blue") cubeX([23,16,LoopHeight],1);
+		translate([-1,3,-2]) beltLoop(); // lower
+		translate([-1,3,BeltMSSpacing+BeltSpacing-1]) beltLoop(); // upper
 	}
+	// something to show belt position on belt bracket
+	%translate([0,1,-BeltWidth]) cube([5,5,BeltMSSpacing]); // bottom
+	%translate([0,3,BeltMSSpacing+BeltSpacing-1]) cube([5,5,BeltWidth]); // top
+	%translate([0,2,BeltMSSpacing-BeltWidth+BeltSpacing-1]) cube([5,5,BeltWidth]); // middle space
+	%translate([0,5,BeltMSSpacing-BeltWidth]) cube([5,5,BeltWidth]); // bottom belt
 	translate([19,-8,0]) BeltLoopMountingBlock();
 }
 
@@ -1094,11 +1126,11 @@ module BeltLoopHolder() {
 
 module BeltLoopMountingBlock() {
 	difference() {
-		color("pink") cubeX([MountThickness,32,LoopHeight],1);
-		translate([-5,LoopHoleOffset,LoopHeight/2]) rotate([0,90,0]) color("red") cylinder(h=LoopHeight,d=screw3);
-		translate([-19,LoopHoleOffset,LoopHeight/2]) rotate([0,90,0]) color("plum") cylinder(h=LoopHeight,d=screw3hd);
-		translate([-5,4,LoopHeight/2]) rotate([0,90,0]) color("blue") cylinder(h=LoopHeight,d=screw3);
-		translate([-19,4,LoopHeight/2]) rotate([0,90,0]) color("red") cylinder(h=LoopHeight,d=screw3hd);
+		translate([0,0,BeltMSSpacing-BeltWidth]) color("pink") cubeX([MountThickness,32,LoopHeight],1);
+		translate([-5,LoopHoleOffset,BeltMSSpacing+BeltWidth/2]) rotate([0,90,0]) color("red") cylinder(h=LoopHeight,d=screw3);
+		translate([-17,LoopHoleOffset,BeltMSSpacing+BeltWidth/2]) rotate([0,90,0]) color("plum") cylinder(h=LoopHeight,d=screw3hd);
+		translate([-5,4,BeltMSSpacing+BeltWidth/2]) rotate([0,90,0]) color("blue") cylinder(h=LoopHeight,d=screw3);
+		translate([-17,4,BeltMSSpacing+BeltWidth/2]) rotate([0,90,0]) color("red") cylinder(h=LoopHeight,d=screw3hd);
 	}
 }
 

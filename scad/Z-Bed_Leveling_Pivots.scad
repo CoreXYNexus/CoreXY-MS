@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 1/29/2017
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 2/28/2019
+// Last Update: 7/13/2019
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/15/17	- Added bearing pivot style carriage & 2040 mounts for multi-motor leveling
 // 1/29/17	- Added pivot version using just a M5 screw
@@ -19,6 +19,7 @@
 //			  Added screw size to extrusion slots option to z_pivot_2040()
 // 2/28/19	- Added z_pivot_2040_v2x3() for three z_pivot_2040_v2()
 // 3/31/19	- Added a 2020 pivot in z_pivot_2040_v3()
+// 7/13/19	- Added to z_pivots() to make either 2020 end or side
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -36,20 +37,24 @@ ht_625z = 5+layer;
 body_ht_625z=4;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//z_pivots(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
-//z_pivots_v2(3,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+z_pivots(3,1,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+					// arg4: 0 for 2020 ends, 1 for 2020 side
 //z_pivot_carriage(0);
 //center_pivot2(1);
 //z_pivot_2040(1,1,screw5);
 //z_pivot_2040_v2(1,1,1);
-z_pivot_2040_v3(1,1,1);
+//z_pivot_2040_v3(1,1,1);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module z_pivots(Qty,Bearing=0,Round=1) {
+module z_pivots(Qty,Bearing=0,Round=1,Flat=0) {
 	if($preview) %translate([-40,-30,-5]) cubeX([200,200,5]);
 	for(i=[0:Qty-1]){
-		translate([0,i*45,15]) z_pivot_2040(Bearing,Round);
+		if(Flat) {
+			translate([0,i*45,15]) z_pivot_2040_v2(Bearing,Round);
+		} else {
+			translate([0,i*45,15]) z_pivot_2040(Bearing,Round);
+		}
 		if(Round) translate([75,i*45+20,21.6]) rotate([180,90,0]) center_pivot2(Bearing);
 		else translate([45,i*45,0]) center_pivot(Bearing); // non-rounded version
 		if(Bearing)	translate([80,i*45,0])z_pivot_carriage(1);
@@ -77,7 +82,7 @@ module z_pivot_carriage(Spacer=0,Holes_offset=42.5) { // bearing between bolt ho
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module z_pivot_2040(Bearing=1,RoundPivot=1,Screw=screw5) { // 3 625 bearing pivot mounts on the 2040 holding the bed
+module z_pivot_2040(Bearing=1,RoundPivot=1,Screw=screw5) { // 3 625 bearing pivot mounts on the end of the 2040 holding the bed
 	difference() {
 		translate([1.5,0,-15]) color("cyan") cubeX([29,40,20],1);
 		translate([5.75,-2,-23]) color("plum") cube([20.5,45,25]);
@@ -112,7 +117,7 @@ module z_pivot_2040(Bearing=1,RoundPivot=1,Screw=screw5) { // 3 625 bearing pivo
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module z_pivot_2040_v2(Quanity=1,Bearing=1,RoundPivot=1) { // 3 625 bearing pivot mounts on the 2040 holding the bed
+module z_pivot_2040_v2(Quanity=1,Bearing=1,RoundPivot=1) { // 3 625 bearing pivot mounts on the end of the 2040 holding the bed
 	for(num=[0:Quanity-1]) {
 		translate([0,num*50,0]) {
 		difference() {
@@ -144,7 +149,7 @@ module z_pivot_2040_v2(Quanity=1,Bearing=1,RoundPivot=1) { // 3 625 bearing pivo
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module z_pivot_2040_v3(Quanity=1,Bearing=1,RoundPivot=1) { // 3 625 bearing pivot mounts on the 2040 holding the bed
+module z_pivot_2040_v3(Quanity=1,Bearing=1,RoundPivot=1) { // mounts on the side of the aluminum extrusion holding the bed
 	for(num=[0:Quanity-1]) {
 		translate([0,num*25,0]) {
 		difference() {
@@ -176,7 +181,7 @@ module z_pivot_2040_v3(Quanity=1,Bearing=1,RoundPivot=1) { // 3 625 bearing pivo
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module roundover() { // roundover a corner
+module roundover() { // round the corner
 	translate([-5,-10,15]) {
 		difference() {
 			color("white") cube([20,20,20]);
@@ -207,7 +212,7 @@ module roundover() { // roundover a corner
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module roundover2() { // roundover a corner
+module roundover2() { // round a corner
 	translate([-5,-10,15]) {
 		difference() {
 			color("white") cube([20,40,20]);
@@ -224,7 +229,7 @@ module roundover2() { // roundover a corner
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module center_pivot(Bearing=0) {
+module center_pivot(Bearing=0) { // middle pivot
 	if(Bearing) {
 		difference() {
 			color("cyan") cubeX([dia_625z+5,dia_625z+5,dia_625z+15],1);
@@ -247,7 +252,7 @@ module center_pivot(Bearing=0) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module center_pivot2(Bearing) {
+module center_pivot2(Bearing) { // middle pivot
 	difference() {
 		translate([0,0.5,dia_625z/2]) color("cyan") cubeX([dia_625z+5,dia_625z+4,dia_625z+5],1);
 		double_bearing_mount_hole();

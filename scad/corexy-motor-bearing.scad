@@ -2,7 +2,7 @@
 // CoreXY-Motor-Bearing.scad - hold the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
-// last update 4/16/19
+// last update 7/2/19
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16	- added built-in spacer to the bearing_bracket
 // 7/14/16	- adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -26,6 +26,7 @@
 // 2/28/19	- Bugfix in all() and bearing_bracket()
 // 4/16/19	- Changed the angle support for the motor mounts to match the Z motor mounts
 //			  Changed the bearing_support() to match the motor mount notch supports
+// 7/2/19	- Made the labels tilted a bit to print better, updated mirror() to 2019.05 version
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in bearing_bracket() must match stepper motor shaft in motor_mount()
 //       If the motors get hot, print it from something that can handle it
@@ -68,10 +69,10 @@ module all(MS) {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module partial() { // uncomment the parts you want and adjust translates as needed
-	motor_mount(1);
-	translate([0,65,0]) motor_mount(0);
-	//bearing_bracket(0,"Right");
-	//translate([-5,0,0]) mirror() bearing_bracket(0,"Left"); // mirror it for the other side
+//	motor_mount(1);
+//	translate([0,65,0]) motor_mount(0);
+	bearing_bracket(0,"Right");
+	translate([90,0,0]) mirror([1,0,0]) bearing_bracket(0,"Left"); // mirror it for the other side
 	//rotate([0,180,0]) 
 	//	bearing_support(0);
 	//translate([0,50,0]) rotate([0,180,0]) bearing_support(0);
@@ -82,7 +83,7 @@ module partial() { // uncomment the parts you want and adjust translates as need
 module motor_mount(Side=0) {	// 0 - lower belt motor; 1 = upper belt motor
 	difference() {	// motor mounting holes
 		color("blue") cubeX([59,59,5],radius=2,center=true);
-		translate([-2,0,-4]) color("red") NEMA17_parallel_holes(7,8);
+		translate([-2,0,-4]) color("red") NEMA17_parallel_holes(7,10);
 		//translate([0,0,10]) notchit(Side);
 	}
 	if(!Side) {
@@ -101,7 +102,7 @@ module motor_mount(Side=0) {	// 0 - lower belt motor; 1 = upper belt motor
 			mountscrews(18);
 			translate([0,0,10]) notchit(Side);
 		}
-		translate([24.8,-6,30]) rotate([90,180,-90]) printchar("Right");
+		translate([25.8,1,30]) rotate([110,180,-90]) printchar("R");//,1.5,4,"Babylon Industrial:style=Normal");
 	} else {
 		diag_side(Side);
 		difference() {
@@ -118,7 +119,7 @@ module motor_mount(Side=0) {	// 0 - lower belt motor; 1 = upper belt motor
 			mountscrews(28);
 			translate([0,0,20]) notchit(Side);
 		}
-		translate([24.8,-6,40]) rotate([90,180,-90]) printchar("Left");
+		translate([25.8,-1,40]) rotate([110,180,-90]) printchar("L");//,1.5,4,"Babylon Industrial:style=Normal");
 	}
 }
 
@@ -171,8 +172,8 @@ module bearing_bracket(TapIt=0,Label="") {
 	}
 	if(!TapIt) translate([b_posY-4,b_posX-4.5,b_height+30-8]) color("salmon") cube([10,10,layer_t]); // nut hole support
 	translate([b_posY,b_posX,40]) spacer(TapIt);
-	if(Label=="Right") translate([4,0.1,20]) rotate([90,0,0]) printchar(Label);
-	if(Label=="Left") translate([14,-1.4,20]) rotate([90,0,0]) mirror([1,0,0]) printchar(Label);
+	if(Label=="Right") translate([4,0.5,20]) rotate([80,0,0]) printchar(Label);
+	if(Label=="Left") translate([14,0.5,20]) rotate([80,0,0]) mirror([1,0,0]) printchar(Label);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -254,8 +255,10 @@ module diag_side(Side) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-module printchar(String,Height=1.5,Size=4) { // print something
-	color("coral") linear_extrude(height = Height) text(String, font = "Liberation Sans",size=Size);
+module printchar(String,Height=1.5,Size=4,Font="Liberation Sans",Color="coral") { // print something
+	color(Color) linear_extrude(height = Height) text(String, font = Font,size=Size);
+	//"Babylon Industrial:style=Normal",size=Size);
+	//"Liberation Sans",size=Size);
 }
 
 /////////////////// emd of corexy-motor-bearing.scad ////////////////////////////////////

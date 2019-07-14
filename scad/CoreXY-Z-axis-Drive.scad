@@ -106,12 +106,12 @@ layer = 0.25;				// printed layer thickness
 
 //direct_drive(3,0,5,8); 	// Z axis for bed leveling
 				// 1st arg: quantiy; 2nd arg: printable couplers; 3rd arg: motor shaft diameter; 4th arg is leadscrew diameter
-//direct_drive_motor_mount(1); // arg is quanity
+direct_drive_motor_mount(3); // arg is quanity
 //motor_direct_with_znut(3); // motor mounts and the znut holder
 //belt_drive();	// arg is quanity, belt drive leadscrew mounts and znut
 //belt_motor_Mount();  // z motor mount for belt version
 //plates(1,screw5); // arg is quanity*2
-direct_belt_drive_motor_mount(3); // arg is quanity
+//direct_belt_drive_motor_mount(3); // arg is quanity
 //partial();
 	
 //////////////////////////////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ module direct_drive(Quanity=1,Coupler,Motorshaft,LeadScrewDiameter) { // set for
 
 module direct_drive_motor_mount(Quanity=1) { // set for makerslide
 	if($preview) %translate([-100,-100,-4.5]) cube([200,200,2]);
-	for(a=[0:Quanity-1]) translate([a*65-65,0,thickness/2]) belt_motor_mount(1);
+	for(a=[0:Quanity-1]) translate([a*65-65,0,thickness/2]) motor_mount(1);
 	echo("-----------------Don't forget the plates, if needed-------------------"); // adding plates makes it bigger than a 200x200 bed
 }
 
