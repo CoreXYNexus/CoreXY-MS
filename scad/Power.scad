@@ -2,7 +2,7 @@
 // Power.scad - uses a pc style power socket with switch
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 7/4/2016
-// last update 5/28/19
+// last update 7/24/19
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/4/16	- Added cover
 // 8/5/16	- adjusted cover & 2020 mounting holes
@@ -14,6 +14,7 @@
 // 5/16/19	- Merged power supply mount into here and renamed this file
 // 5/28/19	- Added a housing version with seperate power plug and switch, added M5 countersinks to housing, modified the MMAX
 //			  power supply mounts for the CXY-MSv1 corexy
+// 7/24/19	- Adjusted cover() screw holes
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Version 0 uses Digi-Key Part number: CCM1666-ND : combined power socket and switch
 //		 http://www.digikey.com/product-detail/en/te-connectivity-corcom-filters/1609112-3/CCM1666-ND/758835
@@ -42,17 +43,18 @@ Length = 113;
 Width = 13;
 Thickness = 10;
 LayerThickness = 0.2;
-SocketPlugWidth=28.5;
-SocketPlugHeight=20;
+SocketPlugWidth=SwitchSocketWidth;
+SocketPlugHeight=SwitchSocketHeight;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-all(0,13,19.5,2,1,2,0);// 1st arg: flip; next 4 args: flip label, Width, length, clip Thickness; defaults to 0,13,19.5,2
+//all(0,13,19.5,2,1,2,0);// 1st arg: flip power label; next 4 args: Width, length, clip Thickness; defaults to 0,13,19.5,2
 //testfit();	// print part of it to test fit the socket & 2020
 //switch();		// 4 args: flip label, Width, length, clip Thickness; defaults to 0,13,19.5,2
 //powersupply_cover();
 //powersupply_cover_v2();
 //pbar(1,2);
-//housing(0,13,19.5);
+housing(1,13,19.5);
+//translate([0,0,0]) cover();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -148,23 +150,23 @@ module housing(Version=0,s_w=13,s_l=19.5) {
 		if(Version==0) {
 			translate([SwitchSocketWidth/2+SocketShiftLR,SwitchSocketHeight/2+14+SocketShiftUD,-2]) color("cyan") cube([SwitchSocketWidth,SwitchSocketHeight,10]);
 		} else {
-			translate([SwitchSocketWidth/2+SocketShiftLR-5,SwitchSocketHeight/2+14+SocketShiftUD,-2]) color("cyan")
+			translate([SwitchSocketWidth/2+SocketShiftLR-10,SwitchSocketHeight/2+14+SocketShiftUD,-2]) color("cyan")
 				cube([SocketPlugWidth,SocketPlugHeight,10]); // plug socket
-			translate([SwitchSocketWidth/2+33+SocketShiftLR,SwitchSocketHeight/2+14.2+SocketShiftUD,-2]) color("pink")
+			translate([SwitchSocketWidth/2+SocketShiftLR+36,SwitchSocketHeight/2+14.2+SocketShiftUD,-2]) color("pink")
 				cube([s_w,s_l,8]); // swicth
 		}
 	}
 	difference() {
 		translate([0,SwitchSocketHeight+35,0]) color("red") cubeX([SwitchSocketWidth+40,5,40],2); // top wall
-		cover_screw_holes();
+		cover_screw_holes(screw3t);
 	}
 	difference() {
 		translate([0,19,0]) color("black") cubeX([5,SwitchSocketHeight+21,40],2); // left wall
-		cover_screw_holes();
+		cover_screw_holes(screw3t);
 	}
 	difference() {
 		translate([SwitchSocketWidth+35,19,0]) color("white") cubeX([5,SwitchSocketHeight+21,40],2); // right wall
-		cover_screw_holes();
+		cover_screw_holes(screw3t);
 	}
 	difference() { // right wing
 		translate([SwitchSocketWidth+35,19,0]) color("lightblue") cubeX([25,5,25],2); // wall
@@ -198,30 +200,30 @@ module screwholesupport() {
 	color("plum") cube([screw5hd+1,screw5hd+1,LayerThickness]);
 }
 
-module coverscrewholes() {
+module coverscrewholes(Screw=screw3) {
 	difference() {
 		translate([5,40,20]) color("blue") cylinder(h=20,d=screw5); // left
 		translate([5,35,13]) rotate([0,-45,0]) color("red") cube([10,10,5]);
-		cover_screw_holes();
+		cover_screw_holes(Screw);
 	}
 	difference() {
 		translate([SwitchSocketWidth+35,40,20]) color("red") cylinder(h=20,d=screw5); // right
 		translate([SwitchSocketWidth+27,35,22]) rotate([0,45,0]) color("blue") cube([10,10,5]);
-		cover_screw_holes();
+		cover_screw_holes(Screw);
 	}
 	difference() {
 		translate([SwitchSocketWidth,62,20]) color("white") cylinder(h=20,d=screw5); // top screw hole
 		translate([SwitchSocketWidth-5,55,20]) rotate([-45,0,0]) color("green") cube([10,10,5]);
-		cover_screw_holes();
+		cover_screw_holes(Screw);
 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module cover_screw_holes() {
-	translate([5,40,12]) color("white") cylinder(h=35,d=screw3t); // left
-	translate([SwitchSocketWidth+35,40,12]) color("gray") cylinder(h=35,d=screw3t); // right
-	translate([SwitchSocketWidth,62,12]) color("hotpink") cylinder(h=35,d=screw3t); // top screw hole
+module cover_screw_holes(Screw=screw3t) {
+	translate([5,40,7]) color("white") cylinder(h=40,d=Screw); // left
+	translate([SwitchSocketWidth+35,40,7]) color("gray") cylinder(h=40,d=Screw); // right
+	translate([SwitchSocketWidth,62,7]) color("hotpink") cylinder(h=40,d=Screw); // top screw hole
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -237,15 +239,13 @@ module testfit() { // may need adjusting if the socket size is changed
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module cover() {
+module cover(Screw=screw3) {
 	difference() {
 		translate([0,15,40]) color("cyan") cubeX([SwitchSocketWidth+40,SwitchSocketHeight+27,5],2); // base
-		translate([5,42,30]) color("red") cylinder(h=20,d=screw3); // left
-		translate([SwitchSocketWidth+35,42,30]) color("white") cylinder(h=20,d=screw3); // right
-		translate([SwitchSocketWidth,64,30]) color("green") cylinder(h=20,d=screw3); // top
+		cover_screw_holes(Screw);
 	}
 	difference() {
-		translate([0,15,25]) color("red") cubeX([SwitchSocketWidth+40,5,20],2); // base
+		translate([0,13.8,25]) color("red") cubeX([SwitchSocketWidth+40,5,20],2); // base
 		color("white") hull() {
 			translate([SwitchSocketWidth,25,30]) rotate([90,0,0]) cylinder(h=15,d=10);
 			translate([SwitchSocketWidth,25,25]) rotate([90,0,0]) cylinder(h=15,d=10);
