@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 1/29/2017
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 7/13/2019
+// Last Update: 8/14/2019
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/15/17	- Added bearing pivot style carriage & 2040 mounts for multi-motor leveling
 // 1/29/17	- Added pivot version using just a M5 screw
@@ -20,6 +20,7 @@
 // 2/28/19	- Added z_pivot_2040_v2x3() for three z_pivot_2040_v2()
 // 3/31/19	- Added a 2020 pivot in z_pivot_2040_v3()
 // 7/13/19	- Added to z_pivots() to make either 2020 end or side
+// 8/14/19	- Added a z_pivot with anti-rotation sides
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -37,13 +38,14 @@ ht_625z = 5+layer;
 body_ht_625z=4;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-z_pivots(3,1,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
+//z_pivots(3,1,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
 					// arg4: 0 for 2020 ends, 1 for 2020 side
 //z_pivot_carriage(0);
 //center_pivot2(1);
 //z_pivot_2040(1,1,screw5);
 //z_pivot_2040_v2(1,1,1);
 //z_pivot_2040_v3(1,1,1);
+z_pivot_2040_v4(1,1,1);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -179,7 +181,50 @@ module z_pivot_2040_v3(Quanity=1,Bearing=1,RoundPivot=1) { // mounts on the side
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module z_pivot_2040_v4(Quanity=1,Bearing=1,RoundPivot=1) { // mounts on the side of the aluminum extrusion holding the bed
+	//%translate([5,0,0]) cube([20,20,5]);
+	for(num=[0:Quanity-1]) {
+		rotate([90,0,0]) translate([0,num*25,0]) {
+			difference() {
+				translate([1.5,0,-15]) color("cyan") cubeX([29,20,5],1);
+				translate([0,0,-15]) if(RoundPivot) 
+				side_screws_2040_2(16.5);
+			else
+				side_screws_2040_2(20);
+			}
+			difference() {
+				translate([-0.5,0,-20]) color("blue") cubeX([5,20,30],1);
+				translate([-0.5,0,-15]) if(RoundPivot) 
+					side_screws_2040_2(16.5);
+				else
+					side_screws_2040_2(20);
+				translate([-0.5,0,-15]) roundover2();
+			}
+			difference() {
+				translate([28,0,-20]) color("red") cubeX([5,20,30],1);
+				translate([-0.5,0,-15]) if(RoundPivot) 
+					side_screws_2040_2(16.5);
+				else
+					side_screws_2040_2(20);
+				translate([-0.5,0,-15]) roundover2();
+			}
+		}
+		Notch20mm(29);
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Notch20mm(Width=29,X=0,Y=0,Z=0) {
+	translate([X,Y,Z]) difference() {
+		translate([2,13,0]) color("pink") cubeX([Width,7,20],1);
+		translate([5.725,0,-2]) color("gray") cubeX([20.5,25,25],1);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module roundover() { // round the corner
 	translate([-5,-10,15]) {

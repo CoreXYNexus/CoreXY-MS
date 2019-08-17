@@ -1,3 +1,0 @@
-; Retract 5mm filament
-M83
-G1 E-5 F2000

@@ -31,17 +31,17 @@ FHeight = 10;
 MountingHoleHeight = 60; 	// screw holes may need adjusting when changing the front to back size
 ExtruderOffset = 18;		// adjusts extruder mounting holes from front edge
 FanSpacing = 32;			// hole spacing for a 40mm fan
-PCfan_spacing = FanSpacing+30;
+PCfan_spacing = FanSpacing+14;
 //////////////////////////////////////////////////////////////////////////
-
 // 1st arg: fan duct;	
 // 2nd arg is side offset
 // 3rd arg: move up/down M4 blower mounting hole
 // 4th arg: move front/rear M4 blower mounting hole
+// 5th arg: move closer/farther from mount
 //Long_Motor_version(0,6,25,6,0);	// e3dv6 at left front
-//Long_Motor_version_v2(0,12,25,6,0); // e3dv6 at right rear
+Long_Motor_version_v2(0,-6,25,6,-5); // e3dv6 at right rear
 //Short_Motor_version(0,6,25,6); 	// e3dv6 at left front
-Short_Motor_version_v2(0,12,25,6); // e3dv6 at right rear
+//Short_Motor_version_v2(0,12,25,6); // e3dv6 at right rear
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Short_Motor_version(Duct=0,Move=0,Raise=0,Back=0,Offset=0) {
@@ -94,7 +94,10 @@ module Long_Motor_version_v2(Duct=0,Move=0,Raise=0,Back=0,Offset=0) { // stepper
 	difference() {
 		color("cyan") cubeX([PCfan_spacing+7,MHeight,Thickness],1);
 		translate([0,0,0.5]) BracketMount_v2();
-//		translate([Move+9,-7,-14]) rotate([35,0,0]) color("lightblue") cubeX([15,15,15],1);
+	}
+	difference() {
+		translate([Move+6,Offset-1,0]) color("lightgray") cubeX([21,Offset*-1+5,Thickness],1); // spacer
+		translate([0,0,0.5]) BracketMount_v2();
 	}
 	difference() {
 		translate([0,Offset+10,0]) FanBlowerMount(Move,Raise,6,0,0,4,1,Offset);
@@ -123,6 +126,7 @@ module FanBlowerMount(Move=0,Raise=0,Back=0,X=0,Y=0,Z=0,Spacer=0,Offset=0) {
 			translate([Move,-16+Back,0]) color("gray") cubeX([21,21-Back,Raise+4],1);
 			RemoveForBlower(Move,Raise);
 			translate([Move+X,-Back+Y,Raise+Z]) rotate([0,90,0]) color("purple") cylinder(h=42,r=screw4/2,$fn=50);
+			translate([Move-5,-29+Back,9]) rotate([-45,0,0]) color("black") cube([30,30,10]);
 		}
 	}
 }

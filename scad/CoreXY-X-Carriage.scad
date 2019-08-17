@@ -112,9 +112,10 @@ shifttitanup = 2.5;	// move motor +up/-down
 shifthotend = 0;	// move hotend opening front/rear
 shifthotend2 = -20;	// move hotend opening left/right
 spacing = 17; 		// ir sensor bracket mount hole spacing
-shiftir = -20;	// shift ir sensor bracket mount holes
-shiftblt = 10;	// shift bltouch up/down
-shiftprox = 5;	// shift proximity sensor up/down
+shiftir = -20;		// shift ir sensor bracket mount holes
+shiftblt = 10;		// shift bltouch up/down
+shiftprox = 5;		// shift proximity sensor up/down
+shiftproxLR = 3;	// shift proximity sensor left/right
 //-----------------------------------------------------------------------------------------
 // info from irsensorbracket.scad
 //-----------------------------------
@@ -126,12 +127,12 @@ ir_gap = 0;		// adjust edge of board up/down
 ir_height = (hotend_length - irboard_length - ir_gap) - irmount_height;	// height of the mount
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//partial();
+partial();
 //FrontCarridge(0,0,0,0);	// Clamps,Loop,Titan
 //CarridgeInOne(0,1,2);	// Clamps,Loop,Titan
 //RearCarridge(0,0);	// Clamps,Loop
 //BothCarriages(0,1,0);
-ExtruderPlateMount(2,2); 	// 1st arg: 0 - old style hotend mount, 1 - drill guide for old style, 2 - titan/e3dv6 mount
+//ExtruderPlateMount(2,2); 	// 1st arg: 0 - old style hotend mount, 1 - drill guide for old style, 2 - titan/e3dv6 mount
 							//			3 - combo of 2 and x-carriage
 							// 2nd arg: 0 | 1 bltouch, 2 - round proxmity, 3 - dc42's ir sensor, 4 - all, 5 - None
 //TitanCarriage(1,5,0);	// 1st arg: 0: two piece; 1-one piece titan/e3dv6 on x-carriage + belt drive holder
@@ -206,7 +207,7 @@ module partial() {
 	//translate([-50,0,0]) CarriageBeltDrive(1);	// 1 - belt loop style
 	//ExtruderPlateDrillGuide();	// drill guide for using an AL plate instead of a printed one
 	//wireclamp();
-	MirrorTitanExtruderPlatform(5,1,1,1); // reverse the platform to have the titan adjusting screw to the front
+	//MirrorTitanExtruderPlatform(5,1,1,1); // reverse the platform to have the titan adjusting screw to the front
 	//TitanExtruderPlatform(5,1,1); // reverse the platform to have the titan adjusting screw to the front
 	//TitanExtruderPlatform(5,1,1);	// 1st arg: extruder platform for e3d titan with (0,1)BLTouch or
 									// (2)Proximity or (3)dc42's ir sensor
@@ -216,6 +217,7 @@ module partial() {
 	//TitanExtruderBowdenMount(); // right angle titan mount to 2020 for bowden
 	//TitanMotorMount(0);
 	//ProximityMount(shiftprox);
+	mirror([1,1,0]) ProximityMount(shiftprox);
 	//BLTouchMount(0,shiftblt);
 	//BLTouchMount(0); // makes hole for bltouch mount
 	//translate([0,0,0]) BeltLoopHolder();
@@ -982,7 +984,7 @@ module E3Dv6Hole() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module ProximityMount(Shift) {
-	difference() {
+	translate([shiftproxLR,0,0]) difference() {
 		translate([-1,-2.5,0]) color("red") cubeX([32,32,8],2);
 		translate([15,12,-2]) color("olive") cylinder(h=wall*2,d=psensord); // proximity sensor hole
 		translate([15,12,4.5]) color("blue") cylinder(h=5,d=psensornut,$fn=6); // proximity nut
