@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CoreXY-X-Carriage - x carriage for makerslide
 // created: 2/3/2014
-// last modified: 8/7/2019
+// last modified: 10/10/2019
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to carriage and put it into a seperate module
@@ -34,7 +34,7 @@
 //			  and fixed the rear support to be rounded in TitanExtruderPlatform() and removed some unecessary code
 //			  added rounded hole under motor to titan3() and fixed mounting holes
 // 7/12/18	- Noticed the plate was not setup for a 200x200 bed
-// 8/19/18	- Dual Titabnmount is in DualTitan.scad, OpenSCAD 2018.06.01 for $preview, which is used to make sure
+// 8/19/18	- Dual Titanmount is in DualTitan.scad, OpenSCAD 2018.06.01 for $preview, which is used to make sure
 //			  a 200x200 bed can print multiple parts.
 // 8/20/18	- Added a carridge and belt only for DualTitan.scad, redid the modules for the other setups
 // 12/8/18	- Changed belt clamp from adjusting type to solid (stepper motors are adjustable)
@@ -64,6 +64,7 @@
 // 8/4/19	- Made nut holes on carriage_v2 and ExtruderPlateMount through holes
 // 8/5/19	- extruderplatemount() to allow mirrored version to work
 // 8/7/19	- Widened tha pc blower fan adapter mounting holes
+// 10/10/19	- Added ability to add/remove led ring mount with the needed spacer
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -125,14 +126,17 @@ irboard_length = 17 - board_overlap; // length of ir board less the overlap on t
 ir_gap = 0;		// adjust edge of board up/down
 //-----------------------------------------------------------------------------------------
 ir_height = (hotend_length - irboard_length - ir_gap) - irmount_height;	// height of the mount
+//---------------------------------------------------------------------------------------------------------
+LEDLight=1; // print LED ring mounting with spacer
+LEDSpacer=8;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-partial();
+//partial();
 //FrontCarridge(0,0,0,0);	// Clamps,Loop,Titan
 //CarridgeInOne(0,1,2);	// Clamps,Loop,Titan
 //RearCarridge(0,0);	// Clamps,Loop
 //BothCarriages(0,1,0);
-//ExtruderPlateMount(2,2); 	// 1st arg: 0 - old style hotend mount, 1 - drill guide for old style, 2 - titan/e3dv6 mount
+ExtruderPlateMount(2,2); 	// 1st arg: 0 - old style hotend mount, 1 - drill guide for old style, 2 - titan/e3dv6 mount
 							//			3 - combo of 2 and x-carriage
 							// 2nd arg: 0 | 1 bltouch, 2 - round proxmity, 3 - dc42's ir sensor, 4 - all, 5 - None
 //TitanCarriage(1,5,0);	// 1st arg: 0: two piece; 1-one piece titan/e3dv6 on x-carriage + belt drive holder
@@ -904,11 +908,7 @@ module TitanExtruderPlatform(recess=3,InnerSupport=0,MountingHoles=1) { // extru
 		}
 		if(MountingHoles) ExtruderMountHoles(screw3);
         //E3Dv6Hole();
-		translate([32.5+shifthotend2,-18+shifthotend,-10]) color("gray") cylinder(h=20,d=screw5);	// mounting hole for a holder
-		translate([32.5+shifthotend2,-18+shifthotend,2]) color("black") nut(nut5,5);				// with a 75mm circle led
-		translate([32.5+shifthotend2,9+shifthotend,-10]) color("lightgray") cylinder(h=20,d=screw5);	// mounting hole holder
-		translate([32.5+shifthotend2,9+shifthotend,2]) color("black") nut(nut5,5);				// with a 75mm circle led
-		 // remove some under the motor
+		if(LEDLight) LEDRingMount();		 // remove some under the motor
 		translate([20+shifthotend2,-5,-10]) color("pink") cylinder(h=20,d=23.5);
 	    translate([0,-5,wall/2]) color("purple") fillet_r(2,23/2,-1,$fn);	// round top edge
 	    translate([0,-5,-wall/2]) color("purple") rotate([180]) fillet_r(2,23/2,-1,$fn);	// round bottom edge
@@ -920,6 +920,7 @@ module TitanExtruderPlatform(recess=3,InnerSupport=0,MountingHoles=1) { // extru
 		translate([15,15,0]) rotate([90,0,0]) PCFanNutHoles(nut3);
 
 	}
+	if(LEDLight) translate([0,0,-4]) ScrewSpacer(LEDSpacer,screw5);
 	difference() {
 		translate([shifthotend2,-32,0]) rotate([90,0,90]) TitanMotorMount(0,0,InnerSupport);
 		translate([-50,0,44.5]) rotate([90,0,90]) FanMountHoles(); // mounting holes for bltouch & prox sensor
@@ -942,6 +943,15 @@ module TitanExtruderPlatform(recess=3,InnerSupport=0,MountingHoles=1) { // extru
 			}
 		}
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module LEDRingMount() {
+	translate([30.5+shifthotend2,-24+shifthotend,-10]) color("gray") cylinder(h=20,d=screw5);	// mounting hole for a holder
+	translate([30.5+shifthotend2,-24+shifthotend,2]) color("black") nut(nut5,5);				// with a 75mm circle led
+	translate([30.5+shifthotend2,12.5+shifthotend,-10]) color("lightgray") cylinder(h=20,d=screw5);	// mounting hole holder
+	translate([30.5+shifthotend2,12.5+shifthotend,2.5]) color("black") nut(nut5,5);				// with a 75mm circle led
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1186,6 +1196,15 @@ module roundedinner() {
 			translate([5,12,wall]) fillet_r(1.5,6,-1,100);
 			translate([5,12,0]) rotate([0,180,0]) fillet_r(1.5,6,-1,100);
 		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module ScrewSpacer(Length=10,Screw=screw5) {
+	difference() {
+		color("blue") cylinder(h=Length,d=Screw*2,$fn=100);
+		translate([0,0,-2]) color("red") cylinder(Length+4,d=Screw,$fn=100);
 	}
 }
 

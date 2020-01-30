@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 4/27/2019
+// Last Update: 12/8/2019
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/28/16	- modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
 // 7/3/16	- added assembly info
@@ -31,6 +31,7 @@
 //			  Now using OPENSCAD version 2019.01.24.ci1256 (git 7fa2c8f1)
 //			  Added M3 version to plates()
 // 4/27/19	- Added a belt drive version of the direct drive mount in direct_belt_drive_motor_mount()
+// 12/8/19	- Added Reduction_Motor_Mount() for using a belt to drive each z axis leadscrew
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
@@ -106,9 +107,10 @@ layer = 0.25;				// printed layer thickness
 
 //direct_drive(3,0,5,8); 	// Z axis for bed leveling
 				// 1st arg: quantiy; 2nd arg: printable couplers; 3rd arg: motor shaft diameter; 4th arg is leadscrew diameter
-direct_drive_motor_mount(3); // arg is quanity
+//direct_drive_motor_mount(3); // arg is quanity
+//Reduction_Motor_Mount(1);
 //motor_direct_with_znut(3); // motor mounts and the znut holder
-//belt_drive();	// arg is quanity, belt drive leadscrew mounts and znut
+belt_drive(1,0);	// 1st arg is quanity; 2nd arg is for znut, belt drive leadscrew mounts and znut
 //belt_motor_Mount();  // z motor mount for belt version
 //plates(1,screw5); // arg is quanity*2
 //direct_belt_drive_motor_mount(3); // arg is quanity
@@ -149,12 +151,12 @@ module direct_belt_drive_motor_mount(Quanity=1) { // arg is quanity
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module belt_drive(Quanity=1) {
+module belt_drive(Quanity=1,ZNut=1) {
 	if($preview) %translate([0,0,-5]) cube([200,200,2],center=true);
 	// a motor driving leadscrew via a belt
 	for(a=[0:Quanity-1]) {
 		translate([a*65-65,0,0]) bearing_mount(1); // bearing mount at bottom of z-axis leadscrew
-		translate([(a*65)-142,-50,0]) single(); // znut holder
+		if(ZNut) translate([(a*65)-142,-50,0]) single(); // znut holder
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -673,6 +675,14 @@ module third_z_spacer() { // allow z makerslide to mount to the outside of a mak
 		color("cyan") cubeX([40,25,15],1);
 		translate([10,30,7.5]) rotate([90,0,0]) color("red") cylinder(h=40,d=screw5,$fn=100);
 		translate([30,30,7.5]) rotate([90,0,0]) color("blue") cylinder(h=40,d=screw5,$fn=100);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Reduction_Motor_Mount(Quanity=3) {
+	for(i=[0:Quanity-1]){
+		translate([i*60,0,0]) belt_motor(0);	// one stepper motor mount with idler
 	}
 }
 

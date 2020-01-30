@@ -16,10 +16,12 @@
 // 2/14/19	- Removed and renamed variables used.
 // 3/1/19	- Fixed Long_Motor_version() for the spacer
 // 8/7/19	- Widened the pc blower fan adapter mounting holes, added versions for both e3dv6 positions
+// 8/17/19	- changed to fanduct_v2.scad
 //////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>
-use <fanduct.scad> // http://www.thingiverse.com/thing:387301
+//use <fanduct.scad> // http://www.thingiverse.com/thing:387301
+use <fanduct_v2.scad>
 $fn=100;
 //////////////////////////////////////////////////////////////////////////
 // vars
@@ -31,7 +33,8 @@ FHeight = 10;
 MountingHoleHeight = 60; 	// screw holes may need adjusting when changing the front to back size
 ExtruderOffset = 18;		// adjusts extruder mounting holes from front edge
 FanSpacing = 32;			// hole spacing for a 40mm fan
-PCfan_spacing = FanSpacing+14;
+PCfan_spacing = 47;//FanSpacing+15;
+DuctLength=65; // set length of 50150 fan duct
 //////////////////////////////////////////////////////////////////////////
 // 1st arg: fan duct;	
 // 2nd arg is side offset
@@ -39,21 +42,21 @@ PCfan_spacing = FanSpacing+14;
 // 4th arg: move front/rear M4 blower mounting hole
 // 5th arg: move closer/farther from mount
 //Long_Motor_version(0,6,25,6,0);	// e3dv6 at left front
-Long_Motor_version_v2(0,-6,25,6,-5); // e3dv6 at right rear
-//Short_Motor_version(0,6,25,6); 	// e3dv6 at left front
-//Short_Motor_version_v2(0,12,25,6); // e3dv6 at right rear
+//Long_Motor_version_v2(0,-2,25,6,-5); // e3dv6 at right rear
+Short_Motor_version(0,6,25,6); 	// e3dv6 at left front
+//Short_Motor_version_v2(1,12,25,6); // e3dv6 at right rear
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Short_Motor_version(Duct=0,Move=0,Raise=0,Back=0,Offset=0) {
-	difference() {
-		color("cyan") cubeX([FanSpacing+Move/2+4,MHeight,Thickness],1);
-		BracketMount();
-	}
-	difference() {
+	//difference() {
+	//	color("cyan") cubeX([FanSpacing+Move/2+4,MHeight,Thickness],1);
+	//	BracketMount();
+	//}
+	//difference() {
 		FanBlowerMount(Move,Raise,Back);
-		BracketMount();
-	}
-	if(Duct) translate([-5,-12,1.5]) color("red") FanDuct();
+	//	BracketMount();
+	//}
+	if(Duct) translate([0,12,0]) color("red") FanDuct_v2(DuctLength);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -67,7 +70,7 @@ module Short_Motor_version_v2(Duct=0,Move=0,Raise=0,Back=0,Offset=0) {
 		FanBlowerMount(Move,Raise,Back);
 		BracketMount_v2();
 	}
-	if(Duct) translate([-5,-12,1.5]) color("red") FanDuct();
+	if(Duct) translate([0,12,0]) color("red") FanDuct_v2(DuctLength);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -85,7 +88,7 @@ module Long_Motor_version(Duct=0,Move=0,Raise=0,Back=0,Offset=0) { // stepper si
 		translate([0,Offset+10,0]) FanBlowerMount(Move,Raise,6,0,0,4,1,Offset);
 		translate([0,0,0.5]) BracketMount();
 	}
-	if(Duct) translate([-5,-15,0]) color("red") FanDuct();
+	if(Duct) translate([0,15,0]) color("red") FanDuct_v2(DuctLength);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,12 +101,13 @@ module Long_Motor_version_v2(Duct=0,Move=0,Raise=0,Back=0,Offset=0) { // stepper
 	difference() {
 		translate([Move+6,Offset-1,0]) color("lightgray") cubeX([21,Offset*-1+5,Thickness],1); // spacer
 		translate([0,0,0.5]) BracketMount_v2();
+		translate([Move+2,-35+Back,10]) rotate([-45,0,0]) color("pink") cube([30,30,10]);
 	}
 	difference() {
 		translate([0,Offset+10,0]) FanBlowerMount(Move,Raise,6,0,0,4,1,Offset);
 		translate([0,0,0.5]) BracketMount_v2();
 	}
-	if(Duct) translate([-5,-15,1.5]) color("red") FanDuct();
+	if(Duct) translate([0,15,0]) color("red") FanDuct_v2(DuctLength);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +118,7 @@ module FanBlowerMount(Move=0,Raise=0,Back=0,X=0,Y=0,Z=0,Spacer=0,Offset=0) {
 			translate([Move+6,-30+Back,0]) color("gray") cubeX([21,21-Back,Raise+Z+5],1);
 			RemoveForBlower(Move+6,Raise,Spacer);
 			translate([Move+X,-14-Back+Y,Raise+Z]) rotate([0,90,0]) color("purple") cylinder(h=42,r=screw4/2,$fn=50);
-			translate([Move+2,-40+Back,9]) rotate([-45,0,0]) color("black") cube([30,30,10]);
+			translate([Move+2,-40+Back,10]) rotate([-45,0,0]) color("black") cube([30,30,10]);
 		}
 		//difference() {
 		//	translate([Move+6,Offset+2,0]) color("lightgray") cubeX([21,Offset,Thickness],1);
