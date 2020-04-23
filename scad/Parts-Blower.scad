@@ -21,7 +21,7 @@
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>
 //use <fanduct.scad> // http://www.thingiverse.com/thing:387301
-use <fanduct_v2.scad>
+use <fanduct_v3.scad>
 $fn=100;
 //////////////////////////////////////////////////////////////////////////
 // vars
@@ -41,54 +41,40 @@ DuctLength=65; // set length of 50150 fan duct
 // 3rd arg: move up/down M4 blower mounting hole
 // 4th arg: move front/rear M4 blower mounting hole
 // 5th arg: move closer/farther from mount
-//Long_Motor_version(0,6,25,6,0);	// e3dv6 at left front
-//Long_Motor_version_v2(0,-2,25,6,-5); // e3dv6 at right rear
-Short_Motor_version(0,6,25,6); 	// e3dv6 at left front
-//Short_Motor_version_v2(1,12,25,6); // e3dv6 at right rear
+//Long_Motor_version(0,6,25,6,-13);	// e3dv6
+//Long_Motor_version_v2(0,-2,25,6,-5); // e3dv6 at left
+Long_Motor_version_v2(0,-2,25,6,-13); // e3dv6 at right
+//Short_Motor_version(1,6,25,6); 	// e3dv6 at left front
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Short_Motor_version(Duct=0,Move=0,Raise=0,Back=0,Offset=0) {
-	//difference() {
-	//	color("cyan") cubeX([FanSpacing+Move/2+4,MHeight,Thickness],1);
-	//	BracketMount();
-	//}
-	//difference() {
-		FanBlowerMount(Move,Raise,Back);
-	//	BracketMount();
-	//}
-	if(Duct) translate([0,12,0]) color("red") FanDuct_v2(DuctLength);
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-module Short_Motor_version_v2(Duct=0,Move=0,Raise=0,Back=0,Offset=0) {
 	difference() {
-		color("cyan") cubeX([PCfan_spacing+7,MHeight,Thickness],1);
-		BracketMount_v2();
+		color("cyan") cubeX([FanSpacing+Move/2+4,MHeight,Thickness],1);
+		BracketMount();
 	}
 	difference() {
 		FanBlowerMount(Move,Raise,Back);
-		BracketMount_v2();
+		BracketMount();
 	}
-	if(Duct) translate([0,12,0]) color("red") FanDuct_v2(DuctLength);
+	if(Duct) translate([0,12,0]) color("red") FanDuct_v3(DuctLength);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 module Long_Motor_version(Duct=0,Move=0,Raise=0,Back=0,Offset=0) { // stepper side
 	difference() {
-		color("cyan") cubeX([FanSpacing+7,MHeight,Thickness],1);
-		translate([0,0,0.5]) BracketMount();
+		color("cyan") cubeX([FanSpacing+Move/2+7,MHeight,Thickness],1);
+		translate([0,0,0.5]) BracketMount_v2();
 	}
-//	difference() {
-//		translate([Move+6,-12,0]) color("lightgray") cubeX([21,Offset+15,Thickness],1);
-//		translate([0,0,0.5]) BracketMount();
-//	}
+	difference() {
+		translate([Move+6,-13.5,0]) color("lightgray") cubeX([21,-Offset+4,Thickness],1);
+		translate([0,0,0.5]) BracketMount_v2();
+	}
 	difference() {
 		translate([0,Offset+10,0]) FanBlowerMount(Move,Raise,6,0,0,4,1,Offset);
-		translate([0,0,0.5]) BracketMount();
+		translate([0,0,0.5]) BracketMount_v2();
 	}
-	if(Duct) translate([0,15,0]) color("red") FanDuct_v2(DuctLength);
+	if(Duct) translate([0,15,0]) color("red") FanDuct_v3(DuctLength);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,13 +87,13 @@ module Long_Motor_version_v2(Duct=0,Move=0,Raise=0,Back=0,Offset=0) { // stepper
 	difference() {
 		translate([Move+6,Offset-1,0]) color("lightgray") cubeX([21,Offset*-1+5,Thickness],1); // spacer
 		translate([0,0,0.5]) BracketMount_v2();
-		translate([Move+2,-35+Back,10]) rotate([-45,0,0]) color("pink") cube([30,30,10]);
+		translate([Move+2,-30+Back+Offset,10]) rotate([-45,0,0]) color("pink") cube([30,30,10]);
 	}
 	difference() {
 		translate([0,Offset+10,0]) FanBlowerMount(Move,Raise,6,0,0,4,1,Offset);
 		translate([0,0,0.5]) BracketMount_v2();
 	}
-	if(Duct) translate([0,15,0]) color("red") FanDuct_v2(DuctLength);
+	if(Duct) translate([0,15,0]) color("red") FanDuct_v3(DuctLength);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
