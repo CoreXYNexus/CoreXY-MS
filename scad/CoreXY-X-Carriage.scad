@@ -139,7 +139,7 @@ LEDLight=1; // print LED ring mounting with spacer
 LEDSpacer=20;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//partial();
+partial();
 //FrontCarridge(0,0,0,0);	// Clamps,Loop,Titan
 //CarridgeAllInOne(0,1,2);	// Clamps,Loop,Titan
 //RearCarridge(0,1,1);	// Clamps,Loop
@@ -702,10 +702,8 @@ module CarriageBeltDriveStandAlone(Loop=0,DoRearWall=1,DoLayer=0) {
 			}
 		}
 		// mounting screw holes to x-carriage plate
-		translate([6,wall/2,-1]) rotate([0,0,0]) color("blue") cylinder(h = 15, r = screw3/2, $fn = 50);
-		translate([6+(width/4+8.5),wall/2,-1]) rotate([0,0,0]) color("black") cylinder(h = 15, r = screw3/2, $fn = 50);
-		translate([6,wall/2+41,-1]) rotate([0,0,0]) color("blue") cylinder(h = 15, r = screw3/2, $fn = 50);
-		translate([6+(width/4+8.5),wall/2+41,-1]) rotate([0,0,0]) color("black") cylinder(h = 15, r = screw3/2, $fn = 50);
+		translate([21.5,wall/2,-30]) rotate([90,0,0]) TopMountBeltHoles(screw3);
+		translate([-6.5+(width/4+8.5),wall/2+42,-30]) rotate([90,0,0]) TopMountBeltHoles(screw3);
 		color("white") hull() { // plastic reduction
 			translate([21,16,-5]) cylinder(h= 20, r = 8);
 			translate([21,25,-5]) cylinder(h= 20, r = 8);
