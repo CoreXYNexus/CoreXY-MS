@@ -107,18 +107,18 @@ layer = 0.25;				// printed layer thickness
 
 //direct_drive(3,0,5,8); 	// Z axis for bed leveling
 				// 1st arg: quantiy; 2nd arg: printable couplers; 3rd arg: motor shaft diameter; 4th arg is leadscrew diameter
-//direct_drive_motor_mount(3); // arg is quanity
+//direct_drive_motor_mount(2); // arg is quanity
 //Reduction_Motor_Mount(1);
 //motor_direct_with_znut(3); // motor mounts and the znut holder
-belt_drive(1,0);	// 1st arg is quanity; 2nd arg is for znut, belt drive leadscrew mounts and znut
+//motor_mount(1,0);	// 1st arg is quanity; 2nd arg is for znut, belt drive leadscrew mounts and znut
 //belt_motor_Mount();  // z motor mount for belt version
 //plates(1,screw5); // arg is quanity*2
 //direct_belt_drive_motor_mount(3); // arg is quanity
-//partial();
+partial();
 	
 //////////////////////////////////////////////////////////////////////////////
 
-module direct_drive(Quanity=1,Coupler,Motorshaft,LeadScrewDiameter) { // set for makerslide
+module direct_drive(Quanity=1,Coupler=1,Motorshaft=5,LeadScrewDiameter=8) { // set for makerslide
 	if($preview) %translate([-100,-100,-2]) cube([200,200,2]);
 	for(a=[0:Quanity-1]) {
 		translate([a*65-65,0,thickness/2]) motor_mount(1);
@@ -188,7 +188,7 @@ module partial() { // this is here just to make it easier to print/test a single
 	//translate([-15,30,0]) single(25); // znut nut holder for third rail where Z makerslide is mounted on outside of makerslide
 	//test();  // test print for checking motor alignment
 	//rotate([-90,0,0]) testnut(1);	// print a shortened nut section for test fitting
-	//translate([0,0,2.5]) bearing_mount(0);
+	translate([0,0,2.5]) bearing_mount(0);
 	//translate([70,0,2.5]) bearing_mount(); // bearing mount at bottom of z-axis leadscrew
 	//test_bearing_hole(); // test fit the bearing hole
 	//translate([60,0,0])
@@ -207,7 +207,7 @@ module partial() { // this is here just to make it easier to print/test a single
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module motor_mount(makerslide=0) { // motor mount
-	rotate([180,0,0]) {
+	rotate([180,0,0]) {				// added a thrust bearing?
 		nema_plate(makerslide);
 		mount(makerslide);
 	}
@@ -431,6 +431,7 @@ module testnut(Type) { 	// a shortened nut section for test fitting of the nut &
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// added a thrust bearing?
 module bearing_mount(Spc=0,SpcThk=idler_spacer_thickness,Idler=1,Makerslide=1) { // bearing holder at bottom of z-axis
 	rotate([180,0,0]) {										// didn't bother to make a left/right versions
 		mount(Makerslide);

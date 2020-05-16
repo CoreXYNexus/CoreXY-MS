@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////////////////
 // ABS or something that can handle the heatbed temperature
 /////////////////////////////////////////////////////////////////////////
-// 3/23/16 - added clamping screw for cam
+// 3/23/16	- added clamping screw for cam
 // 12/23/18	- Added preview colors and a PI3 with camera in a plastic case holder
 //			  Added cubeX.scad
 // 4/10/19	- Changed to a PI Zero W all in one holder, currently set for a Raspberry PI Camera Rev1.3
@@ -23,14 +23,14 @@ $fn=100;
 screw5 = 5.5;	// 5mm screw hole size
 screw3 = 3.6;
 camdia = 29;	// outside diameter of usb camera
-length = 80;	// distance needed from bed to see the entire bed
+length = 100;	// distance needed from bed to see the entire bed
 outer = 7;		// thickness of ring to hold camera
 width = camdia + outer;	// width of the ring to hold camera
 thickness = 6;	// thickness of extension and mount
 camshift = -4.5;	// amount to move camera ring to end of extension
 mlength = 20;	// length of the mount
 extruder = 0.4;	// extruder size for print support for mount end
-stall = 5.16;	// height of print support for mount end
+stall = 6;	// height of print support for mount end
 //----
 PIhw=22.86;
 PIhl=57.81;
@@ -41,18 +41,18 @@ Layer=0.3; // layer thickness
 // note: support for one side needs adjusting if web cam size changes
 ////////////////////////////////////////////////////////////////////////
 
-Bracket(1);
+Bracket(1,1);
 //WCBracket(1);
 
 ////////////////////////////////////////////////////////////////////////
 
-module Bracket(PI=0) {
+module Bracket(PI=0,BracketOnly=0) {
 	Cam(PI);
 	Clamp(PI);
 	Extension(PI);
 	Reinforce(PI);
 	Mount(PI);
-	PIShield(PI);
+	if(!BracketOnly) PIShield(PI);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -201,7 +201,7 @@ module Extension(PI=0) {
 
 module Mount(PI=0) {
 	difference() {
-		color("blue") rotate([0,-15,0]) translate([length-2.5,-width/6,-20.8]) cubeX([mlength,width,thickness],1);
+		color("blue") rotate([0,-15,0]) translate([length-5,-width/6,-25.8]) cubeX([mlength+2,width,thickness],1);
 		// next is not all the way thru to make support of the bottom of the hole
 		color("lightgray") rotate([0,-15,0]) translate([length+7,width/3,-(20.8-Layer)]) cylinder(h=thickness*2,r=screw5/2,$fn=100);
 	}
@@ -212,8 +212,8 @@ module Mount(PI=0) {
 
 module Support(PI=0) {
 	color("plum") translate([length+mlength-0.85,-width/6,0]) cube([extruder,width,stall]);
-	color("gold") rotate([0,0,90]) translate([-width/6+0.1,-(length+mlength-0.85),0]) cube([extruder,width,stall]);
-	color("white") rotate([0,0,90]) translate([width-6.5,-(length+mlength-0.85),0]) cube([extruder,width,stall]);
+	color("gold") rotate([0,0,90]) translate([-width/6+0.1,-(length+mlength-0.85),0]) cube([extruder,width-18,stall]);
+	color("white") rotate([0,0,90]) translate([width-6.5,-(length+mlength-0.85),0]) cube([extruder,width-18,stall]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
