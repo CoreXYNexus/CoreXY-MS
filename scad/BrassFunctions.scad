@@ -4,18 +4,19 @@
 // last modified: 4/13/2020
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 4/13/20	- Functions that return a screw3t (tap hole) or the hole for a 3mm brass insert
-//			  4mm & 5mm not implimented yet
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function GetHoleLen2mm(Screw) =	(Screw==screw2in) ? screw2inl*2.5 : 25;
+function Yes2mmInsert() = (Use2mmInsert==1) ? screw2in : screw2;
+
 function GetHoleLen3mm(Screw) =	(Screw==screw3in) ? screw3inl*2.5 : 25;
-//function YesInsert3mm() = (Use3mmInsert==1) ? screw3in : screw3t;
 function Yes3mmInsert() = (Use3mmInsert==1) ? screw3in : screw3t;
 
-//function GetHoleLenM4(Screw) =	(Screw==screw4in) ? screw4inl*2.5 : 25;
-//function YesInsertM4() = (Use4mmInsert==1) ? screw4in : screw4;
+function GetHoleLen4mm(Screw) =	(Screw==screw4in) ? screw4inl*2.5 : 25;
+function Yes4mmInsert() = (Use4mmInsert==1) ? screw4in : screw4;
 
-//function GetHoleLenM5(Screw) =	(Screw==screw5in) ? screw5inl*2.5 : 25;
-//function YesInsertM5() = (Use5mmInsert==1) ? screw5in : screw5;
+function GetHoleLen5mm(Screw) =	(Screw==screw5in) ? screw5inl*2.5 : 25;
+function Yes5mmInsert() = (Use5mmInsert==1) ? screw5in : screw5;
 
 ////////////////////////////// end of BrassFunctions.scad ///////////////////////////////////////////////////////

@@ -9,6 +9,11 @@
 include <inc/screwsizes.scad>
 include <inc/functions.scad>
 use </inc/cubex.scad>
+Use2mmInsert=0;
+Use3mmInsert=1;
+Use4mmInsert=0;
+Use5mmInsert=0;
+include <brassfunctions.scad>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $fn=100;
 clearance=0.10;
@@ -95,9 +100,9 @@ module Fan_Mount() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module DuctScrewMount() {
-	translate([-5,MountSpacing/2-6,3]) rotate([0,90,0]) color("lightblue") cylinder(h=FrameThickness+5,d=screw3);
-	translate([-5,MountSpacing/2-19,3]) rotate([0,90,0]) color("lightgray") cylinder(h=FrameThickness+5,d=screw3);
+module DuctScrewMount(Screw=Yes3mmInsert()) {
+	translate([-5,MountSpacing/2-6,3]) rotate([0,90,0]) color("lightblue") cylinder(h=FrameThickness+5,d=Screw);
+	translate([-5,MountSpacing/2-19,3]) rotate([0,90,0]) color("lightgray") cylinder(h=FrameThickness+5,d=Screw);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,14 +118,16 @@ module DuctScrewMountCounter() {
 
 module FanFrame() {
 	difference() {
-		translate([-FrameThickness,-28,0])
-			color("red") cubeX([FrameThickness,FrameX,FrameY],1);
+		translate([-FrameThickness,-28,0]) color("red") cubeX([FrameThickness,FrameX,FrameY],1);
+		// mount holes to titan extruder base
 		translate([-5,MountSpacing/2+2,3]) rotate([0,90,0]) color("gold") cylinder(h=FrameThickness+5,d=screw3);
 		translate([-5,-MountSpacing/2+2,3]) rotate([0,90,0]) color("cyan") cylinder(h=FrameThickness+5,d=screw3);
+		translate([-12,MountSpacing/2+2,3]) rotate([0,90,0]) color("gold") cylinder(h=FrameThickness+5,d=screw3hd);
+		translate([-12,-MountSpacing/2+2,3]) rotate([0,90,0]) color("cyan") cylinder(h=FrameThickness+5,d=screw3hd);
 		// 5150 mount holes
 		translate([-1,BlowerOffset+22,50]) rotate([-45,0,0]) {
-			translate([-FrameThickness-2,0,0]) color("blue") rotate([0,90,0]) cylinder(h=10,d=screw4);
-			translate([-FrameThickness-2,FanMountSpacing,0]) color("pink") rotate([0,90,0]) cylinder(h=10,d=screw4);
+			translate([-FrameThickness-2,0,0]) color("blue") rotate([0,90,0]) cylinder(h=10,d=Yes4mmInsert());
+			translate([-FrameThickness-2,FanMountSpacing,0]) color("pink") rotate([0,90,0]) cylinder(h=10,d=Yes4mmInsert());
 		}
 		// plastic reduction or fan inlet, if needed
 		translate([-FrameThickness-2,(-BoltUpperX+BlowerAdjust)/2+11,BoltUpperY/2+4])

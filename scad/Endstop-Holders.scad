@@ -14,6 +14,8 @@
 ////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
+Use3mmInsert=1;
+include <brassfunctions.scad>
 $fn=75;
 ////////////////////////////////////////////////////////////////////////////////////
 // vars
@@ -26,20 +28,16 @@ MountScrew=screw4;	// part that holds the switch
 StikeMountScrew=screw5; // the part the switch hits
 ////////////////////////////////////////////////////////////////////////////
 
-//thing(hole distance,hole diagonal offset,amount to move from edge,screw hole size);
-
-thing(22,10,3,screw3t,MountScrew);	// TEMCo CN0097: 22,10,screw3t ; Little green/black: 9,0,screw2
-//translate([0,40,0]) thing(22,10,3,screw3t,MountScrew);	// TEMCo CN0097: 22,10,screw3t ; Little green/black: 9,0,screw2
-//translate([0,40,0]) thing(10,0,7,screw2,MountScrew); // black microswitch inline mount
-//translate([0,0,0]) thing(10,0,7,screw2,MountScrew); // black microswitch inline mount
-//translate([0,-40,0]) clamp(MountScrew);
+XStopMount(22,10,8,Yes3mmInsert(),MountScrew,8);	// TEMCo CN0097
+//translate([0,0,0]) XStopMount(10,0,8,screw2,MountScrew,8); // black microswitch inline mount
+//translate([8,-40,0]) clamp(MountScrew);
 //translate([-40,-40,0])strikeY(StikeMountScrew);
-translate([-30,-12,0]) strikeX(StikeMountScrew);
+//translate([-30,-12,0]) strikeX(StikeMountScrew);
 
 ///////////////////////////////////////////////////////////////////////////
 
-module thing(Sep,DiagOffset,Offset,ScrewT,ScrewM=screw5) {
-	base(Sep,DiagOffset,Offset,ScrewT);
+module XStopMount(Sep,DiagOffset,Offset,ScrewS,ScrewM=screw5,Adjust) {
+	base(Sep,DiagOffset,Offset,ScrewS,Adjust);
 	mount(ScrewM);
 }
 
@@ -59,10 +57,10 @@ module mount(Screw=screw5) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-module base(Sep,DiagOffset,Offset,ScrewT) {
+module base(Sep,DiagOffset,Offset,ScrewT,Adjust) {
 	rotate([0,-90,0]) difference() {
 		difference() {
-			translate([0,0,-4]) color("yellow") cubeX([Switch_thk,HolderWidth,Switch_ht+4],1);
+			translate([0,0,-4]) color("yellow") cubeX([Switch_thk,HolderWidth,Switch_ht+Offset-Adjust],1);
 			// screw holes for switch
 			rotate([0,90,0]) {		
 				translate([-(Switch_ht-Offset), SwitchShift, -1]) {

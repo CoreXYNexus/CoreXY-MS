@@ -2,7 +2,7 @@
 // CoreXY-Motor-Bearing.scad - hold the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
-// last update 7/2/19
+// last update 5/16/20
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16	- added built-in spacer to the bearing_bracket
 // 7/14/16	- adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -27,6 +27,7 @@
 // 4/16/19	- Changed the angle support for the motor mounts to match the Z motor mounts
 //			  Changed the bearing_support() to match the motor mount notch supports
 // 7/2/19	- Made the labels tilted a bit to print better, updated mirror() to 2019.05 version
+// 5/16/20	- Rounded the end of the bearing bracket end and reduced the width that connects to the 2020
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in bearing_bracket() must match stepper motor shaft in motor_mount()
 //       If the motors get hot, print it from something that can handle it
@@ -45,14 +46,15 @@ include <CoreXY-MSv1-h.scad>
 b_posY = 29.5;		// bearing position X
 b_posX = 20;		// bearing position Y
 b_height = 10;		// amount to raise bearings
-one_stack = 11.78;	// just the length of two washers & two F625Z bearings
+F625ZDoulbleStack = 11.78;	// just the length of two washers & two F625Z bearings
+F625ZDiameter = 18; // diameter of the f625z bearing
 layer_t = 0.2;		// layer thickness used to print
 Vthickness = 7;		// thickness of bearing support vertical section
 Tthickness = 5;		// thickness of bearing support top and fillet
 /////////////////////////////////////////////////////////////////////////////////////////
 
-all(1); // all the needed parts
-//partial();
+//all(1); // all the needed parts
+partial();
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -60,10 +62,10 @@ module all(MS) {
 	if($preview) %translate([20,10,-5]) cube([200,200,2],center=true); // show the 200x200 bed
 	translate([0,-5,0]) motor_mount(1);
 	translate([35,60,-2.5]) rotate([0,0,0]) bearing_bracket(0,"Right");
-	translate([85,21,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
+	translate([80,33,F625ZDoulbleStack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
 	translate([0,65,0]) motor_mount(0);
-	translate([80,-26,-2.5]) rotate([0,0,0]) mirror([1,0,0]) bearing_bracket(0,"Left"); // mirror it for the other side
-	translate([60,-66,one_stack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
+	translate([75,-6,-2.5]) rotate([0,0,0]) mirror([1,0,0]) bearing_bracket(0,"Left"); // mirror it for the other side
+	translate([80,-33,F625ZDoulbleStack*2+b_height+40]) rotate([0,180,0]) bearing_support(MS);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -71,11 +73,11 @@ module all(MS) {
 module partial() { // uncomment the parts you want and adjust translates as needed
 //	motor_mount(1);
 //	translate([0,65,0]) motor_mount(0);
-	bearing_bracket(0,"Right");
-	translate([90,0,0]) mirror([1,0,0]) bearing_bracket(0,"Left"); // mirror it for the other side
-	//rotate([0,180,0]) 
-	//	bearing_support(0);
-	//translate([0,50,0]) rotate([0,180,0]) bearing_support(0);
+//	bearing_bracket(0,"Right");
+//	translate([90,0,0]) mirror([1,0,0]) bearing_bracket(0,"Left"); // mirror it for the other side
+	rotate([0,180,0]) 
+		bearing_support(0);  // arg is to added a makerslide notch
+	translate([0,20,0]) rotate([0,180,0]) bearing_support(0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -193,29 +195,42 @@ module spacer(TapIt=0) { // spacer to raise bearing on bearing braket to match t
 module bearing_support(NotchIt=0) {	// keep the bearing from tilting on the bracket
 	// NotchIt == 1 to notch it for the makerslide rail
 	difference() { // vertical
-		translate([-1,-10,0]) color("gray") cubeX([Vthickness,40,one_stack*2+b_height+43],2); // vertical
-		translate([-3,0,10]) rotate([0,90,0]) color("red") cylinder(h=20,d=screw5); // screw mounting holes
-		translate([-3,20,10]) rotate([0,90,0]) color("white") cylinder(h=20,d=screw5);
-		translate([-3,0,30]) rotate([0,90,0]) color("blue") cylinder(h=20,d=screw5);
-		translate([-3,20,30]) rotate([0,90,0]) color("black") cylinder(h=20,d=screw5);
+		translate([0,0,0]) color("gray") cubeX([Vthickness,F625ZDiameter,F625ZDoulbleStack*2+b_height+43],2); // vertical
+		translate([-3,9,10]) rotate([0,90,0]) color("red") cylinder(h=20,d=screw5); // screw mounting holes
+		translate([-3,9,30]) rotate([0,90,0]) color("blue") cylinder(h=20,d=screw5);
 		if(NotchIt)	translate([Vthickness+3,-40,33]) rotate([0,0,90]) ms_notch(); // notch it?
 	}
 	if(NotchIt) {
 		difference() {	// extra support at notch
-			translate([-2,30,35]) rotate([90,0,0]) color("cyan") cubeX([5,10,40],2); // strengthen at the notch
-			translate([-5,0,30]) rotate([0,90,0]) color("red") cylinder(h=5,d=screw5hd);	// screw head clearance
-			translate([-5,20,30]) rotate([0,90,0]) color("blue") cylinder(h=5,d=screw5hd);
+			// strengthen at the notch
+			translate([-2,F625ZDiameter,35]) rotate([90,0,0]) color("cyan") cubeX([5,10,F625ZDiameter],2);
+			translate([-5,9,30]) rotate([0,90,0]) color("red") cylinder(h=5,d=screw5hd);	// screw head clearance
 			translate([2,-15,35]) color("black") cube([10,50,10]); // remove any of the cylinder on notch side
 		}
 	}
-	difference() { // top
-		translate([0,0,one_stack*2+b_height+38]) color("white") cubeX([50,20,Tthickness],2);
-		translate([Vthickness+30,10,one_stack*2+b_height]) color("blue") cylinder(h=50,d=screw5);
+	BearingBracketHorizontal();
+	BearingBracketHorizontalSupport();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BearingBracketHorizontal() {
+	difference() {
+		union() {
+			translate([0,0,F625ZDoulbleStack*2+b_height+38]) color("blue") cubeX([38,F625ZDiameter,Tthickness],2);
+			translate([37,9,F625ZDoulbleStack*2+b_height+38]) color("red") cylinder(h=Tthickness,d=F625ZDiameter);
+		}
+		translate([Vthickness+30,9,F625ZDoulbleStack*2+b_height]) color("blue") cylinder(h=50,d=screw5);
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module 	BearingBracketHorizontalSupport() {
 	difference() { // angled support for top
-		translate([-11,8,one_stack*2+b_height+30]) rotate([0,45,0]) color("darkgray") cubeX([20,Tthickness,45],2);
-		translate([-19,7,one_stack*2+b_height+10]) color("black") cube([20,7,40]);
-		translate([-4,7,one_stack*2+b_height+42]) color("silver") cube([40,7,25]);
+		translate([-11,6.5,F625ZDoulbleStack*2+b_height+30]) rotate([0,45,0]) color("yellow") cubeX([20,Tthickness,45],2);
+		translate([-19,6,F625ZDoulbleStack*2+b_height+10]) color("black") cube([20,7,40]);
+		translate([-4,6,F625ZDoulbleStack*2+b_height+42]) color("silver") cube([40,7,25]);
 	}
 }
 
