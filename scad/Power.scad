@@ -2,7 +2,7 @@
 // Power.scad - uses a pc style power socket with switch
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 7/4/2016
-// last update 7/24/19
+// last update 6/21/20
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/4/16	- Added cover
 // 8/5/16	- adjusted cover & 2020 mounting holes
@@ -15,6 +15,7 @@
 // 5/28/19	- Added a housing version with seperate power plug and switch, added M5 countersinks to housing, modified the MMAX
 //			  power supply mounts for the CXY-MSv1 corexy
 // 7/24/19	- Adjusted cover() screw holes
+// 6/21/20	- Added power supply mount for a Sunpower SP-180A 12vdc, uses M3 mountind screws on the bottom
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Version 0 uses Digi-Key Part number: CCM1666-ND : combined power socket and switch
 //		 http://www.digikey.com/product-detail/en/te-connectivity-corcom-filters/1609112-3/CCM1666-ND/758835
@@ -36,7 +37,6 @@ PowerSupplyCoverClearance = 1;
 PowerSupplyCoverWidth=115+PowerSupplyCoverClearance;
 PowerSupplyCoverHeight=50+PowerSupplyCoverClearance;
 PowerSupplyCoverDepth=55;
-//PowerSupplyCoverTab=24;
 PowerSupplyAdjust=2;
 PowerSupplySideMountingScrewSpacing=25;
 Length = 113;
@@ -45,6 +45,10 @@ Thickness = 10;
 LayerThickness = 0.2;
 SocketPlugWidth=SwitchSocketWidth;
 SocketPlugHeight=SwitchSocketHeight;
+//--------------------------------------
+PS12Offest=81;
+PS12Edge=10;
+PS12Width=100;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //all(0,13,19.5,2,1,2,0);// 1st arg: flip power label; next 4 args: Width, length, clip Thickness; defaults to 0,13,19.5,2
@@ -53,9 +57,9 @@ SocketPlugHeight=SwitchSocketHeight;
 //powersupply_cover();
 //powersupply_cover_v2();
 //pbar(1,2);
-housing(1,13,19.5);
+//housing(1,13,19.5);
 //translate([0,0,0]) cover();
-
+PS12vdc(2);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module all(flip=0,s_w=13,s_l=19.5,s_t=2,Makerslide=1,PBQuantiy=2,Version=0) {
@@ -353,6 +357,43 @@ module mks_mount_support(mks) {
 			color("black") cube([screw5hd,screw5hd,LayerThickness]);
 	} else
 		translate([Length/2-screw5hd/2,Width/2-screw5hd/2,Thickness/2]) color("black") cube([screw5hd,screw5hd,LayerThickness]);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module PS12vdc(Qty=1) { // Sunpower SP-180A
+	for(a =[0:Qty-1]) {
+		translate([0,a*30,0]) {
+			difference() {
+				color("cyan") cubeX([PS12Width,25,5],2);
+				translate([10,25/2,-3]) color("red") cylinder(h=10,d=screw3);
+				translate([10+PS12Offest,25/2,-3]) color("blue") cylinder(h=10,d=screw3);
+				translate([10,25/2,2]) color("blue") cylinder(h=5,d=screw3hd);
+				translate([10+PS12Offest,25/2,2]) color("red") cylinder(h=5,d=screw3hd);
+			}
+			difference() {
+				color("plum") cubeX([5,25,25],2);
+				translate([-3,25/2,15]) rotate([0,90,0]) color("green") cylinder(h=10,d=screw5);
+				translate([4,25/2,15]) rotate([0,90,0]) color("gray") cylinder(h=5,d=screw5hd);
+			}
+			PS12Supports();
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module PS12Supports() {
+	color("white") difference() {
+		translate([-3,0,0]) rotate([0,12,0]) cubeX([PS12Width,5,25],2);
+		translate([-4,-1,-22]) cube([PS12Width+5,7,25]);
+		translate([-28,-1,-13]) cube([30,7,30]);
+	}
+	translate([0,20,0]) color("black") difference() {
+		translate([-3,0,0]) rotate([0,12,0]) cubeX([PS12Width,5,25],2);
+		translate([-4,-1,-22]) cube([PS12Width+5,7,25]);
+		translate([-28,-1,-13]) cube([30,7,30]);
+	}
 }
 
 //////////////// end of powersocket.scad /////////////////////////

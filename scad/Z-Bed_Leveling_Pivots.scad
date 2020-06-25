@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 1/29/2017
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 8/14/2019
+// Last Update: 6/12/20
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/15/17	- Added bearing pivot style carriage & 2040 mounts for multi-motor leveling
 // 1/29/17	- Added pivot version using just a M5 screw
@@ -21,10 +21,13 @@
 // 3/31/19	- Added a 2020 pivot in z_pivot_2040_v3()
 // 7/13/19	- Added to z_pivots() to make either 2020 end or side
 // 8/14/19	- Added a z_pivot with anti-rotation sides
+// 6/12/20	- Added adjustable length size for the z_pivot_2020() in ZPivotBed()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
+Use5mmInsert=1;
+include <brassfunctions.scad>
 $fn=50;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // Requires good bridging for z_pivot_2040()
@@ -36,6 +39,12 @@ out_dia_625z = 18+clearance;
 flange_625z = 1+layer;
 ht_625z = 5+layer;
 body_ht_625z=4;
+//---------------------
+BedWidth=200;
+ZCarriadgeWidth=581;
+ZLength=(ZCarriadgeWidth-BedWidth)/2;
+CenterPivotLength=100;
+ZPivotLength=28.5;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //z_pivots(3,1,1,1);	// arg1: Quanity ; Arg2: 0 for M5 pivots, 1 for 625z bearing pivots ; Arg3: 1 for round, 0 - square
@@ -45,7 +54,9 @@ body_ht_625z=4;
 //z_pivot_2040(1,1,screw5);
 //z_pivot_2040_v2(1,1,1);
 //z_pivot_2040_v3(1,1,1);
-z_pivot_2040_v4(1,1,1);
+//z_pivot_2040_v4(1,1,1);
+ZPivotBed(2);
+//ZPivotBed(1,CenterPivotLength);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -394,5 +405,76 @@ module bearing_hole2(Xpos=0,Ypos=0,Zpos=0,Bearing=0) {
 module bearing_flange(Xpos,Ypos,Zpos) {
 	translate([Xpos,Ypos,Zpos]) color("red") cylinder(h=15,d=out_dia_625z,$fn=100);
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module ZPivotBed(Quanity=1,Length=ZLength) { // 3 625 bearing pivot mounts on the end of the 2040 holding the bed
+	for(num=[0:Quanity-1]) {
+		translate([0,num*50,0]) {
+			difference() {
+				translate([1.5,0,0]) color("cyan") cubeX([29,40,5],1);
+				translate([16.5,10,0]) {
+					translate([0,0,-5]) color("red") cylinder(h=50,d=screw5);
+					translate([0,20,-5]) color("green") cylinder(h=50,d=screw5);
+					translate([0,0,4]) color("red") cylinder(h=50,d=screw5hd);
+					translate([0,20,4]) color("green") cylinder(h=50,d=screw5hd);
+				}
+			}
+			difference() {
+				translate([-0.5,0,0]) color("blue") cubeX([5,40,Length-ZPivotLength-out_dia_625z/2],1);
+				PivotScrewHole(screw5,Length);
+			}
+			difference() {
+				translate([28,0,0]) color("red") cubeX([5,40,Length-ZPivotLength-out_dia_625z/2],1);
+				PivotScrewHole(Yes5mmInsert(),Length);
+			}
+		}
+		ZPivotBedSupport(Length);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module ZPivotBedSupport(Length) {
+	if(ZLength > 90) {
+		difference() {
+			translate([0,0,Length-ZPivotLength-out_dia_625z*2-5]) color("plum") cubeX([32,40,5],2);
+			translate([16.5,10,0]) color("red") cylinder(h=40,d=screw5hd);
+			translate([16.5,30,0]) color("green") cylinder(h=40,d=screw5hd);
+		}
+		difference() {
+			translate([0,16,0]) color("lightgray") cube([32,8,Length-ZPivotLength-out_dia_625z*2]);
+			ZPivotSupportCenter();
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module ZPivotSupportCenter(Length) {
+		translate([7.5,15.5,0]) {
+			color("gray") hull() {
+				cylinder(h=Length-ZPivotLength-out_dia_625z*2+5,d=screw5);
+				translate([17.5,0,0]) cylinder(h=Length-ZPivotLength-out_dia_625z*2+5,d=screw5);
+			}
+		}
+		translate([7.5,24.5,0]) {
+			color("gray") hull() {
+				cylinder(h=Length-ZPivotLength-out_dia_625z*2+5,d=screw5);
+				translate([17.5,0,0]) cylinder(h=Length-ZPivotLength-out_dia_625z*2+5,d=screw5);
+			}
+		}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module PivotScrewHole(Screw=screw5,Length) {
+	translate([-8,20,Length-ZPivotLength-out_dia_625z]) rotate([0,90,0]) cylinder(h=50,d=Screw);
+	if(!Use5mmInsert) {
+		translate([31.5,20,Length-ZPivotLength-out_dia_625z]) rotate([0,90,0]) color("lime")
+			cylinder(h=10,d=nut5,$fn=6); // pivot
+	}
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

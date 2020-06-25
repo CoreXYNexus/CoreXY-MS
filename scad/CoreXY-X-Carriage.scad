@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CoreXY-X-Carriage - x carriage for makerslide
 // created: 2/3/2014
-// last modified: 5/8/2020
+// last modified: 6/15/2020
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to carriage and put it into a seperate module
@@ -72,6 +72,7 @@
 //			  BeltLoopHolder() now uses a for loop
 // 4/25/20	- Adjusted belt loop belt offset, made a new var:BeltLoopShiftY if shft the belt loop on the mounting
 // 5/8/20	- Fixed belt loop holder so you don't need to twist belts
+// 6/15/20	- Adjust the belt loop holders, wider screw mounts nd position
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -107,10 +108,10 @@ include <brassfunctions.scad>
 //-------------------------------------------------------------------------------------------------------------
 $fn=75;
 TestLoop=0; // 1 = have original belt clamp mount hole visible
-LoopHoleOffset=28;	// distance between the belt loop mounting holes (same as in belt_holder.scad)
+LoopHoleOffset=37;	// distance between the belt loop mounting holes (same as in belt_holder.scad)
 LoopHOffset=0;		// shift horizontal the belt loop mounting holes
 LoopVOffset=-2;		// shift vertical the belt loop mounting holes
-BeltLoopShiftY=-3;
+BeltLoopShiftY=-5;
 MountThickness=5;
 BeltSpacing=7;
 BeltMSSpacing=10;
@@ -118,6 +119,7 @@ BeltWidth=6;
 LoopHeight = 18;
 VerticalCarriageWidth = 37.2;
 HorizontalCarriageHeigth = 20;
+LayerThickness=0.3;
 //---------------------------------------------------------------------------------------------------------------
 E3Dv6 = 36.5;			// hole for E3Dv6 with fan holder
 ShiftTitanUp = 2.5;		// move motor +up/-down
@@ -142,9 +144,9 @@ LEDLight=1; // print LED ring mounting with spacer
 LEDSpacer=20;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-partial();
+//partial();
 //FrontCarridge(0,0,0,0);	// Clamps,Loop,Titan
-//CarridgeAllInOne(0,1,2);	// Clamps,Loop,Titan
+CarridgeAllInOne(0,1,2);	// Clamps,Loop,Titan
 //RearCarridge(0,1,1);	// Clamps,Loop
 //FrontAndRear(0,1,0,1);
 //ExtruderPlateMount(2,5); 	// 1st arg: 0 - old style hotend mount, 1 - drill guide for old style, 2 - titan/E3Dv6 mount
@@ -397,6 +399,7 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,E
 		if(!Titan)	translate([38,45,4]) CarridgeMount(screw4); // 4 mounting holes for an extruder
 		CarriageExtruderPlateNuts();
  	}
+	translate([17,0-4,89.05])  cube([40,38,LayerThickness]);  // support for the holes in the top
 	//%translate([0,0,4]) cube([10,35,10]); // show distance needed between carriages
 	translate([VerticalCarriageWidth*2,35,0]) rotate([90,0,180]) difference() { // rear
 		union() {
@@ -424,7 +427,7 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,E
 		}
 	}
 	BeltClamps(Clamps,Loop);
-	if(LoopMounts) translate([50,55,-(BeltMSSpacing-BeltWidth)]) BeltLoopHolderOppo(2,BeltLoopShiftY);
+	if(LoopMounts) translate([40,70,-(BeltMSSpacing-BeltWidth)]) BeltLoopHolderOppo(2,BeltLoopShiftY);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -696,7 +699,7 @@ module CarriageBeltDrive(Loop=0,DoRearWall=1,DoLayer=0) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module CarriageBeltDriveStandAlone(Loop=0,DoRearWall=1,DoLayer=0) {
-	difference() {	// base
+		difference() {	// base
 		translate([-3,-0,0]) color("cyan") cubeX([47,50,wall],2);
 		if(!Loop && (Yes3mmInsert() == screw3)) {
 			hull() {	// belt clamp nut access slot
@@ -1180,10 +1183,10 @@ module BeltLoopHolder(Quanity=1,ShiftY=-3) {
 module BeltLoopHolderOppo(Quanity=1,ShiftY=-3) {
 	for(a=[0:Quanity-1]) {
 		difference() {
-			translate([a*-30,ShiftY-10,BeltMSSpacing-BeltWidth]) color("blue") cubeX([23,26,LoopHeight],1);
+			translate([a*-30,ShiftY-10,BeltMSSpacing-BeltWidth]) color("blue") cubeX([23,29,LoopHeight],1);
 			translate([a*-30-1,ShiftY+3,-2]) beltLoop(); // lower
 			translate([a*-30-1,ShiftY+5.5,BeltMSSpacing+BeltSpacing+10]) rotate([180,0,0]) beltLoop(); // upper
-			translate([a*-30+19,-8,0]) BeltLoopMountingCountersink(3);
+			translate([a*-30+20,-21,0]) BeltLoopMountingCountersink(3);
 			translate([a*-30+19,-8,0]) BeltLoopMouningHoles();
 		}
 		translate([a*-30+19,-8,0]) BeltLoopMountingBlock(3);
@@ -1194,9 +1197,9 @@ module BeltLoopHolderOppo(Quanity=1,ShiftY=-3) {
 
 module BeltLoopMountingBlock(ExtraThickness=0) {
 	difference() {
-		translate([0,0,BeltMSSpacing-BeltWidth]) color("pink") cubeX([MountThickness+ExtraThickness,32,LoopHeight],1);
-		BeltLoopMouningHoles();
-		BeltLoopMountingCountersink(ExtraThickness);
+		translate([0,-15,BeltMSSpacing-BeltWidth]) color("pink") cubeX([MountThickness+ExtraThickness,45,LoopHeight],1);
+		translate([0,-13,0]) BeltLoopMouningHoles();
+		translate([-3,-13,0]) BeltLoopMountingCountersink(ExtraThickness);
 	}
 }
 
