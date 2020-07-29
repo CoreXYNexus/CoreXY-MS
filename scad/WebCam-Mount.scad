@@ -2,7 +2,7 @@
 // WebCam-Mount.scad - lifecam holder and a PI Zero & Cam holder
 ///////////////////////////////////////////////////////////////////////
 // created 1/31/16
-// last update 6/12/20
+// last update 7/26/20
 ////////////////////////////////////////////////////////////////////////
 // ABS or something that can handle the heatbed temperature
 /////////////////////////////////////////////////////////////////////////
@@ -11,14 +11,17 @@
 //			  Added cubeX.scad
 // 4/10/19	- Changed to a PI Zero W all in one holder, currently set for a Raspberry PI Camera Rev1.3
 // 6/11/20	- Change PI cam opening to one that can also use wide angle cam, added ability to use 2mm brass inserts
+// 7/23/20	- Fixed camera mounting holes
+// 7/25/20	- Fixed PIShield() holes
+// 7/25/20	- Changed pi camera mounting
 /////////////////////////////////////////////////////////////////////////
+// https://www.raspberrypi-spy.co.uk/2013/05/pi-camera-module-mechanical-dimensions
 // For the PI Zero, I use https://elinux.org/RPi-Cam-Web-Interface
 // for the pi zero cover: https://www.thingiverse.com/thing:2165844, the RPI_Zero_W_Case_-_Top_-_Heatsink.stl
 // Uses 4 M2 or 2-56 to mount the PI Zero and four M2 or 2-56 to mount the PI Camera
 /////////////////////////////////////////////////////////////////////////
-//-------------------------------------------------------
-// NOTE: Wide angle cam uses only the two upper screws
-//-------------------------------------------------------
+// ** NOTE: needs a raft for the built in support
+/////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>
 Use2mmInsert=0;  // don't have any M2 screws yet
@@ -28,7 +31,7 @@ include <brassfunctions.scad>
 $fn=100;
 camdia = 29;	// outside diameter of usb camera
 length = 100;	// distance needed from bed to see the entire bed
-outer = 7;		// thickness of ring to hold camera
+outer = 12;		// thickness of ring to hold camera
 width = camdia + outer;	// width of the ring to hold camera
 thickness = 6;	// thickness of extension and mount
 camshift = -4.5;	// amount to move camera ring to end of extension
@@ -38,28 +41,76 @@ stall = 6;	// height of print support for mount end
 //----
 PIhw=22.86;
 PIhl=57.81;
-PIChw=20.83;
-PIChh=12.26;
-PICameraHole=17;
+PIChw=21;
+PIChh=12.5;
+PICameraHole=24;
 Layer=0.3; // layer thickness
 // note: support for one side needs adjusting if web cam size changes
 ////////////////////////////////////////////////////////////////////////
 
-Bracket(1,1);
+Bracket(1);
+translate([0,40,0]) FrontCamHolder();
+translate([30,40,0])RearCamHolder();
 //WCBracket(1);
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
-module Bracket(PI=0,BracketOnly=0) {
-	if(BracketOnly)
-		PIShield(PI);
-	else {
+module Bracket(PI=0) {
 		Cam(PI);
 		Clamp(PI);
 		Extension(PI);
 		Reinforce(PI);
 		Mount(PI);
-		translate([0,40,0]) PIShield(PI);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+module RearCamHolder() {
+	difference() {
+		color("gray") cubeX([PICameraHole,PICameraHole+5,2],1);
+		translate([14,14,-4]) PICamMountingHoles(Yes2mmInsert());
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+module FrontCamHolder() {
+	difference() {
+		color("gray") cubeX([PICameraHole,PICameraHole+5,2],1);
+		translate([14,14,-4]) PICamMountingHoles(screw2);
+		color("white") hull() {
+			translate([9,14.5,-3]) cylinder(h=10,d=16);
+			translate([15,14.5,-3]) cylinder(h=10,d=16);
+		}
+		color("green") hull() {
+			translate([10,6,-3]) cylinder(h=10,d=8);
+			translate([10,23,-3]) cylinder(h=10,d=8);
+		}
+	}
+	difference() {
+		translate([3.6,25,6]) rotate([180,0,0]) CamSpacers(screw2);
+		translate([14,14,-4]) PICamMountingHoles(screw2);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+module CamSpacers(Screw=screw2) {
+	color("red") hull() {
+		translate([0,0,-0.5]) cylinder(h=1,d=Screw+1);
+		translate([0,0,4]) cylinder(h=1,d=Screw+3);
+	}
+	color("plum") hull() {
+		translate([0,PIChw,-0.5]) cylinder(h=1,d=Screw+1);
+		translate([0,PIChw,4]) cylinder(h=1,d=Screw+3);
+	}
+	color("white") hull() {
+		translate([PIChh,0,-0.5]) cylinder(h=1,d=Screw+1);
+		translate([PIChh,0,4]) cylinder(h=1,d=Screw+3);
+	}
+	 color("gray") hull() {
+		translate([PIChh,PIChw,-0.5]) cylinder(h=1,d=Screw+1);
+		translate([PIChh,PIChw,4]) cylinder(h=1,d=Screw+3);
 	}
 }
 
@@ -75,23 +126,23 @@ module WCBracket(PI=0) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module PIShield(PI=0,Screw=Yes2mmInsert()) {
+module PIShield(PI=0) {
 	if(PI) {
 		difference() {
 			color("cyan") cubeX([25,16.5,3.5],1);
-			translate([13,12.7,0]) rotate([0,0,90]) PICamMountingHoles();
+			translate([13,12.7,0]) rotate([0,0,90]) PICamMountingHoles(screw2);
 		}
 		difference() {
-			translate([23,2.4,0]) PICamSpacers2(Screw);
-			translate([2,1.6,6]) cube([21,13.5,8]); // pi camera 1.3 needs clearance for the stuff on the back
-			translate([13,12.7,0])rotate([0,0,90]) PICamMountingHoles();
+			translate([23,2.4,0]) PICamSpacers2(screw2);
+			//translate([2,1.6,6]) cube([21,13.5,8]); // pi camera 1.3 needs clearance for the stuff on the back
+			translate([13,12.7,0])rotate([0,0,90]) PICamMountingHoles(screw2);
 		}
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PIZeroBase(Screw=screw2) {//Yes2mmInsert()) {
+module PIZeroBase(Screw=Yes2mmInsert()) {
 	translate([17,0.5,0]) {
 		translate([0,0,0]) color("red") cylinder(h=10,d=Screw);
 		translate([0,PIhw,0]) color("plum") cylinder(h=10,d=Screw);
@@ -113,11 +164,11 @@ module PICamMountingHoles(Screw=Yes2mmInsert()) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PICamSpacers(Screw=Yes2mmInsert()) {
+module PICamSpacers(Screw=screw2) {
 	translate([-10.5,-10,-2]) {
 		color("red") hull() {
 			translate([0,0,-0.5]) cylinder(h=1,d=Screw+1);
-			translate([0,0,0]) cylinder(h=1,d=Screw+3);
+			translate([0,0,2]) cylinder(h=1,d=Screw+3);
 		}
 		color("plum") hull() {
 			translate([0,PIChw,-0.5]) cylinder(h=1,d=Screw+1);
@@ -136,7 +187,7 @@ module PICamSpacers(Screw=Yes2mmInsert()) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PICamSpacers2(Screw=Yes2mmInsert()) {
+module PICamSpacers2(Screw=screw2) {
 	rotate([0,0,90]) {
 		color("red") translate([0,0,0]) cylinder(h=7,d=Screw+3);
 		color("plum") translate([0,PIChw,0]) cylinder(h=7,d=Screw+3);
@@ -159,12 +210,7 @@ module Cam(PI=0) {
 			difference() {
 				color("cyan") cylinder(h=thickness,r=camdia/2+outer);	// outer
 				PICameraHole();
-				PICamMountingHoles();
-			}
-			difference() {
-				PICamSpacers();
-				translate([0,0,-1]) PICamMountingHoles();
-				PICameraHole();
+				//PICamMountingHoles(screw2);
 			}
 		}
 	}
@@ -173,15 +219,7 @@ module Cam(PI=0) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module PICameraHole() {
-	translate([-12,-8,-2]) color("gray") cube([PICameraHole+1,PICameraHole,10]); // hole
-	translate([-6.5,-12,-2]) color("lightgray") hull() {
-		cube([PICameraHole/2-4,1,10]);
-		translate([-4,7,0]) cube([PICameraHole-4,1,10]);
-	}
-	translate([-6.5,-2,-2]) color("gold") hull() {
-		translate([0,14,0]) cube([PICameraHole/2-4,1,10]);;
-		translate([-4,7,0]) cube([PICameraHole-4,1,10]);
-	}
+	translate([-14,-14,-2]) color("gray") cube([PICameraHole-2,PICameraHole+4,10]); // hole
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -192,19 +230,6 @@ module WCam(PI=0) {
 		translate([-25,0,-4]) color("red") cubeX([thickness+6,1.5,outer+5],1); // expansion slot
 		translate([0,0,-1]) color("gray") cylinder(h=thickness+2,r=camdia/2); // hole
 	}
-/*	if(PI) {
-		translate([camshift,camdia/2-2.4,camdia/2+outer]) rotate([0,75,0]) {
-			difference() {
-				color("cyan") cylinder(h=thickness,r=camdia/2+outer);	// outer
-				translate([-4,-4,-2]) color("gray") cube([PICameraHole,PICameraHole,10]); // hole
-				PICamMountingHoles();
-			}
-			difference() {
-				PICamSpacers();
-				translate([0,0,-1]) PICamMountingHoles();
-			}
-		}
-	}*/
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,6 +237,7 @@ module WCam(PI=0) {
 module Extension(PI=0) {
 	difference() {
 		translate([0,-width/6,0]) color("black") cubeX([length,width,thickness],1);
+		translate([8.2,5,-2]) color("white") cubeX([3,15,15],1);
 		if(PI) {
 			PIZeroBase();
 			translate([20,19,-thickness-3]) color("white") cubeX([52,8,2*thickness],2);
@@ -237,6 +263,8 @@ module Support(PI=0) {
 	color("plum") translate([length+mlength-0.85,-width/6,0]) cube([extruder,width,stall]);
 	color("gold") rotate([0,0,90]) translate([-width/6+0.1,-(length+mlength-0.85),0]) cube([extruder,width-18,stall]);
 	color("white") rotate([0,0,90]) translate([width-6.5,-(length+mlength-0.85),0]) cube([extruder,width-18,stall]);
+	color("green") rotate([0,0,90]) translate([width-20,-(length+mlength-0.85),0]) cube([extruder,width-16,stall]);
+	color("khaki") rotate([0,0,90]) translate([width-35,-(length+mlength-0.85),0]) cube([extruder,width-16,stall]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

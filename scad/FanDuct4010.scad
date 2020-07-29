@@ -2,13 +2,14 @@
 // FanDuct4010.scad
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created 8/10/2019
-// last upate 6/19/20
+// last upate 7/4/20
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/10/19	- Created fan duct of my own design
 // 8/12/19	- Added ability to set length
 // 8/27/19	- Created v3 with a taper next to the fan to clear the mount better
 // 6/18/20	- Vreated a blower nozzle for 4010 blower, began circular version
 // 6/19/20	- Added mockup of 4010 from https://www.thingiverse.com/thing:2943994
+// 7/4/20	- Made circular fan duct long enought for an titan aero
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 use </inc/cubex.scad>
 include <inc/screwsizes.scad>
@@ -31,7 +32,8 @@ DuctLength=65; // set length of fan duct
 //FanDuct_v2(65);
 //FanDuct_v3(65);
 //FanDuct4010();
-rotate([5,0,0]) CircularDuct(); // roate need to place duct flat on the bed
+//rotate([5,0,0])
+	CircularDuct(2); // rotate need to place duct flat on the bed
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -70,15 +72,15 @@ module FanBase(Height=55,ScrewZ=0) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module CircularFanBase(Height=55,ScrewZ=0) {
+module CircularFanBase(Height=55,ScrewZ=0,ShiftLR) {
 	difference() {
 		translate([-5,-15,10]) color("purple") cubeX([45,Height,5],2);
-		translate([0.7,0.85,9]) FanMountHoles(ScrewZ);
-		translate([0,0,12]) rotate([90,0,0]) BracketMount_v3(-6);
+		translate([-4-ShiftLR,0.85,9]) FanMountHoles(ScrewZ);
+		translate([-2,0,12]) rotate([90,0,0]) BracketMount_v3(-7);
 	}
 	difference() {
 		translate([36,-15,10]) color("lightgray") cubeX([20,Height,5],2);
-		translate([0,0,12]) rotate([90,0,0]) BracketMount_v3(-6);
+		translate([-2,0,12]) rotate([90,0,0]) BracketMount_v3(-7);
 		translate([0.7,0.85,9]) FanMountHoles(ScrewZ);
 	}
 }
@@ -104,7 +106,7 @@ module BracketMount_v3(Move=0) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module FanDuctOne() {
-	translate([4,-14.5,0.5]) color("red") cubeX([27-1,20,8-1],2);
+	translate([4,-14,0.5]) color("red") cubeX([27-1,20,8-1],2);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,21 +244,47 @@ module FanDuct_Interior_v3(Length) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module CircularDuct() {
-	%translate([0,-15,7]) cube([5,35,5]);
+module CircularDuct(ShiftLR=0) {
+	//%translate([0,-15,7]) cube([5,35,5]);
 	difference() {
-		translate([-18,-5,16.5]) rotate([90,0,0]) CircularFanBase(25,0);
+		translate([-14+ShiftLR,-5,16.5]) rotate([90,0,0]) CircularFanBase(25,0,ShiftLR);
 		translate([-17,-30,1]) cube([34,15,8]);
 	}
 	translate([-14,-0.75,0]) rotate([-5,0,0]) difference() {
 		translate([0,-21,0]) color("cyan") rotate([90,0,0]) cube([27,15,8]);
-		translate([-8,-20.8,10]) rotate([5,0,0]) color("black") cube([40,1,10]);
+		translate([-8,-21,10]) rotate([5,0,0]) color("black") cube([40,1,10]);
 		translate([-3.5,-21,15]) rotate([90,0,0]) FanDuctOne();
 		translate([1.5,-25,1]) color("white") cube([25,15,8]);
 	}
-	rotate([-5,0,0]) {
-		CircularDuctOuter();
-		CircularDuctInner();
+	rotate([-5,0,0]) { // rear
+		difference() {
+			union() {
+				CircularDuctOuter();
+				CircularDuctInner();
+			}
+			translate([-30,0,-5]) color("gray") cube([60,50,30]);
+		}
+	}
+	translate([0,23,-2]) rotate([-5,0,0]) { // front
+		difference() {
+			union() {
+				CircularDuctOuter();
+				CircularDuctInner();
+			}
+			translate([-30,-50,-5]) color("gray") cube([60,50,30]);
+		}
+	}
+	translate([15,-1.5,0]) rotate([-5,0,0]) { // extension
+		difference() {
+			color("red") cube([12.5,26,10.2]);
+			translate([1,-2,1]) color("pink") cube([10.5,30,8.2]);
+		}
+	}
+	translate([-27.5,-1.5,0]) rotate([-5,0,0]) { // extension
+		difference() {
+			color("blue") cube([12.5,26,10.2]);
+			translate([1,-2,1]) color("pink") cube([10.5,30,8.2]);
+		}
 	}
 	translate([-14,-24.5,2.1]) color("blue") rotate([-5,0,0]) cube([27,5,0.5]);
 	translate([-14,-21,11]) color("khaki") cube([28,2,1]);
@@ -313,7 +341,7 @@ module CircularDuctInner() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Show4040() {
-	%import("4010_Blower_Fan_v2.stl");
+	//%import("4010_Blower_Fan_v2.stl");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

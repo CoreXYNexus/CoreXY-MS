@@ -24,12 +24,11 @@ Switch_thk = 5;			// thickness of holder
 Switch_thk2 = 7;		// thickness of spacer
 HolderWidth = 33;	// width of holder
 SwitchShift = 6;	// move switch mounting holes along width
-MountScrew=screw4;	// part that holds the switch
 StikeMountScrew=screw5; // the part the switch hits
 ////////////////////////////////////////////////////////////////////////////
 
-XStopMount(22,10,8,Yes3mmInsert(),MountScrew,8);	// TEMCo CN0097
-//translate([0,0,0]) XStopMount(10,0,8,screw2,MountScrew,8); // black microswitch inline mount
+//XStopMount(22,10,8,Yes3mmInsert(),screw5,8);	// TEMCo CN0097
+XStopMount(10,0,8,screw2,screw5,8); // black microswitch inline mount
 //translate([8,-40,0]) clamp(MountScrew);
 //translate([-40,-40,0])strikeY(StikeMountScrew);
 //translate([-30,-12,0]) strikeX(StikeMountScrew);
@@ -43,16 +42,20 @@ module XStopMount(Sep,DiagOffset,Offset,ScrewS,ScrewM=screw5,Adjust) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module mount(Screw=screw5) {
+module mount(Screw=screw4) {
 	difference() {
 		color("cyan") cubeX([22,HolderWidth,Switch_thk],1);
-		translate([10,6.5,-1]) color("red") cylinder(h=Switch_thk*2,d=Screw);
+		 color("red") hull() {
+			translate([10,6,-1]) cylinder(h=Switch_thk*2,d=Screw);
+			translate([10,7,-1]) cylinder(h=Switch_thk*2,d=Screw);
+		}
 		translate([10,26.5,-1]) color("blue") cylinder(h=Switch_thk*2,d=Screw);
 	}
 	difference() {
 		translate([2,0,Switch_thk-4]) color("gray") cubeX([20,HolderWidth,Switch_thk2],1);
-		translate([10,6.5,1]) color("black") cylinder(h=Switch_thk*3,d=Screw);
-		translate([10,26.5,1]) color("red") cylinder(h=Switch_thk*3,d=Screw);
+		translate([10,6,-1]) color("black") cylinder(h=Switch_thk*3,d=Screw);
+		translate([10,7,-1]) color("black") cylinder(h=Switch_thk*3,d=Screw);
+		translate([10,26.5,-1]) color("red") cylinder(h=Switch_thk*3,d=Screw);
 	}
 }
 

@@ -38,7 +38,7 @@ use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
 use <corner-tools.scad>
 use <Z-Motor_Leadscrew-Coupler.scad>
-$fn=100;
+$fn=50;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // Multi-motor z for bed leveling.  Makerslide carriage mount: two 525z bearings, M5 screw & nut,
 // washer in between, four m5 screws.  The center pivot uses two 625z bearings, three M5 screws & nuts.
@@ -107,19 +107,19 @@ layer = 0.25;				// printed layer thickness
 
 //direct_drive(3,0,5,8); 	// Z axis for bed leveling
 				// 1st arg: quantiy; 2nd arg: printable couplers; 3rd arg: motor shaft diameter; 4th arg is leadscrew diameter
-//direct_drive_motor_mount(2); // arg is quanity
+direct_drive_motor_mount(3); // arg is quanity
 //Reduction_Motor_Mount(1);
 //motor_direct_with_znut(3); // motor mounts and the znut holder
 //motor_mount(1,0);	// 1st arg is quanity; 2nd arg is for znut, belt drive leadscrew mounts and znut
 //belt_motor_Mount();  // z motor mount for belt version
 //plates(1,screw5); // arg is quanity*2
 //direct_belt_drive_motor_mount(3); // arg is quanity
-partial();
+//partial();
 	
 //////////////////////////////////////////////////////////////////////////////
 
 module direct_drive(Quanity=1,Coupler=1,Motorshaft=5,LeadScrewDiameter=8) { // set for makerslide
-	if($preview) %translate([-100,-100,-2]) cube([200,200,2]);
+	//if($preview) %translate([-100,-100,-2]) cube([200,200,2]);
 	for(a=[0:Quanity-1]) {
 		translate([a*65-65,0,thickness/2]) motor_mount(1);
 		if(Coupler) translate([a*65-65,50,0]) coupler(Motorshaft,LeadScrewDiameter); // printed coupler
@@ -131,7 +131,7 @@ module direct_drive(Quanity=1,Coupler=1,Motorshaft=5,LeadScrewDiameter=8) { // s
 //////////////////////////////////////////////////////////////////////////////
 
 module direct_drive_motor_mount(Quanity=1) { // set for makerslide
-	if($preview) %translate([-100,-100,-4.5]) cube([200,200,2]);
+	//if($preview) %translate([-100,-100,-4.5]) cube([200,200,2]);
 	for(a=[0:Quanity-1]) translate([a*65-65,0,thickness/2]) motor_mount(1);
 	echo("-----------------Don't forget the plates, if needed-------------------"); // adding plates makes it bigger than a 200x200 bed
 }
@@ -183,12 +183,12 @@ module motor_direct_with_znut(Quanity=1) {  // z motor mount for 3 z motors
 
 module partial() { // this is here just to make it easier to print/test a single item
 	motor_mount(1);
-	//translate([60,0,0]) motor_mount(1);
+	translate([60,0,0]) motor_mount(1);
 	//single(); // one znut nut holder
 	//translate([-15,30,0]) single(25); // znut nut holder for third rail where Z makerslide is mounted on outside of makerslide
 	//test();  // test print for checking motor alignment
 	//rotate([-90,0,0]) testnut(1);	// print a shortened nut section for test fitting
-	translate([0,0,2.5]) bearing_mount(0);
+	//translate([0,0,2.5]) bearing_mount(0);
 	//translate([70,0,2.5]) bearing_mount(); // bearing mount at bottom of z-axis leadscrew
 	//test_bearing_hole(); // test fit the bearing hole
 	//translate([60,0,0])
@@ -208,7 +208,7 @@ module partial() { // this is here just to make it easier to print/test a single
 
 module motor_mount(makerslide=0) { // motor mount
 	rotate([180,0,0]) {				// added a thrust bearing?
-		nema_plate(makerslide);
+		nema_plate(,makerslide,1);
 		mount(makerslide);
 	}
 }
@@ -272,10 +272,11 @@ module side_support(MSupport=1) {
 ////////////////////////////////////////////////////////////////////////////
 
 module nema_plate(makerslide=0,HSlot=0) {
+	echo(HSlot);
 	difference() {
 		translate([-27.5,-(shaft_offset-base_offset)-29.5,-1]) color("red") cubeX([b_width,b_length,thickness+1],1);
 		if(HSlot)
-			translate([0,-shaft_offset,-3]) color("white") NEMA17_parallel_holes(10,10);
+			translate([0,-shaft_offset,-3]) rotate([0,0,90]) color("white") NEMA17_parallel_holes(10,10);
 		else
 			translate([0,-shaft_offset,-3]) rotate([0,0,90]) color("white") NEMA17_parallel_holes(10,0);
 		if(makerslide) notchit();
