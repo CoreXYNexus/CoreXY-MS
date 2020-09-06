@@ -2,7 +2,7 @@
 // Endstop-Holders.scad - endstop holder for makerslide
 ////////////////////////////////////////////////////////////////////////////////////
 // created: 5/10/2016
-// last update: 2/26/19
+// last update: 8/8/20
 ////////////////////////////////////////////////////////////////////////////////////
 // 6/29/16	- Adjusted mounting holes for use on the double slot side of makerslide
 // 7/3/16	- Added arg for amount to move from edge to thing() & base()
@@ -11,6 +11,7 @@
 // 7/17/17	- Added strikeX(), adjustable stop for the x endstop to hit
 // 12/17/18	- Added colors for preview
 // 2/26/19	- Added ability to change mounting screw sizes (M5/M4/M3)
+// 8/8/20	- Simplified the x endstop
 ////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
@@ -21,14 +22,14 @@ $fn=75;
 // vars
 Switch_ht=20;//15;		// height of holder
 Switch_thk = 5;			// thickness of holder
-Switch_thk2 = 7;		// thickness of spacer
+Switch_thk2 = 6;		// thickness of spacer
 HolderWidth = 33;	// width of holder
 SwitchShift = 6;	// move switch mounting holes along width
 StikeMountScrew=screw5; // the part the switch hits
 ////////////////////////////////////////////////////////////////////////////
 
 //XStopMount(22,10,8,Yes3mmInsert(),screw5,8);	// TEMCo CN0097
-XStopMount(10,0,8,screw2,screw5,8); // black microswitch inline mount
+XStopMount(10,0,0,screw2,screw5,4); // black microswitch inline mount
 //translate([8,-40,0]) clamp(MountScrew);
 //translate([-40,-40,0])strikeY(StikeMountScrew);
 //translate([-30,-12,0]) strikeX(StikeMountScrew);
@@ -44,38 +45,26 @@ module XStopMount(Sep,DiagOffset,Offset,ScrewS,ScrewM=screw5,Adjust) {
 
 module mount(Screw=screw4) {
 	difference() {
-		color("cyan") cubeX([22,HolderWidth,Switch_thk],1);
+		color("cyan") cubeX([22,HolderWidth,Switch_thk2],1);
 		 color("red") hull() {
 			translate([10,6,-1]) cylinder(h=Switch_thk*2,d=Screw);
 			translate([10,7,-1]) cylinder(h=Switch_thk*2,d=Screw);
 		}
 		translate([10,26.5,-1]) color("blue") cylinder(h=Switch_thk*2,d=Screw);
 	}
-	difference() {
-		translate([2,0,Switch_thk-4]) color("gray") cubeX([20,HolderWidth,Switch_thk2],1);
-		translate([10,6,-1]) color("black") cylinder(h=Switch_thk*3,d=Screw);
-		translate([10,7,-1]) color("black") cylinder(h=Switch_thk*3,d=Screw);
-		translate([10,26.5,-1]) color("red") cylinder(h=Switch_thk*3,d=Screw);
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 module base(Sep,DiagOffset,Offset,ScrewT,Adjust) {
-	rotate([0,-90,0]) difference() {
-		difference() {
-			translate([0,0,-4]) color("yellow") cubeX([Switch_thk,HolderWidth,Switch_ht+Offset-Adjust],1);
+	difference() {
+		//difference() {
+			translate([-22-Adjust,0,0]) color("yellow") cubeX([Switch_ht+Adjust+5,HolderWidth,Switch_thk],1);
 			// screw holes for switch
-			rotate([0,90,0]) {		
-				translate([-(Switch_ht-Offset), SwitchShift, -1]) {
-					color("purple") cylinder(h = 11, r = ScrewT/2, center = false, $fn=100);
-				}
-			}
-			rotate([0,90,0]) {
-				translate(v = [-(Switch_ht-Offset)+DiagOffset, SwitchShift+Sep, -1]) {
-					color("black") cylinder(h = 11, r = ScrewT/2, center = false, $fn=100);
-				}
-			}
-		}
+			translate([-(Switch_ht-Offset), SwitchShift, -1])
+				color("purple") cylinder(h = 11, r = ScrewT/2, center = false, $fn=100);
+			translate(v = [-(Switch_ht-Offset)+DiagOffset, SwitchShift+Sep, -1])
+				color("black") cylinder(h = 11, r = ScrewT/2, center = false, $fn=100);
+		//}
 	}
 }
 

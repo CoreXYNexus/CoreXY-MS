@@ -98,6 +98,7 @@ e3dv6_bl = 3;	// e3dv6 mount bottom land height
 e3dv6_total = ed3v6_tl + e3dv6_il + e3dv6_bl; // e3dv6 total mount height
 mount_bolt_seperation = 23;	// four bolt mount on x carridge
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Use2p5mmInsert=1; // set to 1 to use 2.5mm brass inserts
 Use3mmInsert=1; // set to 1 to use 3mm brass inserts
 Use4mmInsert=0; // set to 1 to use 4mm brass inserts
 Use5mmInsert=0; // set to 1 to use 5mm brass inserts
