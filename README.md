@@ -1,5 +1,5 @@
 # CXY-MSv1
-A corexy printer using Makerslide and a DuetWifi on 24vdc. Please ignore the messy wiring in the photos. :-)
+A corexy printer using Makerslide and a Duet 3 on 24vdc. Photos show a DuetWifi. :-)
 
 August 2020: Upgraded to a Duet 3 6HC.  Currently using in stand alone, no Pi.
 

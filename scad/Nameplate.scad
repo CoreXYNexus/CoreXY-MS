@@ -1,17 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CXY-MSv1 Nameplate - nameplate for the printer
 // created: 7/11/2018
-// last modified: 9/6/20
+// last modified: 9/22/20
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 2/28/19	- Bugfix in printchar()
 // 9/6/20	- Changed font
+// 9/22/20	- Adjusted size and screw mounting, removed unused inlcudes
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-include <inc/configuration.scad> // http://github.com/prusajr/PrusaMendel, which also uses functions.scad & metric.scad
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
-use <inc/Nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
-use <inc/corner-tools.scad>
-use <b5_____.ttf>
 $fn=50;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //vars
@@ -25,10 +22,12 @@ plate();
 
 module plate() {
 	difference() {
-		color("cyan") cubeX([105,20,3]);
-		translate([5,10,-5]) color("red") cylinder(h=10,d=screw3,$fn=100);
-		translate([100,10,-5]) color("blue") cylinder(h=10,d=screw3,$fn=100);
-		translate([9,4.5,1]) printchar("CXY-MSv1",5,12);
+		color("cyan") cubeX([116,20,3]);
+		translate([7,10,-5]) color("red") cylinder(h=10,d=screw5,$fn=100);
+		translate([7,10,2]) color("red") cylinder(h=10,d=screw5hd,$fn=100);
+		translate([108,10,-5]) color("blue") cylinder(h=10,d=screw5,$fn=100);
+		translate([108,10,2]) color("blue") cylinder(h=10,d=screw5hd,$fn=100);
+		translate([14,4.5,1]) printchar("CXY-MSv1",5,12);
 	}	
 }
 

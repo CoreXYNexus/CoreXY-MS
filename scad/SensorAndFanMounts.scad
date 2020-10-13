@@ -13,12 +13,15 @@
 include <CoreXY-MSv1-h.scad>
 use <inc/corner-tools.scad>
 use <fanduct_v3.scad>
-Use2mmInsert=0;
+//Use2mmInsert=0;
 //Use3mmInsert=1; // set to 1 to use 3mm brass inserts
-Use4mmInsert=1; // set to 1 to use 4mm brass inserts
-Use5mmInsert=1; // set to 1 to use 5mm brass inserts
+//Use4mmInsert=1; // set to 1 to use 4mm brass inserts
+//Use5mmInsert=1; // set to 1 to use 5mm brass inserts
 include <brassfunctions.scad>
 /////////////////////////////////////////////////////////////////////////////////////////////////
+//*****************************************************
+// adjustable proximity mount need beefing up 9/19/20
+//*****************************************************
 psensornut = 28; 	// size of proximity sensor nut
 FanSpacing = 32;	// hole spacing for a 40mm fan
 PCfan_spacing = 47;	//FanSpacing+15;
@@ -31,14 +34,15 @@ MountingHoleHeight = 60; 	// screw holes may need adjusting when changing the fr
 ExtruderOffset = 18;		// adjusts extruder mounting holes from front edge
 IRSpacing=spacing;
 LayerThickness=0.3; // layer thickness
+Spacing = 17; 			// ir sensor bracket mount hole spacing
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ProximityMount(6); // arg is shift up/down (min:2)
-//BLTouchMount(0,10);	// 1st arg:type; 2nd: shift
+BLTouchMount(0,10);	// 1st arg:type; 2nd: shift; BLTouch v3.1
 //IRAdapter(0,0);
 // Titan with E3Dv6
 //AdjustableBLTMount(10,2,0); //Shift=0 (add to 10),Type=2,DoBase= 0 (no) : 1 (yes)
-AdjustableProximtyMount(20,0); //Shift=0,DoBase= 0 (no) : 1 (yes)
+//AdjustableProximtyMount(20,0); //Shift=0,DoBase= 0 (no) : 1 (yes)
 // Titan Aero -- not tested
 //AdjustableBLTMount(0,2,0); //Shift=0 (add to 10),Type=2,DoBase= 0 (no) : 1 (yes)
 //AdjustableProximtyMount(0,0); //Shift=0,DoBase= 0 (no) : 1 (yes)
@@ -150,11 +154,12 @@ module FanNutHoles(Nut=nut3,Left=1) {	// fan mounting holes
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module IRMountHoles(Screw=screw3) { // ir screw holes for mounting to extruder plate
-	translate([spacing+shiftir+shifthotend,-25,0]) rotate([90,0,0]) color("red") cylinder(h=25,d=Screw);
-	translate([shiftir+shifthotend,-25,0]) rotate([90,0,0]) color("blue") cylinder(h=25,d=Screw);
+module IRMountHoles(Screw=Yes3mmInsert()) // ir screw holes for mounting to extruder plate
+{
+	translate([Spacing,-107,0]) rotate([90,0,0]) color("blue") cylinder(h=GetHoleLen3mm(),d=Screw);
+	translate([0,-107,0]) rotate([90,0,0]) color("red") cylinder(h=(GetHoleLen3mm()),d=Screw);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -295,11 +300,12 @@ module ProximityMount(Shift=0) {
 module SensorMount(Shift=0,Thicker=0) {
 	difference() {
 		translate([0,26,0]) color("cyan") cubeX([60,5+Thicker,13+Shift],2);
-		translate([27,60,8+Shift]) IRMountHoles(screw3);
-		translate([27,53,8+Shift]) IRMountHolesCS(screw3hd);
-		//translate([57,60,8+Shift]) IRMountHoles(screw3);
-		//translate([57,53,8+Shift]) IRMountHolesCS(screw3hd);
+		//translate([27,60,8+Shift]) IRMountHoles(screw3);
+		//translate([27,53,8+Shift]) IRMountHolesCS(screw3hd);
+		translate([37,140,8+Shift]) IRMountHoles(screw3);
+		translate([57,53,8+Shift]) IRMountHolesCS(screw3hd);
 	}
+	translate([58,28.5,0]) color("black") cylinder(h=LayerThickness,d=15);  // support tab
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,13 +370,13 @@ module BLTouch_Holes(recess=0,Screw=Yes2p5mmInsert()) {
 			cube([bltl-6,bltw-6,wall]);
 			cylinder(h=1,r=3);
 		}
-		translate([-bltl/2+8,bltw/2,-5]) color("blue") cube([bltd,bltd+1,wall+3]); // hole for BLTouch
+		translate([-bltl/2+8,bltw/2,-5]) color("blue") cube([bltd+1.5,bltd+1.5,wall+3]); // hole for BLTouch
 		translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,r=screw2/2);
 		translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,r=screw2/2);
 
 	}
 	if(recess == 0) {	// for mounting on top of the extruder plate
-		translate([-bltl/2+8,bltw/2,-5]) color("blue") cube([bltd,bltd+1,wall+3]); // hole for BLTouch
+		translate([-bltl/2+8,bltw/2-1,-5]) color("blue") cube([bltd,bltd+2,wall+3]); // hole for BLTouch
 		translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,r=screw2/2);
 		translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,r=screw2/2);
 	}
