@@ -2,22 +2,19 @@
 // SensorAndFanMounts.scad
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // created: 6/2/1019
-// last update: 8/30/20
+// last update: 10/15/20
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/2/19	- Separated from single_titan_extruder_mount.scad
 // 4/12/20	- Made the mount to extruder plate the same for Proximity & BLTouch
 // 8/4/20	- Adjsuted the sensor mount holes to the extruder platform
 // 8/17/20	- Copied and edited from M-Max and added an adjustable mount for dc42's ir sensor
 // 8/30/20	- Added an adjustable BLTouch mount
+// 10/15/20	- Added IR mount for titan aero (mounts on printed extruder mount)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 use <inc/corner-tools.scad>
 use <fanduct_v3.scad>
-//Use2mmInsert=0;
-//Use3mmInsert=1; // set to 1 to use 3mm brass inserts
-//Use4mmInsert=1; // set to 1 to use 4mm brass inserts
-//Use5mmInsert=1; // set to 1 to use 5mm brass inserts
-include <brassfunctions.scad>
+include <inc/brassinserts.scad>
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //*****************************************************
 // adjustable proximity mount need beefing up 9/19/20
@@ -35,11 +32,18 @@ ExtruderOffset = 18;		// adjusts extruder mounting holes from front edge
 IRSpacing=spacing;
 LayerThickness=0.3; // layer thickness
 Spacing = 17; 			// ir sensor bracket mount hole spacing
+//------------------------------------------------------------------------------------------------
+Use2p5mmInsert=1;
+Use3mmInsert=1; // set to 1 to use 3mm brass inserts
+LargeInsert=1;
+//Use4mmInsert=1; // set to 1 to use 4mm brass inserts
+//Use5mmInsert=1; // set to 1 to use 5mm brass inserts
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ProximityMount(6); // arg is shift up/down (min:2)
-BLTouchMount(0,10);	// 1st arg:type; 2nd: shift; BLTouch v3.1
+//BLTouchMount(0,10);	// 1st arg:type; 2nd: shift; BLTouch v3.1
 //IRAdapter(0,0);
+IRAdapterAero(0);
 // Titan with E3Dv6
 //AdjustableBLTMount(10,2,0); //Shift=0 (add to 10),Type=2,DoBase= 0 (no) : 1 (yes)
 //AdjustableProximtyMount(20,0); //Shift=0,DoBase= 0 (no) : 1 (yes)
@@ -156,10 +160,10 @@ module FanNutHoles(Nut=nut3,Left=1) {	// fan mounting holes
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module IRMountHoles(Screw=Yes3mmInsert()) // ir screw holes for mounting to extruder plate
+module IRMountHoles(Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) // ir screw holes for mounting to extruder plate
 {
-	translate([Spacing,-107,0]) rotate([90,0,0]) color("blue") cylinder(h=GetHoleLen3mm(),d=Screw);
-	translate([0,-107,0]) rotate([90,0,0]) color("red") cylinder(h=(GetHoleLen3mm()),d=Screw);
+	translate([Spacing,0,0]) rotate([90,0,0]) color("blue") cylinder(h=20,d=Screw);
+	translate([0,0,0]) rotate([90,0,0]) color("red") cylinder(h=(20),d=Screw);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,10 +178,20 @@ module IRMountHolesCS(Screw=screw3hd) { // ir screw holes for mounting to extrud
 module IRAdapter(Top,Taller=0) {  // ir sensor bracket stuff is from irsensorbracket.scad
 	difference() {
 		color("plum") cubeX([irmount_width,irmount_height+Taller,irthickness],2); // mount base
-		ReduceIR(Taller);
+		if(Taller>=0) ReduceIR(Taller);
 		IRMountingHoles(Taller);
 		RecessIR(Taller);
-		translate([24.5,4,45]) rotate([90,0,0]) IRMountHoles(screw3);
+		translate([5,4,13]) rotate([90,0,0]) IRMountHoles(screw3); // tp mount on to the extruder mount
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module IRAdapterAero(Taller=0) {  // ir sensor bracket stuff is from irsensorbracket.scad
+	difference() {
+		translate([0,0,0]) rotate([90,180,180])  SensorMount(0,0,0);
+		translate([0,-13,-32]) IRMountingHoles(Taller,Yes2p5mmInsert(Use2p5mmInsert));
+		translate([0,-13,-32.5]) color("blue") RecessIR(Taller);
 	}
 }
 
@@ -204,12 +218,12 @@ module AdjustableIRMount(Shift=0) {  // adjuster screw has spring between the pa
 
 module AdjustSensorBaseMount(Shift=0) {
 	difference(){  // base mount
-		translate([0,-27,0]) SensorMount(Shift,3);
-		AdjustHoles(Yes3mmInsert());
+		translate([0,-28,0]) SensorMount(Shift,3);
+		AdjustHoles(Yes3mmInsert(Use3mmInsert,LargeInsert));
 	}
 	difference() { // reinforce for the nylock nut
 		translate([46.5,3,0]) color("plum") cylinder(h=11,d=10);
-		AdjustHoles(Yes3mmInsert());
+		AdjustHoles(Yes3mmInsert(Use3mmInsert,LargeInsert));
 	}
 }
 
@@ -234,7 +248,7 @@ module AdjustableProximtyMount(Shift=0,DoBase=0) { // shift not used
 			translate([0,-3,31]) rotate([-90,0,0]) ProximityAngleSupport();
 			translate([0,8,-16+Shift]) rotate([90,0,0]) ProximityAngleSupport();
 		}
-		translate([-30,-11,5+Shift]) AdjustHoles(Yes3mmInsert(),0);
+		translate([-30,-11,5+Shift]) AdjustHoles(Yes3mmInsert(Use3mmInsert,LargeInsert),0);
 		translate([16,18,-2]) color("olive") cylinder(h=wall*2,d=psensord); // proximity sensor hole
 		translate([16,18,-3]) color("blue") cylinder(h=5,d=psensornut,$fn=6); // proximity nut
 	}
@@ -257,7 +271,7 @@ module BLTMount(Shift=0,Type=2) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module AdjustHoles(Screw=Yes3mmInsert(),DoNut=1) {
+module AdjustHoles(Screw=Yes3mmInsert(Use3mmInsert,LargeInsert),DoNut=1) {
 	translate([38,3,-2]) color("blue") rotate([0,0,0]) cylinder(h=20,d=Screw);
 	translate([46.5,3,-2]) color("red") rotate([0,0,0]) cylinder(h=20,d=screw3);
 	translate([55,3,-2]) color("green") rotate([0,0,0]) cylinder(h=20,d=Screw);
@@ -278,9 +292,9 @@ module ReduceIR(Taller=0) { // reduce plastic usage and gives somewhere for air 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module IRMountingHoles(Taller=0) { // mounting screw holes for the ir sensor
-	translate([hole1x+iroffset-1.5,irmounty+Taller,-5]) rotate([0,0,0]) color("black") cylinder(h=20,r=screw3/2);
-	translate([hole2x+iroffset-1.5,irmounty+Taller,-5]) rotate([0,0,0]) color("white") cylinder(h=20,r=screw3/2);
+module IRMountingHoles(Taller=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) { // mounting screw holes for the ir sensor
+	translate([hole1x+iroffset-1.5,irmounty+Taller,-5]) rotate([0,0,0]) color("black") cylinder(h=20,d=Screw);
+	translate([hole2x+iroffset-1.5,irmounty+Taller,-5]) rotate([0,0,0]) color("white") cylinder(h=20,d=Screw);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -297,15 +311,15 @@ module ProximityMount(Shift=0) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module SensorMount(Shift=0,Thicker=0) {
+module SensorMount(Shift=0,Thicker=0,NoTab=0) {
 	difference() {
 		translate([0,26,0]) color("cyan") cubeX([60,5+Thicker,13+Shift],2);
 		//translate([27,60,8+Shift]) IRMountHoles(screw3);
 		//translate([27,53,8+Shift]) IRMountHolesCS(screw3hd);
-		translate([37,140,8+Shift]) IRMountHoles(screw3);
+		translate([37,40,8+Shift]) IRMountHoles(screw3);
 		translate([57,53,8+Shift]) IRMountHolesCS(screw3hd);
 	}
-	translate([58,28.5,0]) color("black") cylinder(h=LayerThickness,d=15);  // support tab
+	if(NoTab) translate([58,28.5,0]) color("black") cylinder(h=LayerThickness,d=15);  // support tab
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

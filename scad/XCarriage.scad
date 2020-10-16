@@ -108,7 +108,7 @@
 include <CoreXY-MSv1-h.scad>
 use <ybeltclamp.scad>	// modified https://www.thingiverse.com/thing:863408
 use <inc/corner-tools.scad>
-include <brassinserts.scad>
+include <inc/brassinserts.scad>
 use <Single-Titan-E3DV6.scad>
 //-------------------------------------------------------------------------------------------------------------
 $fn=75;
@@ -153,13 +153,14 @@ WireChainMount=Yes4mmInsert(Use4mmInsert);
 //WireChainMount=Yes5mmInsert(Use5mmInsert);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-partial();
+//partial();
 //FrontCarridge(0,0,0,0);	// Clamps,Loop,Titan
 //CarridgeAllInOne(0,1,2,0,Yes5mmInsert(Use5mmInsert));	// Clamps,Loop,Titan
 //RearCarridge(0,1,1);	// Clamps,Loop
 //FrontAndRear(0,1,0,1);
 //TitanExtruderBowdenMount(); // right angle titan mount to 2020 for bowden
 CarridgeAllInOneAndSingleTitanExtruder(0,1,1,Yes3mmInsert(Use3mmInsert,LargeInsert));// Clamps,Loop,Titan
+//							Clamps=1,Loop=0,Titan=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert),ExtType=1
 //CarridgeAllInOneAndSingleTitanExtruder(0,1,1,Yes5mmInsert(Use5mmInsert));// Clamps,Loop,Titan
 //translate([30,70,-8]) // position either below to print with CarridgeAllInOneAndSingleTitanExtruder()
 //	BeltLoopHolderOppo(2,BeltLoopShiftY,screw3); // loop mounts opposite of each other
@@ -167,11 +168,11 @@ CarridgeAllInOneAndSingleTitanExtruder(0,1,1,Yes3mmInsert(Use3mmInsert,LargeInse
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module CarridgeAllInOneAndSingleTitanExtruder(Clamps=1,Loop=0,Titan=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) {
+module CarridgeAllInOneAndSingleTitanExtruder(Clamps=1,Loop=0,Titan=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert),ExtType=1,Stiffner=0) {
 	CarridgeAllInOne(Clamps,Loop,Titan,0,Screw);
-	translate([37,-31,0]) Extruder(2,5,1,0);
-	translate([-0.5,35,-4]) color("red") cubeX([width-0.15,wall,wall],1);
-	//translate([49,-14,42.5]) color("blue") cubeX([6.75,14,wall],1);  // don't use this if flexibility is needed
+	translate([-0.6,35,-4]) color("red") cubeX([width,wall,wall],1); // make rear xcarriage even with front
+	translate([37,-31,0]) Extruder(1,5,1,0);
+	if(Stiffner) translate([49,-14,42.5]) color("blue") cubeX([6.75,14,wall],1);  // don't use this if flexibility is needed
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

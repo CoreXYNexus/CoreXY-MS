@@ -22,19 +22,19 @@ plate();
 
 module plate() {
 	difference() {
-		color("cyan") cubeX([116,20,3]);
+		color("cyan") cubeX([108,20,3]);
 		translate([7,10,-5]) color("red") cylinder(h=10,d=screw5,$fn=100);
-		translate([7,10,2]) color("red") cylinder(h=10,d=screw5hd,$fn=100);
-		translate([108,10,-5]) color("blue") cylinder(h=10,d=screw5,$fn=100);
-		translate([108,10,2]) color("blue") cylinder(h=10,d=screw5hd,$fn=100);
-		translate([14,4.5,1]) printchar("CXY-MSv1",5,12);
+		translate([7,10,2]) color("blue") cylinder(h=10,d=screw5hd,$fn=100);
+		translate([99,10,-5]) color("blue") cylinder(h=10,d=screw5,$fn=100);
+		translate([99,10,2]) color("red") cylinder(h=10,d=screw5hd,$fn=100);
 	}	
+	translate([14,4.5,0]) printchar("CXY-MSv1",5,12);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 module printchar(String,TxtHeight=1,TxtSize=3.5) { // print something
-	color("darkgray") linear_extrude(height = TxtHeight) text(String, font = "Old English Text MT:style=Regular",size=TxtSize);
+	color("darkgray") linear_extrude(height = TxtHeight) text(String, font = "StarTrek Film BT:style=Regular",size=TxtSize);
 }
 
 

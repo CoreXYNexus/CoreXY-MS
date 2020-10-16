@@ -33,8 +33,8 @@ LayerHeight=0.3;
 
 //CircularDuct(1,0,-0.3,50,0); // Titan with an E3Dv6, with the extruder mount set up for a Titan Aero
 	// ShiftLR=0,Angle=0,ShiftBracketUD=0,ScrewHZ=0,Show=0
-//CircularDuct(0,0,-0.3,25,0); // titan aero
-HorizontalFanDuct();
+CircularDuct(0,0,-0.3,25,0); // titan aero
+//HorizontalFanDuct();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -113,7 +113,7 @@ module MainDuct() {
 			}
 			translate([-30,0,-5]) color("gray") cube([60,50,30]);
 		}
-		translate([0,23,0]) { // at nozzle
+		translate([0,26,0]) { // at nozzle
 			difference() {
 				union() {
 					CircularDuctOuter();
@@ -125,13 +125,13 @@ module MainDuct() {
 		}
 		translate([15,-1.5,0]) { // extension
 			difference() {
-				color("red") cube([12.5,26,10]);
+				color("red") cube([12.5,29,10]);
 				translate([1.5,-2,1]) color("pink") cube([10,30,8]);
 			}
 		}
 		translate([-27.5,-1.5,0]) { // extension
 			difference() {
-				color("blue") cube([12.5,26,10]);
+				color("blue") cube([12.5,29,10]);
 				translate([1,-2,1]) color("pink") cube([10,30,8]);
 			}
 		}

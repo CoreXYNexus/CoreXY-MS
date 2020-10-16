@@ -15,26 +15,60 @@
 // includes
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad> // http://www.thingiverse.com/thing:112008
-Use4mmInsert=1;
-include <brassfunctions.scad>
+include <inc/brassinserts.scad>
 $fn=50;		// 100 takes a long, long time to render
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Tap smaller blower pillar hole with a M4 tap.  Print more than one or with something else for better quality
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// vars
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Use4mmInsert=1;
 countersink=2;
 bthick = 10+countersink; // thickness of platform
 fan_support = 24; // 30mm fan=24
+40mmFanMountSpacing=32;
 fan_adjustLR=0.5;
 adjust_bevel=4;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-blower_adapter(20,15,48); // 20,14,48 is for a 5015 blower fan
+//blower_adapter(); // for a 5015 blower fan to 30mm square fan
+BlowerAdapterAero(); // for a 5015 blower fan to 30mm square fan
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module blower_adapter(blower_h,blower_w,blower_m_dist) { // to use a 50mm 10x15 blower instead of a 40mm axial
+module BlowerAdapterAero() {
+	difference() {
+		color("cyan") cubeX([40mmFanMountSpacing+9,40mmFanMountSpacing+9,bthick+1],2);
+		translate([4,4,-2]) {
+			color("red") cylinder(h=bthick+5,d=screw3);
+			translate([40mmFanMountSpacing,0,0]) color("blue") cylinder(h=bthick+5,d=screw3);
+			translate([0,40mmFanMountSpacing,0]) color("green") cylinder(h=bthick+5,d=screw3);
+			translate([40mmFanMountSpacing,40mmFanMountSpacing,0]) color("black") cylinder(h=bthick+5,d=screw3);
+		}
+		FanHoleAero();
+	}
+	difference() { // fan holder
+		union() {
+			translate([15,28.5,0]) color("gray") cubeX([screw4+4,screw4+1,48+screw4+1+bthick],2);
+			translate([15,7,0]) color("lightgray") cubeX([screw4+4,screw4+1,48+screw4+1+bthick],2);
+			translate([14,7,45]) rotate([0,-30,0]) color("cyan") cubeX([11,screw4+1,15],2);
+			translate([14,28.5,45]) rotate([0,-25,0]) color("white") cubeX([11,screw4+1,15],2);
+		}
+		translate([screw4/2+12,screw4+35,56]) rotate([90,0,0]) color("red") cylinder(h=15,d=Yes4mmInsert(Use4mmInsert));
+		translate([screw4/2+12,screw4+13,56]) rotate([90,0,0]) color("blue") cylinder(h=15,d=screw4);
+		FanHoleAero();
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module FanHoleAero() {
+	color("gray") hull() {
+		translate([10,13,11.5]) color("khaki") cube([20,15,2]);
+		translate([4,4,-1]) cube([32,32,1]);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module blower_adapter(blower_h=20,blower_w=15,blower_m_dist=48) { // to use a 50mm 10x15 blower instead of a 40mm axial
 	if($preview) %blowertest(blower_h,blower_w,blower_m_dist); // show blower in preview
 	difference() {
 		translate([-0.5+fan_adjustLR,-0.5,0]) color("red") cubeX([fan_support+9,fan_support+9,bthick+1],2);
@@ -63,11 +97,11 @@ module blower_adapter(blower_h,blower_w,blower_m_dist) { // to use a 50mm 10x15 
 		translate([22.3+fan_adjustLR,blower_h-8.5,blower_m_dist-20+bthick]) color("pink") cube([screw4+3,screw4+4,20],2);
 		translate([screw4/2+20+fan_adjustLR,screw4+blower_w-13,blower_m_dist+bthick-4.3]) rotate([90,0,90]) cylinder(h=10,d=screw4);
 	}
-	difference() {
+	difference() { // fan holder
 		translate([17.7-blower_w+fan_adjustLR,blower_h-12,0]) color("gray")
 			cubeX([screw4+1,screw4+4,blower_m_dist+screw4+1+bthick],2);
 		translate([screw4/2+15-blower_w+fan_adjustLR,screw4+blower_w-13.2,blower_m_dist+7.75]) rotate([90,0,90])
-			cylinder(h=10,d=Yes4mmInsert());//screw4t);
+			cylinder(h=10,d=Yes4mmInsert(Use4mmInsert));//screw4t);
 		translate([4+fan_adjustLR,4,3]) color("white") cylinder(h=bthick*2,r=screw3hd/2);
 	}
 	difference() {
@@ -75,7 +109,7 @@ module blower_adapter(blower_h,blower_w,blower_m_dist) { // to use a 50mm 10x15 
 		cubeX([screw4+1,screw4+10,19],2);
 		translate([16.7-blower_w+fan_adjustLR,blower_h-8,blower_m_dist-20+bthick]) color("pink") cube([screw4+3,screw4+4,20],2);
 		translate([screw4/2+15-blower_w+fan_adjustLR,screw4+blower_w-13.3,blower_m_dist+7.75]) rotate([90,0,90])
-			cylinder(h=10,d=Yes4mmInsert());//screw4t);
+			cylinder(h=10,d=Yes4mmInsert(Use4mmInsert));//screw4t);
 	}
 }
 

@@ -5,7 +5,7 @@
 // Use 5mm to attached to the x carriage
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // create 7/5/2016
-// last update 8/9/20
+// last update 10/15/20
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 7/24/16	- added extra support to corner of xy()
 // 7/25/16	- added y() for the y axis wireguide
@@ -13,14 +13,16 @@
 // 8/9/20	- Added XMountWC() to mount the wire chain on the carraige
 // 9/29/20	- Added use of M4 brass inserts, renamed modules, adjusted length of XYWireChainMount()
 //			- removed XAxisWireChainSpacer() since the XCMount() can have its height set, cleaned up code
+// 10/15/20	- Added use of a single wirechain
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
-include <brassinserts.scad>
+include <inc/brassinserts.scad>
 $fn=100;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vars
 Xheight = 100;
+XheightS = 42;
 height=50;
 width = 37;	// width of wire chain
 thickness = 5;
@@ -31,14 +33,73 @@ LayerThickness=0.3;
 //Use2p5Insert=1;
 //Use3mmInsert=1;
 Use4mmInsert=1;
-//Use5mmInsert=1;
+Use5mmInsert=1;
 ///////////////////////////////////////////////////////////////////////
 
-all();
+//TwoWirechains();
+SingleWirechain();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module all() {
+module SingleWirechain(Screw=Yes4mmInsert(Use4mmInsert)) {
+	XMountWCSingle(Screw);  // get xcarraige end of wire chain off the endstop
+	translate([0,50,0]) XYAxisWireChainMountSingle(Screw);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module XMountWCSingle(Screw=Yes4mmInsert(Use4mmInsert)) {
+	difference() {
+		union() {
+			color("red") cubeX([25,40,thickness+2],2); // extension
+			color("cyan") cubeX([8,40,25],2); // spacer
+		}
+		translate([18,15,-5]) WCSingleHoles(Screw);
+		translate([0,-5,53]) rotate([0,90,0]) XMountHoles(screw5);
+	}
+}
+
+////////////////////////////////////////////////////////////////
+
+module XMountHoles(Screw=screw5) {
+	color("gold") hull() {
+		translate([35,13,-5]) cylinder(h=20, d=Screw);
+		translate([39,13,-5]) cylinder(h=20, d=Screw);
+	}
+	color("red") hull() {
+		translate([35,13,7]) cylinder(h=5, d=screw5hd);
+		translate([39,13,7]) cylinder(h=5, d=screw5hd);
+	}
+	color("red") hull() {
+		translate([37,31,-5]) cylinder(h=20, d=Screw);
+		translate([37,35,-5]) cylinder(h=20, d=Screw);
+	}
+	color("gold") hull() {
+		translate([37,31,7]) cylinder(h=5, d=screw5hd);
+		translate([37,35,7]) cylinder(h=5, d=screw5hd);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module WCSingleHoles(Screw=Yes4mmInsert(Use4mmInsert)) {
+	color("black") cylinder(h=15,d=Screw); // second wire chain mount screw hole
+	translate([0,10,0]) color("gray") cylinder(h=15,d=Screw); // second wire chain mount screw hole
+}
+
+/////////////////////////////////////////////////////////////////
+
+module XYAxisWireChainMountSingle(Screw=Yes4mmInsert(Use4mmInsert)) {	// on x axis carriage plate for both wireguides
+	difference() {
+		color("cyan") cubeX([XheightS,width,thickness+2],2);
+		translate([XheightS-10,28,-1]) ExtrusionMountHoles();
+		translate([10,13,0]) WCSingleHoles(Screw);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module TwoWirechains() {
 	if($preview) %translate([-55,-75,-5]) cubeX([200,200,5],2);
 	YAxisWireChain(1);	// on frame for y axis to hold wireguide end
 	translate([60,0,0]) YAxisWireChain(0);	// on frame for y axis to support wireguide
@@ -64,7 +125,7 @@ module XMountWC(Tall=0,Screw=screw4,ScrewMount=Yes4mmInsert(Use4mmInsert)) {
 
 ////////////////////////////////////////////////////////////////
 
-module ESWCHoles(Screw=screw5,Tall) {
+module ESWCHoles(Screw=screw5,Tall=0) {
 	color("gold") hull() {
 		translate([35,13,-5]) cylinder(h=20+Tall, d=Screw);
 		translate([39,13,-5]) cylinder(h=20+Tall, d=Screw);
