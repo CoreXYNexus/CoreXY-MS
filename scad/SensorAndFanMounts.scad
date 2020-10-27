@@ -41,9 +41,9 @@ LargeInsert=1;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ProximityMount(6); // arg is shift up/down (min:2)
-//BLTouchMount(0,10);	// 1st arg:type; 2nd: shift; BLTouch v3.1
+BLTouchMount(2,20,1);	// 1st arg:type; 2nd: shift; BLTouch v3.1
 //IRAdapter(0,0);
-IRAdapterAero(0);
+//IRAdapterAero(0);
 // Titan with E3Dv6
 //AdjustableBLTMount(10,2,0); //Shift=0 (add to 10),Type=2,DoBase= 0 (no) : 1 (yes)
 //AdjustableProximtyMount(20,0); //Shift=0,DoBase= 0 (no) : 1 (yes)
@@ -335,29 +335,28 @@ module ProximityAngleSupport() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module BLTouchMount(Type,Shift) {
+module BLTouchMount(Type,Shift,NoTab=1) {
 	difference() {
-		translate([-5,0,0]) color("salmon") cubeX([40,30,5],2);
-		if(Type==0) translate([15,0,bltdepth+3]) BLTouch_Holes(Type);//BLTouchMountHole(Type); // blt body hole
-		if(Type==1) translate([15,0,bltdepth+3]) BLTouch_Holes(Type);//BLTouchMountHole(Type); // no blt body hole
+		translate([0,0,0]) color("salmon") cubeX([26,25,5],2);
+		translate([13,-4,bltdepth+3]) BLTouch_Holes(Type);
 	}
 	if(Type==1) BLTouchSupport();
-	SensorMount(Shift);
-	BLTouchAngleSupport();
+	translate([0,-5,0]) SensorMount(Shift,0,NoTab);
+	translate([0,-5,0]) BLTouchCurvedSupport();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module BLTouchSupport() {
-	translate([0,7.5,4]) color("green") cube([bltl,bltw,LayerThickness]);
+	translate([1,4,4]) color("green") cube([bltl-6,bltw,LayerThickness]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module BLTouchAngleSupport() {
+module BLTouchCurvedSupport() {
 	translate([2,21,5]) {
 		difference() {
-			color("plum") cube([28,5,5]);
+			color("plum") cube([22,5,5]);
 			translate([-1,0.5,4]) rotate([0,90,0]) color("pink") cylinder(h=35,d=10,$fn=100);
 		}
 	}
@@ -372,27 +371,26 @@ module BLTouchBracketMountHoles(Shift) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module BLTouch_Holes(recess=0,Screw=Yes2p5mmInsert()) {
+module BLTouch_Holes(recess=0,Screw=Yes2p5mmInsert(Use2p5mmInsert)) {
 	if(recess == 2) {	// mounting screw holes only
 		translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,d=Screw);
 		translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,d=Screw);
-		translate([bltouch/2-9,16,-10]) color("black") cylinder(h=25,d=screw5); // adjuster access
+		translate([bltouch/2-9,16,-10]) color("white") cylinder(h=25,d=screw5); // adjuster access
 	}
-	if(recess == 1) {	// dependent on the hotend, for mounting under the extruder plate
-		translate([-bltl/2+3,bltw/2+2.5,bltdepth-4]) color("cyan") minkowski() { // depression for BLTouch
-			// it needs to be deep enough for the retracted pin not to touch bed
-			cube([bltl-6,bltw-6,wall]);
-			cylinder(h=1,r=3);
-		}
-		translate([-bltl/2+8,bltw/2,-5]) color("blue") cube([bltd+1.5,bltd+1.5,wall+3]); // hole for BLTouch
-		translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,r=screw2/2);
-		translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,r=screw2/2);
-
-	}
+	//if(recess == 1) {	// dependent on the hotend, for mounting under the extruder plate
+	//	translate([-bltl/2+3,bltw/2+2.5,bltdepth-4]) color("cyan") minkowski() { // depression for BLTouch
+	//		// it needs to be deep enough for the retracted pin not to touch bed
+	//		cube([bltl-6,bltw-6,wall]);
+	//		cylinder(h=1,r=3);
+	//	}
+	//	translate([-bltl/2+8,bltw/2,-5]) color("blue") cube([bltd+1.5,bltd+1.5,wall+3]); // hole for BLTouch
+	//	translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,r=screw2/2);
+	//	translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,r=screw2/2);
+	//}
 	if(recess == 0) {	// for mounting on top of the extruder plate
 		translate([-bltl/2+8,bltw/2-1,-5]) color("blue") cube([bltd,bltd+2,wall+3]); // hole for BLTouch
-		translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,r=screw2/2);
-		translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,r=screw2/2);
+		translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,d=Screw);
+		translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,d=Screw);
 	}
 }
 

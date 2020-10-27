@@ -22,7 +22,8 @@ $fn=100;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vars
 Xheight = 100;
-XheightS = 42;
+ExtrusionSize=20;
+
 height=50;
 width = 37;	// width of wire chain
 thickness = 5;
@@ -37,13 +38,14 @@ Use5mmInsert=1;
 ///////////////////////////////////////////////////////////////////////
 
 //TwoWirechains();
-SingleWirechain();
+//SingleWirechain();
+XYAxisWireChainMount2(Yes4mmInsert(Use4mmInsert),20+ExtrusionSize);	// on x axis carriage plate for X&Y wireguide ends
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module SingleWirechain(Screw=Yes4mmInsert(Use4mmInsert)) {
-	XMountWCSingle(Screw);  // get xcarraige end of wire chain off the endstop
-	translate([0,50,0]) XYAxisWireChainMountSingle(Screw);
+	XMountWCSingle(Screw);
+	translate([0,55,0]) XYAxisWireChainMountSingle(Screw);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,12 +53,14 @@ module SingleWirechain(Screw=Yes4mmInsert(Use4mmInsert)) {
 module XMountWCSingle(Screw=Yes4mmInsert(Use4mmInsert)) {
 	difference() {
 		union() {
-			color("red") cubeX([25,40,thickness+2],2); // extension
-			color("cyan") cubeX([8,40,25],2); // spacer
+			translate([0,40,0]) color("red") cubeX([35,thickness+2,35],2); // wirechain mount
+			color("cyan") cubeX([8,45,20],2); // mount to xcarriage
 		}
-		translate([18,15,-5]) WCSingleHoles(Screw);
-		translate([0,-5,53]) rotate([0,90,0]) XMountHoles(screw5);
+		translate([23,50,15]) rotate([90,0,0]) WCSingleHoles(Screw);
+		translate([0,-5,47]) rotate([0,90,0]) XMountHoles(screw5);
 	}
+	translate([4,3,0]) color("black") cylinder(h=LayerThickness,d=20);
+	translate([32,43,0]) color("gray") cylinder(h=LayerThickness,d=20);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -89,7 +93,7 @@ module WCSingleHoles(Screw=Yes4mmInsert(Use4mmInsert)) {
 
 /////////////////////////////////////////////////////////////////
 
-module XYAxisWireChainMountSingle(Screw=Yes4mmInsert(Use4mmInsert)) {	// on x axis carriage plate for both wireguides
+module XYAxisWireChainMountSingle(Screw=Yes4mmInsert(Use4mmInsert),XheightS = 52+ExtrusionSize) {	// on x axis carriage plate for both wireguides
 	difference() {
 		color("cyan") cubeX([XheightS,width,thickness+2],2);
 		translate([XheightS-10,28,-1]) ExtrusionMountHoles();
@@ -141,7 +145,7 @@ module ESWCHoles(Screw=screw5,Tall=0) {
 module YAxisWireChain(Holes=1) {	// 	// on frame for y axis
 	difference() { // wireguide mount
 		union() {
-			if(Holes) color("black") cubeX([thickness+5,width,tab],2);
+			if(Holes) color("black") cubeX([thickness+2,width,tab],2);
 			support();
 			color("cyan") cubeX([height/2+4,width,thickness],2);
 		}
@@ -158,11 +162,13 @@ module YAxisWireChain(Holes=1) {	// 	// on frame for y axis
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-module ExtrusionMountHoles() {
-	rotate([0,0,0]) color("red") cylinder(h=thickness*4,d=screw5);
-	translate([0,0,6]) color("blue") cylinder(h=thickness,d=screw5hd);
-	translate([0,-20,0]) color("blue") cylinder(h=thickness*4,d=screw5);
-	translate([0,-20,6]) color("red") cylinder(h=thickness,d=screw5hd);
+module ExtrusionMountHoles(Screw=screw5) {
+	rotate([0,0,0]) color("red") cylinder(h=thickness*4,d=Screw);
+	translate([0,-20,0]) color("blue") cylinder(h=thickness*4,d=Screw);
+	if(Screw==screw5) { // countersink if screw5
+		translate([0,0,6]) color("blue") cylinder(h=thickness,d=screw5hd);
+		translate([0,-20,6]) color("red") cylinder(h=thickness,d=screw5hd);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,22 +183,41 @@ module support() {
 
 /////////////////////////////////////////////////////////////////
 
-module XYAxisWireChainMount() {	// on x axis carriage plate for both wireguides
+module XYAxisWireChainMount(Screw=Yes4mmInsert(Use4mmInsert),XheightS = 52+ExtrusionSize) {
+	// on x axis carriage plate for both wireguides
 	difference() {
 		union() {
-			color("cyan") cubeX([Xheight,width,thickness],2);
-			color("purple") cubeX([thickness+5,width,tab2],2);
-			translate([5,0,0]) support();
+			color("cyan") cubeX([XheightS,width,thickness],2);
+			color("purple") cubeX([thickness+2,width,tab2],2);
+			translate([3,0,0]) support();
 		}
-		translate([Xheight-10,28,-2]) ExtrusionMountHoles();
+		translate([XheightS-10,28,-2]) ExtrusionMountHoles(Yes5mmInsert(Use5mmInsert));
 		// wireguide mount
-		translate([-2,12,tab/2-2]) rotate([0,90,0]) color("gray") cylinder(h=thickness*4,d=Yes4mmInsert(Use4mmInsert));
-		translate([-2,12,tab/2+8]) rotate([0,90,0]) color("white") cylinder(h=thickness*4,d=Yes4mmInsert(Use4mmInsert));
-		translate([-2,width/2+2,tab2-10]) rotate([0,90,0]) color("black") cylinder(h=thickness*4,d=Yes4mmInsert(Use4mmInsert));
-		translate([-2,width/2+12,tab2-10]) rotate([0,90,0]) color("green") cylinder(h=thickness*4,d=Yes4mmInsert(Use4mmInsert));
+		translate([-2,12,tab/2-2]) rotate([0,90,0]) color("gray") cylinder(h=thickness*4,d=Screw);
+		translate([-2,12,tab/2+8]) rotate([0,90,0]) color("white") cylinder(h=thickness*4,d=Screw);
+		translate([-2,width/2+2,tab2-10]) rotate([0,90,0]) color("black") cylinder(h=thickness*4,d=Screw);
+		translate([-2,width/2+12,tab2-10]) rotate([0,90,0]) color("green") cylinder(h=thickness*4,d=Screw);
 	}
 }
 
+/////////////////////////////////////////////////////////////////
+
+module XYAxisWireChainMount2(Screw=Yes4mmInsert(Use4mmInsert),XheightS = 52+ExtrusionSize) {
+	// on x axis carriage plate for y endstop and led wirechain
+	difference() {
+		union() {
+			color("cyan") cubeX([XheightS,width,thickness],2);
+			color("purple") cubeX([thickness+2,width,tab2],2);
+			translate([3,0,0]) support();
+		}
+		translate([XheightS-10,28,-2]) ExtrusionMountHoles(Yes5mmInsert(Use5mmInsert));
+		// wireguide mount
+		//translate([-2,12,tab/2-2]) rotate([0,90,0]) color("gray") cylinder(h=thickness*4,d=Screw);
+		//translate([-2,12,tab/2+8]) rotate([0,90,0]) color("white") cylinder(h=thickness*4,d=Screw);
+		translate([-2,width/2+2,tab2-10]) rotate([0,90,0]) color("black") cylinder(h=thickness*4,d=Screw);
+		translate([-2,width/2+12,tab2-10]) rotate([0,90,0]) color("green") cylinder(h=thickness*4,d=Screw);
+	}
+}
 ///////////////////////////////////////////////////////////////////////////////////
 
 module ZipTieMount() {

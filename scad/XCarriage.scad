@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // XCarriage - x carriage for the COREXY-MSv1 using makerslide
 // created: 2/3/2014
-// last modified: 9/27/2020
+// last modified: 1/17/20
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to carriage and put it into a seperate module
@@ -78,6 +78,7 @@
 // 9/27/20	- Added abilitiy to use M3 or M5 to BeltLoopHolderOppo() and CarridgeAllInOneAndSingleTitanExtruder()
 //			  for the belt loop holders. Changed recomendation from ABS to PETG. PETG prints without a heated chamber.
 //			  WireChainMount lets you change the monting holes on top of the belt mounting bracket to M4 or M5 inserts
+// 10/17/20	- changed extruder mount to allow dual titan areos
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -109,7 +110,7 @@ include <CoreXY-MSv1-h.scad>
 use <ybeltclamp.scad>	// modified https://www.thingiverse.com/thing:863408
 use <inc/corner-tools.scad>
 include <inc/brassinserts.scad>
-use <Single-Titan-E3DV6.scad>
+use <DualTitanAero.scad>
 //-------------------------------------------------------------------------------------------------------------
 $fn=75;
 TestLoop=0; // 1 = have original belt clamp mount hole visible
@@ -155,11 +156,11 @@ WireChainMount=Yes4mmInsert(Use4mmInsert);
 
 //partial();
 //FrontCarridge(0,0,0,0);	// Clamps,Loop,Titan
-//CarridgeAllInOne(0,1,2,0,Yes5mmInsert(Use5mmInsert));	// Clamps,Loop,Titan
+CarridgeAllInOne(0,1,2,0,Yes5mmInsert(Use5mmInsert),1);	// Clamps,Loop,Titan
 //RearCarridge(0,1,1);	// Clamps,Loop
 //FrontAndRear(0,1,0,1);
 //TitanExtruderBowdenMount(); // right angle titan mount to 2020 for bowden
-CarridgeAllInOneAndSingleTitanExtruder(0,1,1,Yes3mmInsert(Use3mmInsert,LargeInsert));// Clamps,Loop,Titan
+//CarridgeAllInOneAndSingleTitanExtruder(0,1,1,Yes3mmInsert(Use3mmInsert,LargeInsert));// Clamps,Loop,Titan
 //							Clamps=1,Loop=0,Titan=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert),ExtType=1
 //CarridgeAllInOneAndSingleTitanExtruder(0,1,1,Yes5mmInsert(Use5mmInsert));// Clamps,Loop,Titan
 //translate([30,70,-8]) // position either below to print with CarridgeAllInOneAndSingleTitanExtruder()
@@ -170,8 +171,9 @@ CarridgeAllInOneAndSingleTitanExtruder(0,1,1,Yes3mmInsert(Use3mmInsert,LargeInse
 
 module CarridgeAllInOneAndSingleTitanExtruder(Clamps=1,Loop=0,Titan=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert),ExtType=1,Stiffner=0) {
 	CarridgeAllInOne(Clamps,Loop,Titan,0,Screw);
+	translate([0,-wall,-4]) color("plum") cubeX([width,wall,wall],1); // make front xcarriage even with extruder mount
 	translate([-0.6,35,-4]) color("red") cubeX([width,wall,wall],1); // make rear xcarriage even with front
-	translate([37,-31,0]) Extruder(1,5,1,0);
+	translate([33,-42,0]) rotate([0,0,90]) TitanSingle(0);
 	if(Stiffner) translate([49,-14,42.5]) color("blue") cubeX([6.75,14,wall],1);  // don't use this if flexibility is needed
 }
 
@@ -185,9 +187,9 @@ module FrontCarridge(Clamps=1,Loop=0,Titan=0,BeltDrive=0) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module CarridgeAllInOne(Clamps=1,Loop=0,Titan=0,LoopMounts=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) {
+module CarridgeAllInOne(Clamps=1,Loop=0,Titan=0,LoopMounts=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert),ExtMount=1) {
 	//if($preview) %translate([-70,-50,-1]) cube([200,200,1]);
-	Carriage_v3(Titan,0,Clamps,Loop,1,LoopMounts,0,Screw);
+	Carriage_v3(Titan,0,Clamps,Loop,1,LoopMounts,ExtMount,Screw);
 			// Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,ExtMountingHoles=1
 }
 
