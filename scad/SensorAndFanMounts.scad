@@ -44,14 +44,6 @@ LargeInsert=1;
 BLTouchMount(2,20,1);	// 1st arg:type; 2nd: shift; BLTouch v3.1
 //IRAdapter(0,0);
 //IRAdapterAero(0);
-// Titan with E3Dv6
-//AdjustableBLTMount(10,2,0); //Shift=0 (add to 10),Type=2,DoBase= 0 (no) : 1 (yes)
-//AdjustableProximtyMount(20,0); //Shift=0,DoBase= 0 (no) : 1 (yes)
-// Titan Aero -- not tested
-//AdjustableBLTMount(0,2,0); //Shift=0 (add to 10),Type=2,DoBase= 0 (no) : 1 (yes)
-//AdjustableProximtyMount(0,0); //Shift=0,DoBase= 0 (no) : 1 (yes)
-//AdjustableIRMount();
-//FanAndProximityMount(8);//**broken** // arg is shift up/down (min:2) *** blocks e3dv6 fan ***
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

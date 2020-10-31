@@ -29,12 +29,12 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
 include <inc/screwsizes.scad>
-//Use3mmInsert=1;
-use <brassfunctions.scad>
+use <inc/brassinserts.scad>
 $fn = 50;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vars
-UseLargeInsert=0;
+Use3mmInsert=1;
+UseLargeInsert=1;
 SwitchSocketWidth=39;	// socket hole width
 SwitchSocketHeight=27;	// socket hole height
 SwitchLength=19.5;
@@ -59,8 +59,8 @@ PS12Edge=10;
 PS12Width=100;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//all();// 1st arg: flip power label; next 4 args: Width, length, clip Thickness; defaults to 0,13,19.5,2
-PowerInlet(0,0);
+all();// 1st arg: flip power label; next 4 args: Width, length, clip Thickness; defaults to 0,13,19.5,2
+//PowerInlet(0,0);
 //testfit();	// print part of it to test fit the socket & 2020
 //PowerSwitch(0,"POWER");		// 1st arg: flip label; 2nd arg:Text Label, default="POWER"
 //translate([40,0,0]) PowerSwitch(0," 5VDC");
@@ -79,8 +79,8 @@ module all(flip=0,Makerslide=1,PBQuantiy=2,Version=0) {
 	translate([0,-12,0]) PowerInletHousing(Version);
 	translate([0,-5,45]) rotate([180,0,0]) PowerInletHousingCover();
 	translate([-50,-45,0]) PowerSwitch();
-	translate([-30,60,0]) powersupply_cover();
-	translate([-35,-10,0]) rotate([0,0,90]) PowerSupplyMount(Makerslide,PBQuantiy);
+	//translate([-30,60,0]) powersupply_cover();
+	//translate([-35,-10,0]) rotate([0,0,90]) PowerSupplyMount(Makerslide,PBQuantiy);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,7 +179,7 @@ module pwr_supply_cover_vents(Qty=1) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PowerInletHousing(Version=0,Screw=Yes3mmInsert(UseLargeInsert)) {
+module PowerInletHousing(Version=0,Screw=Yes3mmInsert(Use3mmInsert,UseLargeInsert)) {
 	difference() {
 		color("blue") cubeX([SwitchSocketWidth+40,SwitchSocketHeight+40,5],2); // base
 		translate([SwitchSocketWidth-25,9,-2]) color("green") cylinder(h=10,r=screw5/2); // mounting hole

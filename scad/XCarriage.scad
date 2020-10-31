@@ -149,14 +149,15 @@ HeightIR = (HotendLength - IRBoardLength - IRGap) - irmount_height;	// height of
 LEDLight=1; // print LED ring mounting with spacer
 LEDSpacer=20;
 //------------------------------------------------------------------------------------------------
-// The variable WireChainMount lets you change the monting holes on top of the belt mounting bracket to M4 or M5 inserts
-WireChainMount=Yes4mmInsert(Use4mmInsert);
-//WireChainMount=Yes5mmInsert(Use5mmInsert);
+// The variable WireChainMount lets you change the mounting holes on top of the belt mounting bracket to M4 or M5 inserts
+//WireChainMount=Yes4mmInsert(Use4mmInsert);
+WireChainMount=Yes5mmInsert(Use5mmInsert);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //partial();
 //FrontCarridge(0,0,0,0);	// Clamps,Loop,Titan
 CarridgeAllInOne(0,1,2,0,Yes5mmInsert(Use5mmInsert),1);	// Clamps,Loop,Titan
+//CarridgeAllInOne(0,1,2,0,Yes3mmInsert(Use3mmInsert),1);	// Clamps,Loop,Titan
 //RearCarridge(0,1,1);	// Clamps,Loop
 //FrontAndRear(0,1,0,1);
 //TitanExtruderBowdenMount(); // right angle titan mount to 2020 for bowden
@@ -303,6 +304,12 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,E
 			color("blue") cubeX([width,HorizontalCarriageHeigth,wall],1);
 				translate([VerticalCarriageWidth/2+31,HorizontalCarriageHeigth+0.9,0]) roundedinner();
 			translate([VerticalCarriageWidth/2+6.5,HorizontalCarriageHeigth+0.9,8]) rotate([0,180,0]) roundedinner();
+			if(ExtMountingHoles) {  // front print support tabs
+				translate([0,LayerThickness,4]) color("cyan") rotate([90,0,0])
+					cylinder(h=LayerThickness,d=20); // print support tab
+				translate([70,LayerThickness,4]) color("red") rotate([90,0,0])
+					cylinder(h=LayerThickness,d=20); // print support tab
+			}
 		}
 		rotate([-90,0,0]) translate([16,-8,67]) BeltLoopHolderMountingHoles();
 		// wheel holes
@@ -326,8 +333,8 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,E
 		if(!Titan)	translate([38,45,4]) CarridgeMount(screw4); // 4 mounting holes for an extruder
 		CarriageExtruderPlateNuts();
  	}
-	translate([0,39,-4]) color("black") cylinder(h=LayerThickness,d=20); // print support tab
-	translate([70,39,-4]) color("gray") cylinder(h=LayerThickness,d=20); // print support tab
+	translate([0,39,0]) color("black") cylinder(h=LayerThickness,d=20); // rear print support tab
+	translate([70,39,0]) color("gray") cylinder(h=LayerThickness,d=20); // rear print support tab
 	translate([17,-4,89.05])  color("green") cube([40,38,LayerThickness]);  // support for the holes in the top
 	//%translate([0,0,4]) cube([10,35,10]); // show distance needed between carriages
 	translate([VerticalCarriageWidth*2,35,0]) rotate([90,0,180]) difference() { // rear
@@ -338,13 +345,21 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,E
 			translate([VerticalCarriageWidth/2+6.5,HorizontalCarriageHeigth+0.9,8]) rotate([0,180,0]) roundedinner();
 		}
 		BeltDriveNotch(Loop);
-		if(Yes5mmInsert(Use5mmInsert) == screw5) translate([width/2,tri_sep/2+42,3]) color("lightgray") nut(nut5,10);
-		translate([width/2,tri_sep/2+42,-2]) color("green") cylinder(h=15,d=Yes5mmInsert(Use5mmInsert));
-		translate([dual_sep/2+width/2,-tri_sep/2+42,-10]) color("yellow")
-			cylinder(h = depth+10,d = Yes5mmInsert(Use5mmInsert)); // right hole
-		translate([-dual_sep/2+width/2,-tri_sep/2+42,-10]) color("purple")
-			cylinder(h = depth+10,d = Yes5mmInsert(Use5mmInsert)); // left hole
-		if(Yes5mmInsert() == screw5) NutAccessHole();
+		if(Use5mmInsert) {
+			translate([width/2,tri_sep/2+42,3]) color("lightgray") nut(nut5,10);
+			NutAccessHole();
+			translate([width/2,tri_sep/2+42,-2]) color("green") cylinder(h=15,d=screw5);
+			translate([dual_sep/2+width/2,-tri_sep/2+42,-10]) color("yellow")
+				cylinder(h = depth+10,d=screw5); // right hole
+			translate([-dual_sep/2+width/2,-tri_sep/2+42,-10]) color("purple")
+				cylinder(h = depth+10,d=screw5); // left hole
+		} else {
+			translate([width/2,tri_sep/2+42,-2]) color("green") cylinder(h=15,d=Yes5mmInsert(Use5mmInsert));
+			translate([dual_sep/2+width/2,-tri_sep/2+42,-10]) color("yellow")
+				cylinder(h = depth+10,d = Yes5mmInsert(Use5mmInsert)); // right hole
+			translate([-dual_sep/2+width/2,-tri_sep/2+42,-10]) color("purple")
+				cylinder(h = depth+10,d = Yes5mmInsert(Use5mmInsert)); // left hole
+		}
 		translate([38,height/2+8,-wall/2]) color("gray") hull() { // reduce usage of filament
 			cylinder(h = wall+10, r = 6);
 			translate([0,-40,0]) cylinder(h = wall+10, r = 6);

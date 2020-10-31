@@ -30,7 +30,7 @@
 // ** NOTE: May need a raft for the built in support for the camera bracket
 // For the PI camera 1.3, it only has clearance for the ribbon connector, so don't overtighten
 // Or, use the CameraHolder() underneath the pi camera
-// Uses 2.5mm brass inserts
+// Uses 2.5mm brass inserts for the pi 0 and 2mm brass inserts for the camera
 /////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>

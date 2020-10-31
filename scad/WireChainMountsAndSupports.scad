@@ -13,7 +13,7 @@
 // 8/9/20	- Added XMountWC() to mount the wire chain on the carraige
 // 9/29/20	- Added use of M4 brass inserts, renamed modules, adjusted length of XYWireChainMount()
 //			- removed XAxisWireChainSpacer() since the XCMount() can have its height set, cleaned up code
-// 10/15/20	- Added use of a single wirechain
+// 10/15/20	- Added use of a single wirechain to the x carraige
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
@@ -22,7 +22,7 @@ $fn=100;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vars
 Xheight = 100;
-ExtrusionSize=20;
+ExtrusionSize=20; // 2020
 
 height=50;
 width = 37;	// width of wire chain
@@ -31,17 +31,23 @@ tab = 25;
 tab2 = 52;
 LayerThickness=0.3;
 //----------------------------------------------------
-//Use2p5Insert=1;
-//Use3mmInsert=1;
 Use4mmInsert=1;
 Use5mmInsert=1;
 ///////////////////////////////////////////////////////////////////////
 
-//TwoWirechains();
-//SingleWirechain();
-XYAxisWireChainMount2(Yes4mmInsert(Use4mmInsert),20+ExtrusionSize);	// on x axis carriage plate for X&Y wireguide ends
+//TwoWirechains(); // two wirechains, on from xcarraige to xend, then xend to frame
+//SingleWirechain(); // one wirechain to x carraige
+YAxisWireChain();  // if using the single, then you need this if there is wiring at the xend
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module YAxisWireChain() {
+	XYAxisWireChainMount2(Yes4mmInsert(Use4mmInsert),20+ExtrusionSize);	// on x axis carriage plate for Y wireguide
+	translate([45,0,0]) YAxisWireChain(0);	// on frame for y axis to support wireguide
+	translate([78,0,0]) YAxisWireChain(0);	// on frame for y axis to support wireguide
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module SingleWirechain(Screw=Yes4mmInsert(Use4mmInsert)) {
 	XMountWCSingle(Screw);
@@ -53,14 +59,14 @@ module SingleWirechain(Screw=Yes4mmInsert(Use4mmInsert)) {
 module XMountWCSingle(Screw=Yes4mmInsert(Use4mmInsert)) {
 	difference() {
 		union() {
-			translate([0,40,0]) color("red") cubeX([35,thickness+2,35],2); // wirechain mount
+			translate([0,40,0]) color("red") cubeX([55,thickness+2,35],2); // wirechain mount
 			color("cyan") cubeX([8,45,20],2); // mount to xcarriage
 		}
-		translate([23,50,15]) rotate([90,0,0]) WCSingleHoles(Screw);
+		translate([43,50,15]) rotate([90,0,0]) WCSingleHoles(Screw);
 		translate([0,-5,47]) rotate([0,90,0]) XMountHoles(screw5);
 	}
-	translate([4,3,0]) color("black") cylinder(h=LayerThickness,d=20);
-	translate([32,43,0]) color("gray") cylinder(h=LayerThickness,d=20);
+	translate([4,3,0]) color("black") cylinder(h=LayerThickness,d=20); // print support tab
+	translate([52,43,0]) color("gray") cylinder(h=LayerThickness,d=20); // print support tab
 }
 
 ////////////////////////////////////////////////////////////////
@@ -93,7 +99,7 @@ module WCSingleHoles(Screw=Yes4mmInsert(Use4mmInsert)) {
 
 /////////////////////////////////////////////////////////////////
 
-module XYAxisWireChainMountSingle(Screw=Yes4mmInsert(Use4mmInsert),XheightS = 52+ExtrusionSize) {	// on x axis carriage plate for both wireguides
+module XYAxisWireChainMountSingle(Screw=Yes4mmInsert(Use4mmInsert),XheightS = 72+ExtrusionSize) {	// on x axis carriage plate for both wireguides
 	difference() {
 		color("cyan") cubeX([XheightS,width,thickness+2],2);
 		translate([XheightS-10,28,-1]) ExtrusionMountHoles();

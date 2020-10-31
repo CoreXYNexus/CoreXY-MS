@@ -14,6 +14,7 @@
 include <CoreXY-MSv1-h.scad>
 include <inc/brassinserts.scad>
 //-------------------------------------------------------------------------------------------------------------
+$fn=100;
 Use3mmInsert=1; // set to 1 to use 3mm brass inserts
 Use5mmInsert=1;
 LargeInsert=1;
@@ -22,21 +23,17 @@ ExtruderThickness = wall;	// thickness of the extruder plate
 LayerThickness=0.3;
 Spacing = 17; 			// ir sensor bracket mount hole spacing
 //---------------------------------------------------------------------------------------------------------
-LEDLight=1; // print LED ring mounting with spacer
-LEDSpacer=0;//8;  // length need for titan is 8; length need for aero is 0
-//==================================================================================================
-//**** NOTE: heater blocker on a areo titan: heater side towards fan side
-//==================================================================================================
-
+LEDLight=1; // print LED ring mounting
+LEDSpacer=0;//8;  // length need for titan is 8; length need for aero is 0 (none)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//DualAero(1,1,1);	// arg 1: Mounting holes, arg2: stepper notch
-SingleAero(1,0,1);
+DualAero(1,0,1);	// arg 1: Mounting holes, arg2: stepper notch to allow inserting motor
+//SingleAero(1,0,1);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module DualAero(Mounting=1,StepperNotch=1,DoTab=1) {
-	TitanDual(Mounting,StepperNotch);
+	TitanDual(Mounting,StepperNotch,DoTab);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

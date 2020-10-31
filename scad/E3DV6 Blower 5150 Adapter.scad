@@ -16,9 +16,7 @@
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad> // http://www.thingiverse.com/thing:112008
 include <inc/brassinserts.scad>
-$fn=50;		// 100 takes a long, long time to render
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Tap smaller blower pillar hole with a M4 tap.  Print more than one or with something else for better quality
+$fn=50;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Use4mmInsert=1;
 countersink=2;

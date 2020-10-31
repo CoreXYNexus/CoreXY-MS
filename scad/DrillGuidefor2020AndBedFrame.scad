@@ -16,12 +16,14 @@
 //////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <inc/cubeX.scad>
-use <brassfunctions.scad>
+use <inc/brassinserts.scad>
 //////////////////////////////////////////////////////////////////////////////
 // vars
 /////////////////////////////////////////////////////////////////////////////
 $fn=100;
-UseLarge3mmInsert=1;
+Use3mmInsert=1;
+LargeInsert=1;
+Use5mmInsert=0;
 width = 30;
 thickness = 5;
 w2020 = 20.1;
@@ -30,14 +32,14 @@ offset = 20;//80;
 length = offset + 25;
 ////////////////////////////////////////////////////////////////////////////////
 
-2020DrillGuide();
+//2020DrillGuide();
 //MSDrillGuide();
-//DrillClips(4); // used to hold the bed onto the 2020 to drill the adjusting mount holes
+BedDrillClips(4); // used to hold the bed onto the 2020 to drill the adjusting mount holes
 				 // use #39 drill bit for all three mounting holes, drill through the 2020 and bed,
 				 // M3 tap the 2020, drill the bed holes 3mm and countersink
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module DrillClips(Quanity=1) { // used to hold bed onto the 2020 to drill the adjusting mount holes
+module BedDrillClips(Quanity=1) { // used to hold bed onto the 2020 to drill the adjusting mount holes
 	for(x=[0:Quanity-1]) {
 		translate([x*23,0,0]) difference() {
 			union() {
@@ -45,30 +47,40 @@ module DrillClips(Quanity=1) { // used to hold bed onto the 2020 to drill the ad
 				color("blue") cubeX([20,4,20],2);
 			}
 			translate([10,25,-3]) color("red") cylinder(h=10,d=screw5);
-			translate([10,8,12]) rotate([90,0,0]) color("gray") cylinder(h=10,d=Yes3mmInsert(UseLarge3mmInsert));
+			translate([10,8,12]) rotate([90,0,0]) color("gray") cylinder(h=10,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
 		}
 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 
-module 2020DrillGuide(Screw=Yes5mmInsert()) { //2020 channel
+module 2020DrillGuide(Screw=Yes5mmInsert(Use5mmInsert)) { //2020 channel
 	difference() {
 		color("cyan") cubeX([length,width,thickness+2],1);
 		translate([5,5,3]) color("blue") cube([length,w2020,thickness]);
-		translate([bottom+5,w2020/2+5,-5]) color("black") cylinder(h=20,d=Screw);
-		translate([offset+bottom+5,w2020/2+5,-5]) color("gray") cylinder(h=20,d=Screw);
+		if(Use5mmInsert) {
+			translate([bottom+5,w2020/2+5,-5]) color("black") cylinder(h=20,d=Screw);
+			translate([offset+bottom+5,w2020/2+5,-5]) color("gray") cylinder(h=20,d=Screw);
+		} else {
+			translate([bottom+5,w2020/2+5,-5]) color("black") cylinder(h=20,d=screw5);
+			translate([offset+bottom+5,w2020/2+5,-5]) color("gray") cylinder(h=20,d=screw5);
+}
 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 
-module MSDrillGuide(Screw=Yes5mmInsert()) { // to use on makerslide, just has the tab on the end
+module MSDrillGuide(Screw=Yes5mmInsert(Use5mmInsert)) { // to use on makerslide, just has the tab on the end
 	difference() {
 		color("cyan") cube([length,width-10,thickness+2]);
 		translate([5,-1,3]) color("red") cube([length,width+2,thickness]);
-		translate([bottom+5,w2020/2,-5]) color("black") cylinder(h=20,d=Screw);
-		translate([offset+bottom+5,w2020/2,-5]) color("gray") cylinder(h=20,d=Screw);
+		if(Use5mmInsert) {
+			translate([bottom+5,w2020/2,-5]) color("black") cylinder(h=20,d=Screw);
+			translate([offset+bottom+5,w2020/2,-5]) color("gray") cylinder(h=20,d=Screw);
+		} else {
+			translate([bottom+5,w2020/2,-5]) color("black") cylinder(h=20,d=screw5);
+			translate([offset+bottom+5,w2020/2,-5]) color("gray") cylinder(h=20,d=screw5);
+		}
 	}
 }
 

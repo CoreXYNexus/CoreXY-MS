@@ -19,15 +19,12 @@ lite_t = 2;
 tab_d = 5;
 /////////////////////////////////////////////////////////////////////////////////////////
 
-clips(6); // must be multiples of two
+clips(6);
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-module clips(Qty=2) {
-	if(Qty>1) {
-		for (i=[0:(Qty/2)-1]) translate([i*20,0,0]) rotate([0,-90,0]) clip();
-		for (i=[0:(Qty/2)-1]) translate([i*20,20,0]) rotate([0,-90,0]) clip();
-	}
+module clips(Qty=1) {
+	for (i=[0:Qty-1]) translate([i*20,0,0]) rotate([0,-90,0]) clip();
 }
 
 

@@ -28,9 +28,8 @@ Use5mmInsert=1;
 
 // 1st arg is type: 0 - zip tie mount;1 - screw mount;2 - both;3 - neither
 //RelayMount(2,Width,Length,Thickness,Side_dx,Side_dy);
-//RelayMount(2,21.24,43.37,5,6.6,2.6); // 12v relay module from Amazon
-//RelayMount(2,21.2,43.1,5,6.3,3); // ebay buck convertor
-RelayMountBrassM5(21.2,43.1,5,6.3,3); // uses a M5 brass insert to mount
+RelayMount(2,21.2,43.1,5,6.3,3); // ebay buck convertor
+//translate([0,30,0]) RelayMountBrassM5(21.2,43.1,5,6.3,3); // uses a M5 brass insert to mount
 
 ///////////////////////////////////////////////////////////////////////////////
 

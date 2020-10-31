@@ -52,9 +52,10 @@ CenterPivotLength=100;
 ZPivotLength=28.5;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-z_pivots(3,1,0);// arg1: Quanity;Arg2: 0 for M5 pivots, 1 for 625z bearing pivots;Arg3: 0 for none, 1 for 2020, 2 for 2040
-//ZPivotBed2020(1,95-ZPivotLength);		// equal length long bed pivots for 2020
-//translate([40,0,0]) ZPivotBed2020(2,ZCarriadgeWidth-BedWidth-ZPivotLength-95);		// equal length long bed pivots for 2020
+//z_pivots(3,1,0);// arg1: Quanity;Arg2: 0 for M5 pivots, 1 for 625z bearing pivots;Arg3: 0 for none, 1 for 2020, 2 for 2040
+// *** may not be correct length
+ZPivotBed2020(1,95-ZPivotLength);		// equal length long bed pivots for 2020
+translate([40,0,0]) ZPivotBed2020(2,ZCarriadgeWidth-BedWidth-ZPivotLength-95);		// equal length long bed pivots for 2020
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -469,7 +470,7 @@ module ZPivotBedSupport2020(Length) {
 			translate([16.5,30,0]) color("green") cylinder(h=40,d=screw5hd);
 		}
 		difference() {
-			translate([0,17,0]) color("lightgray") cube([32,3,Length-ZPivotLength-out_dia_625z*2]);
+			translate([0,17,0]) color("plum") cube([32,3,Length-ZPivotLength-out_dia_625z*2]);
 			ZPivotSupportCenter(Length);
 		}
 	}
@@ -494,14 +495,14 @@ module ZPivotBedSupport2040(Length) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module ZPivotSupportCenter(Length) {
-		translate([7.5,15.5,0]) {
-			color("gray") hull() {
+		translate([6.9,15.5,0]) {
+			color("green") hull() {
 				cylinder(h=Length-ZPivotLength-out_dia_625z*2+5,d=screw5);
-				translate([17.5,0,0]) cylinder(h=Length-ZPivotLength-out_dia_625z*2+5,d=screw5);
+				translate([19,0,0]) cylinder(h=Length-ZPivotLength-out_dia_625z*2+5,d=screw5);
 			}
 		}
 		translate([7.5,24.5,0]) {
-			color("gray") hull() {
+			color("pink") hull() {
 				cylinder(h=Length-ZPivotLength-out_dia_625z*2+5,d=screw5);
 				translate([17.5,0,0]) cylinder(h=Length-ZPivotLength-out_dia_625z*2+5,d=screw5);
 			}

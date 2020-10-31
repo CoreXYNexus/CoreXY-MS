@@ -109,15 +109,15 @@ idler_spacer_thickness = GT2_40t_h + 0.9;	// thickness of idler bearing spacer
 layer = 0.25;				// printed layer thickness
 ////////////////////////////////////////////////////////////////////////////
 
-//partial();
+//test();
 //DirectDriveZAxis(3,1,1,5,8); 	// Z axis for bed leveling
 				// 1st: Quantiy; 2nd: plates; 3rd: printable couplers; 4th: motor shaft diameter; 5th: leadscrew diameter
 //Reduction_Motor_Mount(1);
 //DirectDriveZAxisAndZNut(3); // motor mounts and the znut holder
-//BeltDrivenZAxis(3); // arg is quanity
+//BeltDrivenZAxis(3); // arg is quanity, includes drive motor mount
 // also need the following with BeltDrivenZAxis(), since a 200x200 build plate isn't big enough
 ZNutBracket(3); // arg is quanity
-//ZAxisMountPlates(3); // arg is quanity*2
+translate([50,20,0]) ZAxisMountPlates(3); // arg is quanity*2
 	
 //////////////////////////////////////////////////////////////////////////////
 
@@ -172,7 +172,7 @@ module DirectDriveZAxisAndZNut(Quanity=1) {  // z motor mount for 3 z motors
 
 /////////////////////////////////////////////////////////////////////////////
 
-module partial() { // this is here just to make it easier to print/test a single item
+module test() { // this is here just to make it easier to print/test a single item
 	//motor_mount(1);
 	//translate([60,0,0]) motor_mount(1);
 	//translate([120,0,0]) motor_mount(1);
