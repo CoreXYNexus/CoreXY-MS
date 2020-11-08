@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // XCarriage - x carriage for the COREXY-MSv1 using makerslide
 // created: 2/3/2014
-// last modified: 1/17/20
+// last modified: 11/8/20
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to carriage and put it into a seperate module
@@ -79,6 +79,7 @@
 //			  for the belt loop holders. Changed recomendation from ABS to PETG. PETG prints without a heated chamber.
 //			  WireChainMount lets you change the monting holes on top of the belt mounting bracket to M4 or M5 inserts
 // 10/17/20	- changed extruder mount to allow dual titan areos
+// 11/8/20	- Added extra set of holes to mount the single titan aero extruder mount
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -107,7 +108,6 @@
 // corner-tools.scad fillet_r() doesn't show in preview
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
-use <ybeltclamp.scad>	// modified https://www.thingiverse.com/thing:863408
 use <inc/corner-tools.scad>
 include <inc/brassinserts.scad>
 use <DualTitanAero.scad>
@@ -219,8 +219,7 @@ module partial() {
 					// 3rd arg: belt clamps; 4th arg: Loop style belt holders
 					// 5:arg DoBeltDrive if 1; 6th arg: Rear carriage plate if 1; 7th arg: 1 or 2 Moves the Belt loops
 					// defaults: Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLoops=0
-	Carriage_v3(1,0,0,1,1,0);
-				//Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,ExtMountingHoles=1
+	Carriage_v3();	//Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,ExtMountingHoles=1
 	//ExtruderPlatform(0);	// for BLTouch: 0 & 1, 2 is proximity, 3 is dc42 ir sensor, 4- none
 	//translate([-50,0,0]) CarriageBeltDrive(1);	// 1 - belt loop style
 	//MirrorTitanExtruderPlatform(5,1,1,1); // reverse the platform to have the titan adjusting screw to the front
@@ -311,7 +310,7 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,E
 					cylinder(h=LayerThickness,d=20); // print support tab
 			}
 		}
-		rotate([-90,0,0]) translate([16,-8,67]) BeltLoopHolderMountingHoles();
+		if(!ExtMountingHoles) rotate([-90,0,0]) translate([16,-8,67]) BeltLoopHolderMountingHoles();
 		// wheel holes
 		translate([VerticalCarriageWidth,tri_sep+10,0]) color("red") hull() {
 			// bevel the countersink to get easier access to adjuster
@@ -328,7 +327,10 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,E
 			translate([0,-40,0]) cylinder(h = wall+10, r = 6);
 		}
 		// screw holes to mount extruder plate
-		if(ExtMountingHoles) translate([37.5,45,4]) ExtruderMountHolesFn(Yes3mmInsert(Use3mmInsert,LargeInsert),1);
+		if(ExtMountingHoles) {
+			translate([37.5,45,4]) ExtruderMountHolesFn(Yes3mmInsert(Use3mmInsert,LargeInsert),1);
+			translate([29,45,4]) ExtruderMountHolesFn(Yes3mmInsert(Use3mmInsert,LargeInsert),1,1);
+		}
 		// screw holes in top (alternate location for a belt holder)
 		if(!Titan)	translate([38,45,4]) CarridgeMount(screw4); // 4 mounting holes for an extruder
 		CarriageExtruderPlateNuts();
@@ -345,7 +347,7 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,E
 			translate([VerticalCarriageWidth/2+6.5,HorizontalCarriageHeigth+0.9,8]) rotate([0,180,0]) roundedinner();
 		}
 		BeltDriveNotch(Loop);
-		if(Use5mmInsert) {
+		if(!Use5mmInsert) {
 			translate([width/2,tri_sep/2+42,3]) color("lightgray") nut(nut5,10);
 			NutAccessHole();
 			translate([width/2,tri_sep/2+42,-2]) color("green") cylinder(h=15,d=screw5);
@@ -428,10 +430,10 @@ module BeltDriveNotch(Belt=1) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module ExtruderMountHolesFn(Screw=screw3,All=0) {
+module ExtruderMountHolesFn(Screw=screw3,All=0,Just4=0) {
 	translate([0,-15,0]) rotate([90,0,0]) color("red") cylinder(h = 35, d = Screw); // center
 	translate([width/2-5,-15,0]) rotate([90,0,0]) color("blue") cylinder(h = 35, d = Screw); //right
-	translate([-(width/2-5),-15,0]) rotate([90,0,0]) color("black") cylinder(h = 35, d = Screw); // left
+	if(!Just4) translate([-(width/2-5),-15,0]) rotate([90,0,0]) color("black") cylinder(h = 35, d = Screw); // left
 	if(All) {
 		translate([width/4-2,-15,0]) rotate([90,0,0]) color("purple") cylinder(h = 35, d = Screw);
 		translate([-(width/4-2),-15,0]) rotate([90,0,0]) color("gray") cylinder(h = 35, d = Screw);

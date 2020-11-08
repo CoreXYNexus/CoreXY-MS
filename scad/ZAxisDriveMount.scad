@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 10/22/20
+// Last Update: 11/5/20
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/28/16	- modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
 // 7/3/16	- added assembly info
@@ -34,6 +34,7 @@
 // 12/8/19	- Added Reduction_Motor_Mount() for using a belt to drive each z axis leadscrew
 // 10/19/20	- Added use of M5 & M3 brass inserts
 // 10/22/20	- Changed modules names and cleaned up the main modules
+// 11/5/20	- Added ZMotorThrustSpacer() to use M5 thrust brearings under the coupler
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <inc/brassinserts.scad>
@@ -107,6 +108,8 @@ shiftbm = 0; 				// move belt motor mount up/down (- shifts it up)
 GT2_40t_h = 6.1;			// thickness of the clamping part on the 40 tooth GT2 pulley
 idler_spacer_thickness = GT2_40t_h + 0.9;	// thickness of idler bearing spacer
 layer = 0.25;				// printed layer thickness
+ThrustWasherThickness=4;
+
 ////////////////////////////////////////////////////////////////////////////
 
 //test();
@@ -116,10 +119,22 @@ layer = 0.25;				// printed layer thickness
 //DirectDriveZAxisAndZNut(3); // motor mounts and the znut holder
 //BeltDrivenZAxis(3); // arg is quanity, includes drive motor mount
 // also need the following with BeltDrivenZAxis(), since a 200x200 build plate isn't big enough
-ZNutBracket(3); // arg is quanity
-translate([50,20,0]) ZAxisMountPlates(3); // arg is quanity*2
-	
+//ZNutBracket(3); // arg is quanity
+//translate([50,20,0]) ZAxisMountPlates(3); // arg is quanity*2
+ZMotorThrustSpacer(3,7.5-ThrustWasherThickness); // to use M5 thrust brearings under the coupler
+
 //////////////////////////////////////////////////////////////////////////////
+
+module ZMotorThrustSpacer(Qty=1,Length=5) { // to use M5 thrust brearings under the coupler
+	for(x= [0:Qty-1]) {
+		translate([0,x*15,0]) difference() {
+			color("cyan") cylinder(h=Length,d=10);
+			translate([0,0,-2]) color("red") cylinder(h=Length+4,d=screw5);
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module DirectDriveZAxis(Quanity=1,Plates=0,Coupler=1,Motorshaft=5,LeadScrewDiameter=8) { // set for makerslide
 	if($preview) %translate([-100,-115,-2]) cube([200,200,2]);
