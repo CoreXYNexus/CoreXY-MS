@@ -5,7 +5,7 @@
 // Use 5mm to attached to the x carriage
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // create 7/5/2016
-// last update 10/15/20
+// last update 11/14/20
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 7/24/16	- added extra support to corner of xy()
 // 7/25/16	- added y() for the y axis wireguide
@@ -14,6 +14,7 @@
 // 9/29/20	- Added use of M4 brass inserts, renamed modules, adjusted length of XYWireChainMount()
 //			- removed XAxisWireChainSpacer() since the XCMount() can have its height set, cleaned up code
 // 10/15/20	- Added use of a single wirechain to the x carraige
+// 11/14/20	- Fixed YAxisWirechainOnly(), add height to XAxisWireChainFrameMount()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
@@ -22,7 +23,7 @@ $fn=100;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vars
 Xheight = 100;
-ExtrusionSize=20; // 2020
+ExtrusionSize=20; // 20 for 2020, 40 for 2040
 
 height=50;
 width = 37;	// width of wire chain
@@ -36,22 +37,23 @@ Use5mmInsert=1;
 ///////////////////////////////////////////////////////////////////////
 
 //TwoWirechains(); // two wirechains, on from xcarraige to xend, then xend to frame
-//SingleWirechain(); // one wirechain to x carraige
-YAxisWireChain();  // if using the single, then you need this if there is wiring at the xend
+SingleWirechainX(); // one wirechain to x carraige
+//YAxisWireChainOnly();  // if using the single, then you need this if there is wiring at the xend
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module YAxisWireChain() {
+module YAxisWireChainOnly() {
 	XYAxisWireChainMount2(Yes4mmInsert(Use4mmInsert),20+ExtrusionSize);	// on x axis carriage plate for Y wireguide
-	translate([45,0,0]) YAxisWireChain(0);	// on frame for y axis to support wireguide
-	translate([78,0,0]) YAxisWireChain(0);	// on frame for y axis to support wireguide
+	translate([45,0,0]) YAxisWireChain(0);
+	translate([78,0,0]) YAxisWireChain(0);
+	translate([110,0,0]) YAxisWireChain(1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module SingleWirechain(Screw=Yes4mmInsert(Use4mmInsert)) {
+module SingleWirechainX(Screw=Yes4mmInsert(Use4mmInsert)) {
 	XMountWCSingle(Screw);
-	translate([0,55,0]) XYAxisWireChainMountSingle(Screw);
+	translate([0,55,0]) XAxisWireChainFrameMount(Screw);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,10 +101,15 @@ module WCSingleHoles(Screw=Yes4mmInsert(Use4mmInsert)) {
 
 /////////////////////////////////////////////////////////////////
 
-module XYAxisWireChainMountSingle(Screw=Yes4mmInsert(Use4mmInsert),XheightS = 72+ExtrusionSize) {	// on x axis carriage plate for both wireguides
+module XAxisWireChainFrameMount(Screw=Yes4mmInsert(Use4mmInsert),XheightS=92) {	// on x axis carriage plate for both wireguides
 	difference() {
-		color("cyan") cubeX([XheightS,width,thickness+2],2);
-		translate([XheightS-10,28,-1]) ExtrusionMountHoles();
+		color("cyan") cubeX([XheightS+ExtrusionSize,width,thickness+2],2);
+		if(ExtrusionSize==20)
+			translate([XheightS+ExtrusionSize-10,28,-1]) ExtrusionMountHoles();
+		if(ExtrusionSize==40) {
+			translate([XheightS+ExtrusionSize-10,28,-1]) ExtrusionMountHoles();
+			translate([XheightS+ExtrusionSize-30,28,-1]) ExtrusionMountHoles();
+		}
 		translate([10,13,0]) WCSingleHoles(Screw);
 	}
 }
@@ -169,7 +176,7 @@ module YAxisWireChain(Holes=1) {	// 	// on frame for y axis
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 module ExtrusionMountHoles(Screw=screw5) {
-	rotate([0,0,0]) color("red") cylinder(h=thickness*4,d=Screw);
+	color("red") cylinder(h=thickness*4,d=Screw);
 	translate([0,-20,0]) color("blue") cylinder(h=thickness*4,d=Screw);
 	if(Screw==screw5) { // countersink if screw5
 		translate([0,0,6]) color("blue") cylinder(h=thickness,d=screw5hd);

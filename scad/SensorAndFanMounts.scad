@@ -41,9 +41,24 @@ LargeInsert=1;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ProximityMount(6); // arg is shift up/down (min:2)
-BLTouchMount(2,20,1);	// 1st arg:type; 2nd: shift; BLTouch v3.1
+//BLTouchMount(2,20,1);	// 1st arg:type; 2nd: shift; BLTouch v3.1
 //IRAdapter(0,0);
 //IRAdapterAero(0);
+Spacer(3,7);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Spacer(Qty=1,Thickness=5,Screw=screw3,BottomSize=3) {
+	for(x = [0:Qty-1]) {
+		translate([0,x*15,0]) difference() {
+			color("cyan") hull() {
+				cylinder(h=0.5,d=Screw*BottomSize);
+				translate([0,0,Thickness]) cylinder(h=1,d=Screw*2);
+			}
+			translate([0,0,-2]) color("plum") cylinder(h=Thickness+5,d=Screw);
+		}
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

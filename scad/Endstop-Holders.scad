@@ -32,13 +32,14 @@ Switch_thk = 5;			// thickness of holder
 Switch_thk2 = 6;		// thickness of spacer
 HolderWidth = 33;	// width of holder
 SwitchShift = 6;	// move switch mounting holes along width
+LayerThickness=0.3;
 ////////////////////////////////////////////////////////////////////////////
 
-//XStopMount(22,10,8,Yes3mmInsert(Use3mmInsert,LargeInsert),screw4,8);	// TEMCo CN0097
-XStopMount(10,0,0,Yes2mmInsert(Use2mmInsert),screw5,4); // black microswitch
+//XStopMount(22,10,8,Yes3mmInsert(Use3mmInsert,LargeInsert),screw5,8);	// TEMCo CN0097
+//XStopMount(10,0,0,Yes2mmInsert(Use2mmInsert),screw5,4); // black microswitch
 //translate([0,40,0]) YStopMount(22,10,8,Yes3mmInsert(Use3mmInsert,LargeInsert),screw4,8);	// TEMCo CN0097
-translate([0,40,0]) YStopMount(10,0,0,Yes2mmInsert(Use2mmInsert),screw5,4); // black microswitch
-translate([-40,-40,0])strikeY(screw5);
+//translate([0,40,0]) YStopMount(10,0,0,Yes2mmInsert(Use2mmInsert),screw5,4); // black microswitch
+//translate([-40,-40,0])strikeY(screw5);
 translate([-40,-12,0]) strikeX(screw5);
 
 ///////////////////////////////////////////////////////////////////////////
@@ -104,12 +105,17 @@ module strikeY(Screw=screw5) {	// used on y a-xis
 
 /////////////////////////////////////////////////////////////////////////////
 
-module strikeX(Screw=screw5) {	// used on y a-xis
+module strikeX(Screw=screw5,DoTab=1) {	// used on y a-xis
 	difference() {	
-		color("cyan") cubeX([9,80,9],1);
-		translate([-5,54,4.5]) mount2040(Screw);
+		color("cyan") cubeX([9,84,9],2);
+		translate([-5,58,4.5]) mount2040(Screw);
 	}
-	translate([0,0,0]) color("black") cubeX([35,10,9],radius=2);
+	translate([0,0,0]) color("black") cubeX([35,10,9],2);
+	if(DoTab) {
+		translate([33,5,0]) color("green") cylinder(h=LayerThickness,d=20);
+		translate([4,5,0]) color("red") cylinder(h=LayerThickness,d=20);
+		translate([4,80,0]) color("plum") cylinder(h=LayerThickness,d=20);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -117,6 +123,10 @@ module strikeX(Screw=screw5) {	// used on y a-xis
 module mount2040(Screw=screw5) {
 	translate([0,0,0]) rotate([0,90,0]) color("red") cylinder(h=20,d=Screw);
 	translate([0,20,0]) rotate([0,90,0]) color("blue") cylinder(h=20,d=Screw);
+	if(Screw==screw5) {
+		translate([1,0,0]) rotate([0,90,0]) color("blue") cylinder(h=5,d=screw5hd);
+		translate([1,20,0]) rotate([0,90,0]) color("red") cylinder(h=5,d=screw5hd);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////

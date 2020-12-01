@@ -23,6 +23,8 @@
 // https://www.raspberrypi-spy.co.uk/2013/05/pi-camera-module-mechanical-dimensions
 // For the PI Zero, I use https://elinux.org/RPi-Cam-Web-Interface
 // MS Webcam: Duet 3 w/SBC https://pimylifeup.com/raspberry-pi-webcam-server/
+// For a PI Cam: https://github.com/silvanmelchior/RPi_Cam_Web_Interface
+// https://github.com/DanalEstes/DuetLapse
 // for the pi zero cover: https://www.thingiverse.com/thing:2165844, I used the RPI_Zero_W_Case_-_Top_-_Heatsink.stl
 // Uses four M2 to mount the PI Zero and four M2 to mount the PI Camera
 // Web cam software I use: https://elinux.org/RPi-Cam-Web-Interface
@@ -39,7 +41,7 @@ include <inc/brassinserts.scad>
 ///////////////////////////////////////////////////////////////////////
 $fn=100;
 CameraDiameter = 29;	// outside diameter of usb camera
-Length = 100;			// distance needed from bed to see the entire bed
+Length = 90;			// distance needed from bed to see the entire bed
 OuterRingThickness = 8;	// thickness of ring to hold camera
 Width = CameraDiameter + OuterRingThickness;	// width of the ring to hold camera
 MountThickness = 6;		// thickness of extension and mount
@@ -318,6 +320,8 @@ module Mount(PI=0) {
 
 module MountV2() {
 	translate([-14,0,25.8]) {
+		translate([96,-0.5,-24]) color("white") cylinder(h=MountThickness*3,screw5);
+		translate([96,26,-24]) color("lightgray") cylinder(h=MountThickness*3,screw5);
 		difference() {
 			color("blue") hull() {
 				translate([Length-5,-Width/6,-25.8]) cubeX([1,Width,MountThickness],2);

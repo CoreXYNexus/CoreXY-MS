@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dual Titan - titan w/e3dv6 or titan aero
 // created: 10/14/2020
-// last modified: 10/25/20
+// last modified: 11/23/20
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16	- added bevel on rear carriage for x-stop switch to ride up on
 // 5/30/20	- Added ability to use a Titan Aero on mirrored version
@@ -10,6 +10,7 @@
 // 10/13/20	- Changed width of base to allow 42mm long stepper motor
 // 10/14/20	- Converted to single to dual
 // 10/25/20	- You can nan remove the stepper notch, added tabs to prevent lifting
+// 11/23/20	- Added mounts for a brace mount to top of SingleAero() and brace bracket
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 include <inc/brassinserts.scad>
@@ -27,8 +28,28 @@ LEDLight=1; // print LED ring mounting
 LEDSpacer=0;//8;  // length need for titan is 8; length need for aero is 0 (none)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DualAero(1,0,1);	// arg 1: Mounting holes, arg2: stepper notch to allow inserting motor
-//SingleAero(1,0,1);
+//DualAero(1,0,1);	// arg 1: Mounting holes, arg2: stepper notch to allow inserting motor
+//SingleAero(1,0,1,35,0,0); // e3d short stepper motor .9 degree with heatsink on end
+Brace(1);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Brace(DoTab=0) {
+	difference() {
+		union() {
+			color("cyan") cubeX([55,4,5],1);
+			translate([0,59,0]) color("blue") cubeX([55,4,5],1);
+			color("red") cubeX([4,63,5],1);
+		}
+		translate([52,65,2.6]) color("plum") rotate([90,0,0]) cylinder(h=70,d=screw3);
+	}
+	if(DoTab) {
+		translate([52,59,0]) color("black") cylinder(h=LayerThickness,d=20);
+		translate([52,2,0]) color("gray") cylinder(h=LayerThickness,d=20);
+		translate([2,59,0]) color("green") cylinder(h=LayerThickness,d=20);
+		translate([2,2,0]) color("pink") cylinder(h=LayerThickness,d=20);
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,8 +59,8 @@ module DualAero(Mounting=1,StepperNotch=1,DoTab=1) {
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-module SingleAero(Mounting=1,StepperNotch=1,DoTab=1) {
-	TitanSingle(Mounting,StepperNotch,DoTab);
+module SingleAero(Mounting=1,StepperNotch=1,DoTab=1,StepperLength=42,ShowLength=0,BraceAttachment=0) {
+	TitanSingle(Mounting,StepperNotch,DoTab,StepperLength,ShowLength,BraceAttachment);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,20 +121,36 @@ module TitanDual(Mounting=1,StepperNotch=1,DoTab=1) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module TitanSingle(Mounting=1,StepperNotch=1,DoTab=1) {
+module TitanSingle(Mounting=1,StepperNotch=1,DoTab=1,StepperLength=42,ShowLength=0,BraceAttachment=0) {
 	//single titan aero and should work with a titan with e3dv6
 	difference() {
 		union() {
-			//%translate([-15,0,wall*2]) cube([45,10,10]); // check for room for a 42mm long stepper
-			translate([16,-34,-wall/2])	color("lightgray") cubeX([26,HorizontallCarriageWidth-20,wall],1); // extruder side
-			translate([-21,-34,-wall/2]) color("gray") cubeX([40,10,wall],1); // extruder side
-			translate([-21,11,-wall/2]) color("black") cubeX([40,10,wall],1); // extruder side
+			if(ShowLength) %translate([-15,0,wall/2]) cube([StepperLength,10,10]); // check for room for the StepperLength
+			translate([StepperLength,0,0]) difference() {
+				translate([-20,-35,-wall/2]) color("lightgray")
+					cubeX([20,HorizontallCarriageWidth-18,wall],1); // extruder side
+				if(Mounting) translate([-5,1,10]) rotate([90,0,90]) ExtruderMountHoles();
+				if(LEDLight) translate([-38,-15,0]) LEDRingMount();
+			}
+			translate([-21,-34,-wall/2]) color("gray") cubeX([45,10,wall],1); // extruder side
+			translate([-21,11,-wall/2]) color("black") cubeX([45,10,wall],1); // extruder side
 			//translate([-21,54,-wall/2]) color("white") cubeX([40,10,wall],1); // extruder side
 		}
-		if(Mounting) translate([37,1,10]) rotate([90,0,90]) ExtruderMountHoles();
-		//if(LEDLight) LEDRingMount();
-		if(LEDLight) translate([0,-15,0]) LEDRingMount();
 		SensorAnd1LCMountSingle();
+	}
+	if(BraceAttachment) {
+		translate([-14,21,52]) {
+			difference() {
+				color("blue") rotate([90,0,0]) cylinder(h=4,d=screw5hd+1);
+				translate([0,1,0]) color("pink") rotate([90,0,0]) cylinder(h=6,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+			}
+		}
+		translate([-14,-30,52]) {
+			difference() {
+				color("blue") rotate([90,0,0]) cylinder(h=4,d=screw5hd+1);
+				translate([0,1,0]) color("pink") rotate([90,0,0]) cylinder(h=6,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+			}
+		}
 	}
 	if(LEDLight && LEDSpacer) translate([0,40,-4]) LED_Spacer(LEDSpacer,screw5);
 	difference() {
@@ -141,9 +178,9 @@ module AddTab() {
 
 module SensorAnd1LCMountSingle() {
 	translate([-16,91,0]) SensorAnd1LCMounting(Yes3mmInsert(Use3mmInsert,LargeInsert)); // mounting holes for irsensor bracket
-	translate([11,91,0]) SensorAnd1LCMounting(Yes3mmInsert(Use3mmInsert,LargeInsert)); // mounting holes for irsensor bracket
+	translate([1,91,0]) SensorAnd1LCMounting(Yes3mmInsert(Use3mmInsert,LargeInsert)); // mounting holes for irsensor bracket
 	translate([-16,130,0]) SensorAnd1LCMounting(Yes3mmInsert(Use3mmInsert,LargeInsert)); // mounting holes for irsensor bracket
-	translate([11,130,0]) SensorAnd1LCMounting(Yes3mmInsert(Use3mmInsert,LargeInsert)); // mounting holes for irsensor bracket
+	translate([1,130,0]) SensorAnd1LCMounting(Yes3mmInsert(Use3mmInsert,LargeInsert)); // mounting holes for irsensor bracket
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
