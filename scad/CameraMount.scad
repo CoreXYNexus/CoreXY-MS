@@ -2,7 +2,7 @@
 // WebCam-Mount.scad - lifecam holder and a PI Zero & Cam holder
 ///////////////////////////////////////////////////////////////////////
 // created 1/31/16
-// last update 8/29/20
+// last update 12/6/20
 ////////////////////////////////////////////////////////////////////////
 // ABS or something that can handle the heatbed temperature
 /////////////////////////////////////////////////////////////////////////
@@ -18,14 +18,13 @@
 // 8/20/20	- Needed more clearance for the pi camera version, reduced the outer diameter of the cam mount
 // 8/27/20	- Can now mount the Pi0W in either direction
 // 8/29/20	- Now uses 2.5mm inserts and screws, hole for pi camera can use the wide or narrow ribbon cable
+// 12/6/20	- Added a cmaera mount just for the pi camera
 /////////////////////////////////////////////////////////////////////////
 // https://www.raspberrypi.org/documentation/hardware/raspberrypi/mechanical/README.md
 // https://www.raspberrypi-spy.co.uk/2013/05/pi-camera-module-mechanical-dimensions
-// For the PI Zero, I use https://elinux.org/RPi-Cam-Web-Interface
-// MS Webcam: Duet 3 w/SBC https://pimylifeup.com/raspberry-pi-webcam-server/
-// For a PI Cam: https://github.com/silvanmelchior/RPi_Cam_Web_Interface
-// https://github.com/DanalEstes/DuetLapse
-// for the pi zero cover: https://www.thingiverse.com/thing:2165844, I used the RPI_Zero_W_Case_-_Top_-_Heatsink.stl
+// MS USB Webcam: Duet 3 w/SBC https://pimylifeup.com/raspberry-pi-webcam-server/
+// For a PI Cam only: https://elinux.org/RPi-Cam-Web-Interface -- freezes on Duet 3 with PI4 during printing
+// For the pi zero cover: https://www.thingiverse.com/thing:2165844, I used the RPI_Zero_W_Case_-_Top_-_Heatsink.stl
 // Uses four M2 to mount the PI Zero and four M2 to mount the PI Camera
 // Web cam software I use: https://elinux.org/RPi-Cam-Web-Interface
 /////////////////////////////////////////////////////////////////////////////////////
@@ -33,6 +32,7 @@
 // For the PI camera 1.3, it only has clearance for the ribbon connector, so don't overtighten
 // Or, use the CameraHolder() underneath the pi camera
 // Uses 2.5mm brass inserts for the pi 0 and 2mm brass inserts for the camera
+// Print in PETG, ABS, or anything that handle your bed temperatrue without drooping
 /////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>
@@ -57,24 +57,34 @@ PIChh=12.8; 			// cam screw hole vertical distance (my camera is a bit longer)
 PICameraSize=24;		// smaller dimension of the camera circuit board
 Nozzle=0.4;				// nozzle size
 Layer=0.3;				// layer thickness
+Use2mmInsert=1;
 Use2p5mmInsert=1;
 Use3mmInsert=1;
 LargeInsert=1;
 ////////////////////////////////////////////////////////////////////////
 
 //rotate([-90,0,0]) PICameraBracket(1);
+PICameraBracketNoPi(0,1);
 //translate([18,10,-30.8]) CameraHolder();
 //MSWebCameraBracket(0); // must use support
-MSWebCameraBracketV2(0); // must use support
+//MSWebCameraBracketV2(0); // must use support
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module PICameraBracket(PI=0) {
 		Camera(PI);
-		Clamp(PI);
-		Extension(PI,1);
-		Reinforce(PI,0);
+		Extension(PI);
+		Reinforce(PI);
 		Mount(PI);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module PICameraBracketNoPi(PI=0,PiCam=1) {
+		CameraV2(PiCam);
+		translate([-1,0,0]) ReinforceV2();
+		ExtensionV2();
+		MountV2();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -231,11 +241,33 @@ module Camera(PI=0) {
 			difference() {
 				translate([0,-0.2,0]) color("cyan") cubeX([Width,Width,MountThickness],2); 
 				translate([15,18,1]) {
-					PICamMountingHoles(Yes2p5mmInsert(Use2p5mmInsert));
+					PICamMountingHoles(Yes2mmInsert(Use2mmInsert));
 					translate([-PIChh/2+0.5,-PIChw/2-1,MountThickness-2]) color("red")
 						cube([4,PICameraSize,4]); // wide angle pi cam
 					translate([-PIChh/2+11.5,-PIChw/2-1,MountThickness-4]) color("blue") cube([6,PICameraSize,4]); // pi cam 1.3
 				}
+			}
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module CameraV2(PI=0) {
+	if(!PI) {
+		translate([ShiftCamera,CameraDiameter/2-2.4,CameraDiameter/2+OuterRingThickness]) rotate([0,90,0]) difference() {
+			color("cyan") cylinder(h=MountThickness,r=CameraDiameter/2+OuterRingThickness);	// outer
+			translate([-25,0,-4]) color("red") cubeX([MountThickness+6,1.5,OuterRingThickness+5],1); // expansion slot
+			translate([0,0,-1]) color("gray") cylinder(h=MountThickness+2,r=CameraDiameter/2); // hole
+		}
+	} else {
+		difference() {
+			translate([-5,-6,0]) color("cyan") cubeX([MountThickness,Width,Width+10],2); 
+			translate([-4,12,30]) rotate([0,90,0]) {
+				PICamMountingHoles(Yes2mmInsert(Use2mmInsert));
+				translate([-PIChh/2+0.5,-PIChw/2-1,MountThickness-2]) color("red")
+					cube([4,PICameraSize,4]); // wide angle pi cam
+				translate([-PIChh/2+11.5,-PIChw/2-1,MountThickness-4]) color("blue") cube([6,PICameraSize,4]); // pi cam 1.3
 			}
 		}
 	}
@@ -287,8 +319,11 @@ module Extension(PI=0,PiCam=0) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module ExtensionV2() {
-	translate([-5,-Width/6,0]) color("black") cubeX([Length-10,Width,MountThickness],2);
+module ExtensionV2(PiCam=1) {
+	difference() {
+		translate([-5,-Width/6,0]) color("black") cubeX([Length-10,Width,MountThickness],2);
+		if(PiCam) translate([2,2,-5]) color("white") cubeX([3,20,15],1); // hole for camera ribbon cable
+		}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -320,8 +355,8 @@ module Mount(PI=0) {
 
 module MountV2() {
 	translate([-14,0,25.8]) {
-		translate([96,-0.5,-24]) color("white") cylinder(h=MountThickness*3,screw5);
-		translate([96,26,-24]) color("lightgray") cylinder(h=MountThickness*3,screw5);
+		translate([98,0.5,-24]) color("white") cylinder(h=MountThickness*3,screw5); // something to help prevent moving left/right
+		translate([98,25.5,-24]) color("lightgray") cylinder(h=MountThickness*3,screw5);
 		difference() {
 			color("blue") hull() {
 				translate([Length-5,-Width/6,-25.8]) cubeX([1,Width,MountThickness],2);
@@ -391,11 +426,11 @@ module Reinforce(PI=0,Tilt=1) {
 
 module ReinforceV2() {
 		difference() {
-			translate([-2,-5.5,16]) rotate([0,45,0]) color("yellow") cubeX([30,4,5],1);
+			translate([-2.5,-5.8,16]) rotate([0,45,0]) color("yellow") cubeX([30,4,5],1);
 			translate([-7,-7,-22]) rotate([0,0,0]) color("pink") cube([35,6,25]);
 		}
 		difference() {
-			translate([-2,26.5,16]) rotate([0,45,0]) color("red") cubeX([30,4,5],1);
+			translate([-2.5,26.5,16]) rotate([0,45,0]) color("red") cubeX([30,4,5],1);
 			translate([-7,26,-22]) rotate([0,0,0]) color("blue") cube([35,6,25]);
 		}
 	

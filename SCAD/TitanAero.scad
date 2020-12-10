@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Dual Titan - titan w/e3dv6 or titan aero
+// TitanAero.scad - titan aero - single or dual
 // created: 10/14/2020
 // last modified: 11/23/20
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,8 +29,8 @@ LEDSpacer=0;//8;  // length need for titan is 8; length need for aero is 0 (none
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //DualAero(1,0,1);	// arg 1: Mounting holes, arg2: stepper notch to allow inserting motor
-//SingleAero(1,0,1,35,0,0); // e3d short stepper motor .9 degree with heatsink on end
-Brace(1);
+SingleAero(1,0,1,35,0,1); // e3d short stepper motor .9 degree with heatsink on end
+translate([50,-38,0]) Brace(1);  // something to help with drooping over time
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -132,8 +132,8 @@ module TitanSingle(Mounting=1,StepperNotch=1,DoTab=1,StepperLength=42,ShowLength
 				if(Mounting) translate([-5,1,10]) rotate([90,0,90]) ExtruderMountHoles();
 				if(LEDLight) translate([-38,-15,0]) LEDRingMount();
 			}
-			translate([-21,-34,-wall/2]) color("gray") cubeX([45,10,wall],1); // extruder side
-			translate([-21,11,-wall/2]) color("black") cubeX([45,10,wall],1); // extruder side
+			translate([-21,-35,-wall/2]) color("gray") cubeX([45,10,wall],1); // extruder side
+			translate([-21,12,-wall/2]) color("black") cubeX([45,10,wall],1); // extruder side
 			//translate([-21,54,-wall/2]) color("white") cubeX([40,10,wall],1); // extruder side
 		}
 		SensorAnd1LCMountSingle();
@@ -155,7 +155,7 @@ module TitanSingle(Mounting=1,StepperNotch=1,DoTab=1,StepperLength=42,ShowLength
 	if(LEDLight && LEDSpacer) translate([0,40,-4]) LED_Spacer(LEDSpacer,screw5);
 	difference() {
 		translate([-0.5,-32,0]) rotate([90,0,90]) TitanMotorMountSingle();
-		translate([-24,-25,-3]) color("plum") cubeX([wall*2,38,wall],3); // clearance for hotend
+		translate([-24,-26,-3]) color("plum") cubeX([wall*2,39,wall],3); // clearance for hotend
 		SensorAnd1LCMountSingle();
 		if(StepperNotch) color("green") hull() {
 			translate([-22,-11.5,55])cube([wall,10,1]); // cut out to allow motor be install after nount to xcarriage
