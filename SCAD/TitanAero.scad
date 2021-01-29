@@ -29,38 +29,42 @@ LEDSpacer=0;//8;  // length need for titan is 8; length need for aero is 0 (none
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //DualAero(1,0,1);	// arg 1: Mounting holes, arg2: stepper notch to allow inserting motor
-SingleAero(1,0,1,35,0,1); // e3d short stepper motor .9 degree with heatsink on end
-translate([50,-38,0]) Brace(1);  // something to help with drooping over time
+//SingleAero(1,0,1,35,0,1); // e3d short stepper motor .9 degree with heatsink on end
+SingleAero(1,0,1,40,0,1); // e3d short stepper motor .9 degree with heatsink on end
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module Brace(DoTab=0) {
-	difference() {
-		union() {
-			color("cyan") cubeX([55,4,5],1);
-			translate([0,59,0]) color("blue") cubeX([55,4,5],1);
-			color("red") cubeX([4,63,5],1);
+module Brace(DoTab=0,Length=35,Dual=0) {
+	if(!Dual) {
+		difference() {
+			union() {
+				color("cyan") cubeX([Length+20,4,5],1);
+				translate([0,59,0]) color("blue") cubeX([Length+20,4,5],1);
+				color("red") cubeX([4,63,5],1);
+			}
+			translate([Length+17,65,2.6]) color("plum") rotate([90,0,0]) cylinder(h=70,d=screw3);
 		}
-		translate([52,65,2.6]) color("plum") rotate([90,0,0]) cylinder(h=70,d=screw3);
-	}
-	if(DoTab) {
-		translate([52,59,0]) color("black") cylinder(h=LayerThickness,d=20);
-		translate([52,2,0]) color("gray") cylinder(h=LayerThickness,d=20);
-		translate([2,59,0]) color("green") cylinder(h=LayerThickness,d=20);
-		translate([2,2,0]) color("pink") cylinder(h=LayerThickness,d=20);
+		if(DoTab) {
+			translate([Length+17,59,0]) color("black") cylinder(h=LayerThickness,d=20);
+			translate([Length+17,2,0]) color("gray") cylinder(h=LayerThickness,d=20);
+			translate([2,59,0]) color("green") cylinder(h=LayerThickness,d=20);
+			translate([2,2,0]) color("pink") cylinder(h=LayerThickness,d=20);
+		}
 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-module DualAero(Mounting=1,StepperNotch=1,DoTab=1) {
+module DualAero(Mounting=1,StepperNotch=1,DoTab=1,StepperLength=42) {
 	TitanDual(Mounting,StepperNotch,DoTab);
+	translate([50,-38,-4]) Brace(DoTab,StepperLength,1);  // something to help with drooping over time
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module SingleAero(Mounting=1,StepperNotch=1,DoTab=1,StepperLength=42,ShowLength=0,BraceAttachment=0) {
 	TitanSingle(Mounting,StepperNotch,DoTab,StepperLength,ShowLength,BraceAttachment);
+	translate([50,-38,-4]) Brace(DoTab,StepperLength,0);  // something to help with drooping over time
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

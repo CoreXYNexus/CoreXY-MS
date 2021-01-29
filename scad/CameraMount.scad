@@ -1,11 +1,11 @@
-///////////////////////////////////////////////////////////////////////
-// WebCam-Mount.scad - lifecam holder and a PI Zero & Cam holder
-///////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CameraMount.scad - MS lifecam holder and a PI Zero & PI Cam holder
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 1/31/16
-// last update 12/6/20
-////////////////////////////////////////////////////////////////////////
+// last update 1/7/21
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ABS or something that can handle the heatbed temperature
-/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 3/23/16	- added clamping screw for cam
 // 12/23/18	- Added preview colors and a PI3 with camera in a plastic case holder
 //			  Added cubeX.scad
@@ -18,27 +18,29 @@
 // 8/20/20	- Needed more clearance for the pi camera version, reduced the outer diameter of the cam mount
 // 8/27/20	- Can now mount the Pi0W in either direction
 // 8/29/20	- Now uses 2.5mm inserts and screws, hole for pi camera can use the wide or narrow ribbon cable
-// 12/6/20	- Added a cmaera mount just for the pi camera
-/////////////////////////////////////////////////////////////////////////
+// 12/6/20	- Added a camera mount just for the pi camera
+// 12/19/20	- Added a PI camera and MS webcam mount for the 2020/2040 extrusion printer frame
+// 1/7/21	- Added a mount for a PI 0 for the PICamera2020() and MSWebCam2020()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://www.raspberrypi.org/documentation/hardware/raspberrypi/mechanical/README.md
 // https://www.raspberrypi-spy.co.uk/2013/05/pi-camera-module-mechanical-dimensions
 // MS USB Webcam: Duet 3 w/SBC https://pimylifeup.com/raspberry-pi-webcam-server/
 // For a PI Cam only: https://elinux.org/RPi-Cam-Web-Interface -- freezes on Duet 3 with PI4 during printing
 // For the pi zero cover: https://www.thingiverse.com/thing:2165844, I used the RPI_Zero_W_Case_-_Top_-_Heatsink.stl
+// https://randomnerdtutorials.com/video-streaming-with-raspberry-pi-camera/
 // Uses four M2 to mount the PI Zero and four M2 to mount the PI Camera
-// Web cam software I use: https://elinux.org/RPi-Cam-Web-Interface
-/////////////////////////////////////////////////////////////////////////////////////
+// Web cam software I use: https://pimylifeup.com/raspberry-pi-webcam-server/
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ** NOTE: May need a raft for the built in support for the camera bracket
 // For the PI camera 1.3, it only has clearance for the ribbon connector, so don't overtighten
 // Or, use the CameraHolder() underneath the pi camera
 // Uses 2.5mm brass inserts for the pi 0 and 2mm brass inserts for the camera
 // Print in PETG, ABS, or anything that handle your bed temperatrue without drooping
-/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>
 include <inc/brassinserts.scad>
-// vars
-///////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $fn=100;
 CameraDiameter = 29;	// outside diameter of usb camera
 Length = 90;			// distance needed from bed to see the entire bed
@@ -49,7 +51,6 @@ ShiftCamera = -4.5;		// amount to move camera ring to end of extension
 MountLength = 20;		// length of the mount
 HotendNozzleSize = 0.4;	// nozzle size for print support for mount end
 MountSupport = 6;		// height of print support for mount end
-//----
 PIhw=30-3.5-3.5;		// pi zero w vertical screw hole width
 PIhl=58;				// pi zero w horizontal screw hole width
 PIChw=21;				// cam screw hole horizontal distance
@@ -57,17 +58,149 @@ PIChh=12.8; 			// cam screw hole vertical distance (my camera is a bit longer)
 PICameraSize=24;		// smaller dimension of the camera circuit board
 Nozzle=0.4;				// nozzle size
 Layer=0.3;				// layer thickness
-Use2mmInsert=1;
-Use2p5mmInsert=1;
+Use2mmInsert=1;			// pi camera
+Use2p5mmInsert=1;		// pi 0 w
 Use3mmInsert=1;
 LargeInsert=1;
 ////////////////////////////////////////////////////////////////////////
 
-//rotate([-90,0,0]) PICameraBracket(1);
-PICameraBracketNoPi(0,1);
+//PICameraBracket(1);
+//PICameraBracketNoPi(0,1);
 //translate([18,10,-30.8]) CameraHolder();
 //MSWebCameraBracket(0); // must use support
 //MSWebCameraBracketV2(0); // must use support
+PICamera2020(1,0.2);
+//MSWebCam2020(1);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module MSWebCam2020(AddPI0Mount=0,Addtickness=0) {
+	rotate([0,-90,0]) difference() {
+			Mount2020();
+			translate([-10,-1.5,-1]) color("black") rotate([0,90,0]) cylinder(h=40,d=screw3);
+	}
+	translate([37,15,0]) MSWebCamMount();
+	if(AddPI0Mount) {
+		difference() {
+			translate([0,70,6+AddThickness]) rotate([180,0,0]) Extension(1,0,AddThickness);
+			translate([35,59,-5]) color("red") cylinder(h=20,d=screw5);
+			translate([35,59,MountThickness-4]) color("blue") cylinder(h=5,d=screw5hd);
+			translate([58,59,-5]) color("green") cylinder(h=20,d=screw5);
+			translate([58,59,MountThickness-4]) color("purple") cylinder(h=5,d=screw5hd);
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+module SwivelMount(DoTab=1) {
+	translate([35,8,MountThickness]) rotate([90,180,0]) {
+		difference() {
+			translate([0,0,-5]) color("khaki") cubeX([20,MountThickness,30],2);
+			translate([-2,-3,-0.25]) color("plum") cubeX([10,MountThickness+6,20.5],2);
+			translate([3,3,-10]) color("pink") cylinder(h=50,d=screw3);
+			translate([3,3,-8]) color("gray") cylinder(h=10,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		}
+		if(DoTab) {
+			translate([2,MountThickness,-2]) color("gray") rotate([90,0,0]) cylinder(h=Layer,d=20);
+			translate([2,MountThickness,23]) color("lightgray") rotate([90,0,0]) cylinder(h=Layer,d=20);
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+module MSWebCamMount(DoTab=1) {
+	difference() {
+		color("cyan") cylinder(h=MountThickness,r=CameraDiameter/2+OuterRingThickness);	// outer
+		translate([-25,0,-4]) color("red") cubeX([MountThickness+6,1.5,OuterRingThickness+5],1); // expansion slot
+		translate([0,0,-1]) color("gray") cylinder(h=MountThickness+2,r=CameraDiameter/2); // hole
+		// notch bottom of gap to prevent bad layers
+		translate([-10,-6.4,-3]) rotate([0,0,45]) color("green") cube([10,10,10]);
+	}
+	translate([22,-12,8.5]) rotate([0,-90,0]) difference() {
+		translate([ShiftCamera-4,CameraDiameter/2-12,CameraDiameter/2+OuterRingThickness+19])
+			color("black") cubeX([6,20,9],1);
+		translate([ShiftCamera-5,CameraDiameter/2-3,CameraDiameter/2+OuterRingThickness+15])
+			color("plum") cube([8,2.5,35]); // expansion slot
+		translate([ShiftCamera-1,CameraDiameter/2+12,CameraDiameter/2+OuterRingThickness+25]) {
+			rotate([90,0,0]) {
+				color("white") cylinder(h=30,d=screw3);
+				color("plum") cylinder(h=10,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+			}
+		}
+	}
+	SwivelMount(DoTab);
+	
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module PICamera2020(AddPI0Mount=0,AddThickness=0) {
+	rotate([0,270,0]) Mount2020();
+	translate([10,0,0]) CameraMount();
+	if(AddPI0Mount) {
+		difference() {
+			translate([0,70,6+AddThickness]) rotate([180,0,0]) Extension(1,0,AddThickness);
+			translate([35,59,-5]) color("red") cylinder(h=20,d=screw5);
+			translate([35,59,MountThickness-4]) color("blue") cylinder(h=5,d=screw5hd);
+			translate([58,59,-5]) color("green") cylinder(h=20,d=screw5);
+			translate([58,59,MountThickness-4]) color("purple") cylinder(h=5,d=screw5hd);
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Mount2020(Tab=1,ExtraHeight=0,DoTab=1) {
+	difference() {
+		union() {
+			color("cyan") cubeX([20+ExtraHeight,25,MountThickness],2);
+			//color("plum") cubeX([20+ExtraHeight,MountThickness,25],2);
+			if(Tab) translate([0,-2,-6]) color("red") rotate([45,0,0]) cubeX([20,12,MountThickness],2);
+		}
+		translate([-10,-1.5,-1]) color("black") rotate([0,90,0]) cylinder(h=40,d=screw3);
+		ScrewMount2020();
+	}
+	if(DoTab) {
+		difference() {
+			translate([0,-1,-1]) color("gray") rotate([0,90,0]) cylinder(h=Layer,d=20);
+			translate([-10,-1.5,-1]) color("black") rotate([0,90,0]) cylinder(h=40,d=screw3);
+		}
+		translate([0,23,3]) color("lightgray") rotate([0,90,0]) cylinder(h=Layer,d=20);
+		//translate([0,3,23]) color("lightgreen") rotate([0,90,0]) cylinder(h=Layer,d=20);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module ScrewMount2020(Screw=screw5) {
+	translate([10,10+MountThickness,-2]) color("red") cylinder(h=10,d=Screw);
+	translate([30,10+MountThickness,-2]) color("blue") cylinder(h=10,d=Screw);
+	translate([10,8,10+MountThickness]) color("green") rotate([90,0,0]) cylinder(h=10,d=Screw);
+	translate([30,8,10+MountThickness]) color("purple") rotate([90,0,0]) cylinder(h=10,d=Screw);
+	if(Screw==screw5) {
+		translate([10,10+MountThickness,-MountThickness+1.5]) color("blue") cylinder(h=5,d=screw5hd);
+		translate([30,10+MountThickness,-MountThickness+1.5]) color("red") cylinder(h=5,d=screw5hd);
+		translate([10,0.5,10+MountThickness]) color("purple") rotate([90,0,0]) cylinder(h=5,d=screw5hd);
+		translate([30,0.5,10+MountThickness]) color("green") rotate([90,0,0]) cylinder(h=5,d=screw5hd);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module CameraMount() {
+	translate([45,0,MountThickness]) rotate([0,180,0]) difference() {
+		translate([0,-0.2,0]) color("cyan") cubeX([Width,Width,MountThickness],2); 
+		translate([15,18,1]) {
+			PICamMountingHoles(Yes2mmInsert(Use2mmInsert));
+			translate([-PIChh/2+0.5,-PIChw/2-1,MountThickness-2]) color("red")
+				cube([4,PICameraSize,4]); // wide angle pi cam
+			translate([-PIChh/2+11.5,-PIChw/2-1,MountThickness-4]) color("blue") cube([7,PICameraSize,4]); // pi cam 1.3
+		}
+	}
+	translate([25,21,-11]) rotate([0,-90,90]) SwivelMount(0);
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -81,10 +214,12 @@ module PICameraBracket(PI=0) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module PICameraBracketNoPi(PI=0,PiCam=1) {
+	rotate([-90,0,0])  {
 		CameraV2(PiCam);
 		translate([-1,0,0]) ReinforceV2();
 		ExtensionV2();
 		MountV2();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -306,9 +441,9 @@ module MSWebCameraV2() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module Extension(PI=0,PiCam=0) {
+module Extension(PI=0,PiCam=0,AddThickness=0) {
 	difference() {
-		translate([0,-Width/6,0]) color("black") cubeX([Length,Width,MountThickness],2);
+		translate([0,-Width/6,0]) color("black") cubeX([Length,Width,MountThickness+AddThickness],2);
 		if(PiCam) translate([6,2,-2]) color("white") cubeX([3,20,15],1); // hole for camera ribbon cable
 		if(PI) {
 			PIZeroBaseMount();
