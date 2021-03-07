@@ -18,13 +18,13 @@ plate();
 
 module plate() {
 	difference() {
-		color("cyan") cubeX([108,20,3]);
+		color("cyan") cubeX([108,20,4],2);
 		translate([7,10,-5]) color("red") cylinder(h=10,d=screw5,$fn=100);
-		translate([7,10,2]) color("blue") cylinder(h=10,d=screw5hd,$fn=100);
+		translate([7,10,3]) color("blue") cylinder(h=10,d=screw5hd,$fn=100);
 		translate([99,10,-5]) color("blue") cylinder(h=10,d=screw5,$fn=100);
-		translate([99,10,2]) color("red") cylinder(h=10,d=screw5hd,$fn=100);
+		translate([99,10,3]) color("red") cylinder(h=10,d=screw5hd,$fn=100);
 	}	
-	translate([14,4.5,0]) printchar("CXY-MSv1",5,12);
+	translate([14,4.5,1]) printchar("CXY-MSv1",5,12);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 // CameraMount.scad - MS lifecam holder and a PI Zero & PI Cam holder
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 1/31/16
-// last update 1/7/21
+// last update 3/6/21
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ABS or something that can handle the heatbed temperature
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,9 +21,13 @@
 // 12/6/20	- Added a camera mount just for the pi camera
 // 12/19/20	- Added a PI camera and MS webcam mount for the 2020/2040 extrusion printer frame
 // 1/7/21	- Added a mount for a PI 0 for the PICamera2020() and MSWebCam2020()
+// 2/27/21	- Added one piece PI0W & camera mount
+// 3/4/21	- Made one piece pi0w mount to allow the cmaer to mount on either side of the pi
+// 3/6/21	- Added Raspberry PI HQ camera mount (not tested, don't have one)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://www.raspberrypi.org/documentation/hardware/raspberrypi/mechanical/README.md
 // https://www.raspberrypi-spy.co.uk/2013/05/pi-camera-module-mechanical-dimensions
+// https://static.raspberrypi.org/files/product-mechanical-drawings/20200428_HQ_Camera_Technical_drawing.pdf
 // MS USB Webcam: Duet 3 w/SBC https://pimylifeup.com/raspberry-pi-webcam-server/
 // For a PI Cam only: https://elinux.org/RPi-Cam-Web-Interface -- freezes on Duet 3 with PI4 during printing
 // For the pi zero cover: https://www.thingiverse.com/thing:2165844, I used the RPI_Zero_W_Case_-_Top_-_Heatsink.stl
@@ -62,6 +66,9 @@ Use2mmInsert=1;			// pi camera
 Use2p5mmInsert=1;		// pi 0 w
 Use3mmInsert=1;
 LargeInsert=1;
+HQCamWidth=30;  // cable connection on back bottom
+HQCamLength=30;
+HQCamHoleOffset=4;
 ////////////////////////////////////////////////////////////////////////
 
 //PICameraBracket(1);
@@ -69,8 +76,10 @@ LargeInsert=1;
 //translate([18,10,-30.8]) CameraHolder();
 //MSWebCameraBracket(0); // must use support
 //MSWebCameraBracketV2(0); // must use support
-PICamera2020(1,0.2);
+//PICamera2020(1,0.2,1);
+PICamera2020AllInOne(1,0.2);
 //MSWebCam2020(1);
+//HQCameraMount();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -136,9 +145,12 @@ module MSWebCamMount(DoTab=1) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PICamera2020(AddPI0Mount=0,AddThickness=0) {
+module PICamera2020(AddPI0Mount=0,AddThickness=0,HQ=0) {
 	rotate([0,270,0]) Mount2020();
-	translate([10,0,0]) CameraMount();
+	if(HQ)
+		translate([10,0,0]) HQCameraMount();
+	else
+		translate([10,0,0]) CameraMount();
 	if(AddPI0Mount) {
 		difference() {
 			translate([0,70,6+AddThickness]) rotate([180,0,0]) Extension(1,0,AddThickness);
@@ -147,6 +159,39 @@ module PICamera2020(AddPI0Mount=0,AddThickness=0) {
 			translate([58,59,-5]) color("green") cylinder(h=20,d=screw5);
 			translate([58,59,MountThickness-4]) color("purple") cylinder(h=5,d=screw5hd);
 		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module PICamera2020AllInOne(AddPI0Mount=0,AddThickness=0,HQ=0) {
+	translate([4,76.2,0]) rotate([0,0,180]) Mount2020v2();
+	translate([-16,39.2,0]) Mount2020v2();
+	if(HQ)
+		translate([10,0,0]) HQCameraMount();
+	else
+		translate([10,0,0]) CameraMount();
+	if(AddPI0Mount) {
+		difference() {
+			translate([0,70,6+AddThickness]) rotate([180,0,0]) Extension(1,0,AddThickness);
+			translate([35,58,-5]) color("red") cylinder(h=20,d=screw5);
+			translate([35,58,MountThickness-5]) color("blue") cylinder(h=10,d=screw5hd);
+			translate([58,58,-5]) color("green") cylinder(h=20,d=screw5);
+			translate([58,58,MountThickness-5]) color("purple") cylinder(h=10,d=screw5hd);
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Mount2020v2(Tab=1,ExtraHeight=0,DoTab=1) {
+	difference() {
+		union() {
+			color("cyan") cubeX([20+ExtraHeight,25,MountThickness],2);
+			//color("plum") cubeX([20+ExtraHeight,MountThickness,25],2);
+			if(Tab) translate([0,-6,10]) color("red") rotate([-45,0,0]) cubeX([20,15,MountThickness],2);
+		}
+		translate([-10,-1.5,9.5]) color("black") rotate([0,90,0]) cylinder(h=40,d=screw3);
 	}
 }
 
@@ -189,17 +234,30 @@ module ScrewMount2020(Screw=screw5) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module CameraMount() {
+module CameraMount(Screw=Yes2mmInsert(Use2mmInsert)) {
 	translate([45,0,MountThickness]) rotate([0,180,0]) difference() {
 		translate([0,-0.2,0]) color("cyan") cubeX([Width,Width,MountThickness],2); 
 		translate([15,18,1]) {
-			PICamMountingHoles(Yes2mmInsert(Use2mmInsert));
+			PICamMountingHoles(Screw);
 			translate([-PIChh/2+0.5,-PIChw/2-1,MountThickness-2]) color("red")
 				cube([4,PICameraSize,4]); // wide angle pi cam
 			translate([-PIChh/2+11.5,-PIChw/2-1,MountThickness-4]) color("blue") cube([7,PICameraSize,4]); // pi cam 1.3
 		}
 	}
 	translate([25,21,-11]) rotate([0,-90,90]) SwivelMount(0);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module HQCameraMount(Screw=Yes2mmInsert(Use2mmInsert)) {
+	difference() {
+		translate([0,-0.2,0]) color("cyan") cubeX([HQCamLength,HQCamWidth,MountThickness],2); 
+		translate([15,18,1]) {
+			translate([0,-4.0]) PIHQCamMountingHoles(Screw);
+			translate([-HQCamLength/2,-HQCamWidth/2,-MountThickness+4]) color("blue") cube([7,PICameraSize,4]); // pi cam 1.3
+		}
+	}
+	translate([13,17,-11]) rotate([0,-90,90]) SwivelMount(0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -325,6 +383,17 @@ module PICamMountingHoles(Screw=Yes2p5mmInsert(Use2p5mmInsert)) {
 		translate([0,PIChw,-1]) color("red") cylinder(h=15,d=Screw);
 		translate([PIChh,0,-1]) color("plum") cylinder(h=15,d=Screw);
 		translate([PIChh,PIChw,-1]) color("white") cylinder(h=15,d=Screw);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+module PIHQCamMountingHoles(Screw=Yes2p5mmInsert(Use2p5mmInsert)) {
+	translate([-10.5,-10,-2]) {
+		translate([0,0,-1]) color("gray") cylinder(h=15,d=Screw);
+		translate([0,HQCamLength-HQCamHoleOffset*2,-1]) color("red") cylinder(h=15,d=Screw);
+		translate([HQCamWidth-HQCamHoleOffset*2,0,-1]) color("plum") cylinder(h=15,d=Screw);
+		translate([HQCamWidth-HQCamHoleOffset*2,HQCamLength-HQCamHoleOffset*2,-1]) color("white") cylinder(h=15,d=Screw);
 	}
 }
 
