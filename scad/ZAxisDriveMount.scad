@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 12/15/20
+// Last Update: 4/8/21
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/28/16	- modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
 // 7/3/16	- added assembly info
@@ -36,6 +36,7 @@
 // 10/22/20	- Changed modules names and cleaned up the main modules
 // 11/5/20	- Added ZMotorThrustSpacer() to use M5 thrust brearings under the coupler
 // 12/15/20	- Redid the braces on the motor_mount() and added countersinks for M5 screws
+// 4/8/21	- BeltdriveMotorMount() is a separate printable item
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <inc/brassinserts.scad>
@@ -55,7 +56,7 @@ $fn=100;
 // Most modules have parameters, see them for info
 //-----------------------------------------------------------------------------------------------------
 // Uses M3x6 screws & washers for the stepper motor
-// Uses M5x6 screws & t-nuts for mounting to makerslide & extrusion
+// Uses M5x6 screws & t-nuts for mounting to makerslide & extrusion and uses a #### belt
 //-----------------------------------------------------------------------------------------------------
 // For the belt version, you move the stepper motor mount to tension belt
 // Uses one 40 tooth GT2 belt pulley, 1 608 bearing, 2 washers, one lockring
@@ -113,10 +114,11 @@ ThrustWasherThickness=4;
 ////////////////////////////////////////////////////////////////////////////
 
 //test();
-DirectDriveZAxis(3,1,1,1,5,8); 	// Z axis for bed leveling
+//DirectDriveZAxis(3,1,1,1,5,8); 	// Z axis for bed leveling
 			// 1st: Quantiy; 2nd: plates; 3rd: printable couplers; 4th ZNut ;5th: motor shaft diameter; 6th: leadscrew diameter
 //Reduction_Motor_Mount(1);
 //BeltDrivenZAxis(3); // arg is quanity, includes drive motor mount
+BeltDrivenZAxisMotorMount(3,0);
 // also need the following with BeltDrivenZAxis(), since a 200x200 build plate isn't big enough
 //ZNutBracket(3); // arg is quanity
 //translate([50,20,0]) ZAxisMountPlates(3); // arg is quanity*2
@@ -149,12 +151,19 @@ module DirectDriveZAxis(Quanity=1,Plates=0,ZNut=0,Coupler=1,Motorshaft=5,LeadScr
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module BeltDrivenZAxis(Quanity=1) { // arg is quanity
-	if($preview) %translate([-40,-100,-4.5]) cube([200,200,2]);
+	//if($preview) %translate([-40,-100,-4.5]) cube([200,200,2]);
 	for(a=[0:Quanity-1]) {
 		translate([a*60,50,0]) bearing_mount(0,0,0,1);
 	}
-	translate([55,5,thickness/2]) rotate([0,0,90]) BeltStepperDriveMountZAxis(1);
-	echo("-----------------Don't forget the plates, if needed-------------------");
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BeltDrivenZAxisMotorMount(Quanity=1,Idler=1) { // arg is quanity
+	//if($preview) %translate([-60,-50,-4.5]) cube([200,200,2]);
+	for(a=[0:Quanity-1]) {
+		translate([a*60,50,0]) BeltStepperDriveMountZAxis(Idler);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +180,7 @@ module belt_drive(Quanity=1,ZNut=1) {
 
 module BeltStepperDriveMountZAxis(Idler=1) {
 	translate([-30,-30,0]) belt_motor(Idler);	// one stepper motor mount with idler
-	translate([10,-30,-2.5]) lockring();	// something to hold leadscrew in bearing
+	//translate([-30,-20,-2.5]) lockring();	// something to hold leadscrew in bearing
 }
 
 //////////////////////////////////////////////////////////////////////////////

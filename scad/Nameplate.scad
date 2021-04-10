@@ -1,14 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CXY-MSv1 Nameplate - nameplate for the printer
 // created: 7/11/2018
-// last modified: 9/22/20
+// last modified: 4/9/21
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 2/28/19	- Bugfix in printchar()
 // 9/6/20	- Changed font
 // 9/22/20	- Adjusted size and screw mounting, removed unused inlcudes
+// 4/9/21	- Converted to BOSL2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
-use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
+include <bosl2/std.scad>
 $fn=50;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -18,7 +19,7 @@ plate();
 
 module plate() {
 	difference() {
-		color("cyan") cubeX([108,20,4],2);
+		color("cyan") cuboid([108,20,4],rounding=2,p1=[0,0],except_edges=BOTTOM);
 		translate([7,10,-5]) color("red") cylinder(h=10,d=screw5,$fn=100);
 		translate([7,10,3]) color("blue") cylinder(h=10,d=screw5hd,$fn=100);
 		translate([99,10,-5]) color("blue") cylinder(h=10,d=screw5,$fn=100);

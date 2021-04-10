@@ -2,7 +2,7 @@
 // MotorAndBearingMounts.scad - hold the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
-// last update 10/17/20
+// last update 4/8/21
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16	- added built-in spacer to the bearing_bracket
 // 7/14/16	- adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -30,6 +30,7 @@
 // 5/16/20	- Rounded the end of the bearing bracket end and reduced the width that connects to the 2020
 // 8/8/20	- Changed the supports for the BearingSupport()
 // 10/17/20	- Can now use 5mm inserts
+// 4/1/21	- Added an adjustable front bearing mount
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in FrontBearingBracket() must match stepper motor shaft in MotorMount()
 //       If the motors get hot, print it from something that can handle it
@@ -37,9 +38,11 @@
 //       M5x50, and a 5mm nut in the nut trap
 //		 Motor mounts have two holes on the makerslide side, to allow the makerslide to be installed
 //		 either way.
+//		 Adjustable front bearing has the motor adjustable, since you may not get the belts the same length.
+//		 Used M3x40 screw in the bearing holder, held in with a M3 mut.
 // --------------------------------------------------------------------------------------
 //		 Taller motor_mount on left side rear.
-//		 Bearing brackets at inside front corners & supports on outside
+//		 NON-adjustable bearing brackets at inside front corners & supports on outside
 //		 Install one M5 nut in each bearing bracket
 /////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
@@ -54,14 +57,22 @@ F625ZDiameter = 18; // diameter of the f625z bearing
 LayerThickness = 0.2;		// layer thickness used to print
 Vthickness = 7;		// thickness of bearing support vertical section
 Tthickness = 5;		// thickness of bearing support top and fillet
+Use3mmInsert=1;
+LargeInsert=1;
 Use5mmInsert=1;
+Knob_Diameter=nut3*3;
+Knob_Height=3;
+WasherThickness=1;
 /////////////////////////////////////////////////////////////////////////////////////////
 
-all(); // all the needed parts
+//NonAdjustableBearingMountSet(); // all the needed parts
+AdjustableFrontBearingMountSet(0);
+//AdjustableFrontBearingMount(0);
+//AdjustingKnob();
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-module all() {
+module NonAdjustableBearingMountSet() {
 	//if($preview) %translate([20,10,-4]) cube([200,200,2],center=true); // show a 200x200 bed
 	translate([0,-5,0]) MotorMount(1);
 	translate([35,60,-2.5]) rotate([0,0,0]) FrontBearingBracket(0,"Right");
@@ -70,12 +81,98 @@ module all() {
 	translate([75,20,-2.5]) rotate([0,0,0]) mirror([1,0,0]) FrontBearingBracket(0,"Left"); // mirror it for the other side
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+module AdjustingKnob() {
+	difference() {
+		color("cyan") cylinder(h=27,d=nut3*2);
+		translate([0,0,-5]) color("black") cylinder(h=35,d=screw3+0.1);
+		if(Use3mmInsert)  translate([0,0,11]) color("red") cylinder(h=25,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		else translate([0,0,17]) color("red") cylinder(h=5,d=nut3,$fn=6);
+	}
+	difference() {
+		translate([0,0,0]) color("blue") cylinder(h=Knob_Height,d=Knob_Diameter);
+		translate([0,0,-5]) color("black") cylinder(h=30,d=screw3+0.1); // throuch hole for M3
+		for(i=[22.5:45:360]) translate([(Knob_Diameter)*sin(i)/2,(Knob_Diameter)*cos(i)/2,-1]) // knurls
+			color("purple") cylinder(r=0.7,h=Knob_Height+2);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module AdjustableFrontBearingMountSet(Fit=0) {
+	translate([0,-35,2]) MotorMount(1,1);
+	translate([0,85,2]) MotorMount(0,1);
+	rotate([0,-90,0]) AdjustableFrontBearingMount(Fit);
+	translate([90,0,0]) rotate([0,-90,0]) AdjustableFrontBearingMount(Fit);
+	translate([-25,10,0]) AdjustingKnob();
+	translate([-5,10,0]) AdjustingKnob();
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
-module MotorMount(Side=0) {	// 0 - lower belt motor; 1 = upper belt motor
+module AdjustableFrontBearingMount(Fit=0) {
+	difference() { // vertical
+		union() {
+			translate([0,0,45]) color("gray") cubeX([Vthickness-2,F625ZDiameter,F625ZDoulbleStack*2+b_height-2],1);
+			translate([0,0,45-WasherThickness]) color("white") cubeX([34,F625ZDiameter,Tthickness-1],1);
+			translate([33,9,F625ZDoulbleStack*2+b_height+11.45-WasherThickness]) color("red")
+				cylinder(h=Tthickness-1,d=F625ZDiameter); // bottom
+			translate([0,0,F625ZDoulbleStack*2+b_height+38]) color("blue") cubeX([34,F625ZDiameter,Tthickness],1);
+			translate([33,9,F625ZDoulbleStack*2+b_height+38]) color("cyan") cylinder(h=Tthickness,d=F625ZDiameter); // top
+			translate([0,0,45]) color("green") cubeX([22,Tthickness-1,30],2);
+			translate([0,14,45]) color("lightgreen") cubeX([22,Tthickness-1,30],2);
+		}
+		translate([Vthickness+26,9,F625ZDoulbleStack+b_height+30]) color("lightgray") cylinder(h=50,d=screw5); // top
+		translate([Vthickness+26,9,F625ZDoulbleStack+b_height-5]) color("gray")
+			cylinder(h=50,d=Yes5mmInsert(Use5mmInsert)); // bottom
+		translate([Vthickness+26,9,F625ZDoulbleStack*2+b_height+42]) color("blue") cylinder(h=5,d=screw5hd);
+		translate([-10,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("plum") cylinder(h=50,d=screw3+0.1);
+		translate([Vthickness-4,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("white")
+			cylinder(h=50,d=screw3hd);
+	}
+	if(Fit) translate([0,0,-1]) AdjustableFrontBearingMountBase();  // fit parts
+	else  translate([5,27,-5]) AdjustableFrontBearingMountBase();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module AdjustableFrontBearingMountBase() {
+	difference() {
+		union() {
+			translate([-5,-5,0]) color("purple") cubeX([Vthickness-2,F625ZDiameter+10,F625ZDoulbleStack*2+b_height+48],2);
+			translate([-5,-5,78.75]) color("cyan") cubeX([28,F625ZDiameter+10,Tthickness],2);
+			translate([-5,-37,39.75]) color("khaki") cubeX([24,F625ZDiameter+75,Tthickness],2);
+			translate([-5,-5,40]) color("black") cubeX([28,Tthickness-0.25,42],2);
+			translate([-5,18.5,40]) color("white") cubeX([28,Tthickness-0.25,42],2);
+		}
+		translate([-10,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("plum") cylinder(h=50,d=screw3+0.1);
+		//translate([-10,9,F625ZDoulbleStack*2+b_height+19]) rotate([0,90,0]) color("pink") cylinder(h=50,d=screw3);
+		//translate([-10,9,F625ZDoulbleStack*2+b_height+37]) rotate([0,90,0]) color("green") cylinder(h=50,d=screw3);
+		translate([10,-28,30]) color("blue") cylinder(h=20,d=screw5);
+		translate([10,48,30]) color("red") cylinder(h=20,d=screw5);
+		translate([10,-28,44]) color("red") cylinder(h=5,d=screw5hd);
+		translate([10,48,44]) color("blue") cylinder(h=5,d=screw5hd);
+		translate([-11,9,10]) rotate([0,90,0]) color("red") cylinder(h=20,d=screw5);  // screw mounting holes
+		translate([-8,9,10]) rotate([0,90,0]) color("blue") cylinder(h=5,d=screw5hd); // countersink
+		translate([-11,9,30]) rotate([0,90,0]) color("blue") cylinder(h=20,d=screw5); // screw mounting holes
+		translate([-8,9,30]) rotate([0,90,0]) color("red") cylinder(h=5,d=screw5hd);  // countersink
+	}
+	translate([-3,9,10]) rotate([0,90,0]) color("black") cylinder(h=LayerThickness,d=screw5hd); // countersink support
+	translate([-3,9,30]) rotate([0,90,0]) color("white") cylinder(h=LayerThickness,d=screw5hd); // countersink support
+	translate([-5,-38,42]) rotate([90,0,90]) color("gray") cylinder(h=LayerThickness,d=screw5hd); // tab support
+	translate([-5,55,42]) rotate([90,0,90]) color("lightgray") cylinder(h=LayerThickness,d=screw5hd); // tab support
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt motor
 	difference() {	// motor mounting holes
 		color("blue") cubeX([59,59,5],radius=2,center=true);
-		translate([-2,0,-4]) color("red") NEMA17_parallel_holes(7,10);
+		if(Adjustable)
+			translate([-2,0,-4]) color("red") NEMA17_parallel_holes(7,5);
+		else 
+			translate([-2,0,-4]) rotate([0,0,45]) color("white")  NEMA17_x_holes(7,3);
 		//translate([0,0,10]) MakerslideNotchIt(Side);
 	}
 	if(!Side) {
