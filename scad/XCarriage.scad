@@ -110,7 +110,7 @@
 include <CoreXY-MSv1-h.scad>
 use <inc/corner-tools.scad>
 include <inc/brassinserts.scad>
-use <DualTitanAero.scad>
+use <TitanAero.scad>
 use <yBeltClamp.scad>
 //-------------------------------------------------------------------------------------------------------------
 $fn=75;
@@ -168,7 +168,7 @@ WireChainMount=Yes5mmInsert(Use5mmInsert);
 //CarridgeAllInOneAndSingleTitanExtruder(0,1,1,Yes5mmInsert(Use5mmInsert));// Clamps,Loop,Titan
 //translate([30,70,-8]) // position either below to print with CarridgeAllInOneAndSingleTitanExtruder()
 //	BeltLoopHolderOppo(2,BeltLoopShiftY,screw3); // loop mounts opposite of each other
-	BeltLoopHolderOppo(2,BeltLoopShiftY,screw5); // loop mounts opposite of each other
+	BeltLoopHolderOppo(BeltLoopShiftY,screw5); // loop mounts opposite of each other
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -232,7 +232,7 @@ module partial() {
 	//mirror([1,1,0]) ProximityMount(ShiftProximity);
 	//BLTouchMount(0,ShiftBLTouch);
 	//BLTouchMount(0); // makes hole for bltouch mount
-	//BeltLoopHolderOppo(2,BeltLoopShiftY); // loop mounts opposite of each other
+	//BeltLoopHolderOppo(BeltLoopShiftY); // loop mounts opposite of each other
 	//BeltLoopHolder(2,BeltLoopShiftY);
 	//CarriageBeltDriveStandAlone(1,1,0);
 }
@@ -289,8 +289,8 @@ module Carriage_v2(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=0,Rear=0,MoveBel
 			translate([128,3,30]) rotate([0,90,0]) TitanTensionHole();
 		}
 		if(Loop) {
-			if(MoveBeltLoops==1) translate([80,0,0]) BeltLoopHolderOppo(2,BeltLoopShiftY);
-			if(MoveBeltLoops==2) translate([60,120,-(BeltMSSpacing-BeltWidth)]) BeltLoopHolderOppo(2,BeltLoopShiftY);
+			if(MoveBeltLoops==1) translate([80,0,0]) BeltLoopHolderOppo(BeltLoopShiftY);
+			if(MoveBeltLoops==2) translate([60,120,-(BeltMSSpacing-BeltWidth)]) BeltLoopHolderOppo(BeltLoopShiftY);
 		}
 	}
 	BeltClamps(Clamps,Loop);
@@ -376,7 +376,7 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,E
 		translate([59,-8,98]) rotate([180,0,180]) CarriageBeltDrive(Loop,0,0,Screw);	// belt attachment to above
 	}
 	BeltClamps(Clamps,Loop);
-	if(LoopMounts) translate([40,70,-(BeltMSSpacing-BeltWidth)]) BeltLoopHolderOppo(2,BeltLoopShiftY);
+	if(LoopMounts) translate([40,70,-(BeltMSSpacing-BeltWidth)]) BeltLoopHolderOppo(BeltLoopShiftY);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -856,18 +856,38 @@ module BeltLoopHolder(Quanity=1,ShiftY=-3) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module BeltLoopHolderOppo(Quanity=1,ShiftY=-3,Screw=screw3) {
-	for(a=[0:Quanity-1]) {
+module BeltLoopHolderOppo(ShiftY=-3,Screw=screw3) {
+	BeltLoopHolder(ShiftY,Screw,0);
+	translate([60,0,0]) BeltLoopHolder(ShiftY,Screw,1);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BeltLoopHolder(ShiftY=-3,Screw=screw3,Invert=0) {
+	if(Invert) {
+			mirror([0,1,0]) rotate([0,0,180]) {
+				difference() {
+					translate([0,ShiftY-10,BeltMSSpacing-BeltWidth]) color("blue") cubeX([23,29,LoopHeight],1);
+					translate([0,ShiftY+3,-2]) beltLoop(); // lower
+					translate([0,ShiftY+3,BeltMSSpacing+BeltSpacing-2]) rotate([0,0,0]) beltLoop(); // upper
+					if(Screw==screw5)
+						translate([20,-21,0]) BeltLoopMountingCountersink(2,screw5hd);
+					else if(Screw==screw3)
+						translate([20,-21,0]) BeltLoopMountingCountersink(3,screw3hd);
+				}
+				translate([19,-8,0]) BeltLoopMountingBlock(3,Screw);
+			}
+	} else {
 		difference() {
-			translate([a*-30,ShiftY-10,BeltMSSpacing-BeltWidth]) color("blue") cubeX([23,29,LoopHeight],1);
-			translate([a*-30-1,ShiftY+3,-2]) beltLoop(); // lower
-			translate([a*-30-1,ShiftY+5.5,BeltMSSpacing+BeltSpacing+10]) rotate([180,0,0]) beltLoop(); // upper
+			translate([0,ShiftY-10,BeltMSSpacing-BeltWidth]) color("blue") cubeX([23,29,LoopHeight],1);
+			translate([0,ShiftY+3,-2]) beltLoop(); // lower
+			translate([0,ShiftY+3,BeltMSSpacing+BeltSpacing-2]) rotate([0,0,0]) beltLoop(); // upper
 			if(Screw==screw5)
-				translate([a*-30+20,-21,0]) BeltLoopMountingCountersink(2,screw5hd);
+				translate([20,-21,0]) BeltLoopMountingCountersink(2,screw5hd);
 			else if(Screw==screw3)
-				translate([a*-30+20,-21,0]) BeltLoopMountingCountersink(3,screw3hd);
+				translate([20,-21,0]) BeltLoopMountingCountersink(3,screw3hd);
 		}
-		translate([a*-30+19,-8,0]) BeltLoopMountingBlock(3,Screw);
+		translate([19,-8,0]) BeltLoopMountingBlock(3,Screw);
 	}
 }
 

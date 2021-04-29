@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 4/8/21
+// Last Update: 4/14/21
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/28/16	- modified z-axis_motor_mount.scad from Makerslide Mendel printer for corexy z
 // 7/3/16	- added assembly info
@@ -37,10 +37,12 @@
 // 11/5/20	- Added ZMotorThrustSpacer() to use M5 thrust brearings under the coupler
 // 12/15/20	- Redid the braces on the motor_mount() and added countersinks for M5 screws
 // 4/8/21	- BeltdriveMotorMount() is a separate printable item
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 4/14/21	- Added DirectBeltDrive() where the motor drive the leadscrew via a belt and it mounts with the leadscrew
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <inc/brassinserts.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
+include <bosl2/std.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
 use <corner-tools.scad>
 use <ZMotorLeadscrewCoupler.scad>
@@ -111,6 +113,7 @@ GT2_40t_h = 6.1;			// thickness of the clamping part on the 40 tooth GT2 pulley
 idler_spacer_thickness = GT2_40t_h + 0.9;	// thickness of idler bearing spacer
 layer = 0.25;				// printed layer thickness
 ThrustWasherThickness=4;
+LayerThickness=0.3;
 ////////////////////////////////////////////////////////////////////////////
 
 //test();
@@ -118,11 +121,34 @@ ThrustWasherThickness=4;
 			// 1st: Quantiy; 2nd: plates; 3rd: printable couplers; 4th ZNut ;5th: motor shaft diameter; 6th: leadscrew diameter
 //Reduction_Motor_Mount(1);
 //BeltDrivenZAxis(3); // arg is quanity, includes drive motor mount
-BeltDrivenZAxisMotorMount(3,0);
+//BeltDrivenZAxisMotorMount(3,0);
 // also need the following with BeltDrivenZAxis(), since a 200x200 build plate isn't big enough
 //ZNutBracket(3); // arg is quanity
 //translate([50,20,0]) ZAxisMountPlates(3); // arg is quanity*2
 //ZMotorThrustSpacer(3,7.5-ThrustWasherThickness); // to use M5 thrust brearings under the coupler
+DirectBeltDrive(3);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module DirectBeltDrive(Qty=1) {
+	for(i = [0:Qty-1]) translate([0,65*i,0]) {
+		difference() {
+			union() {
+				BeltDrivenZAxis(1,0); // arg is quanity, includes drive motor mount
+				translate([20,27,-2.5]) color("red") cubeX([b_width,b_width+3,thickness],2);
+				translate([22,26,-2.5]) color("green") cuboid([53,thickness,40.5],rounding=2,p1=[0,0]);
+			}	
+			translate([40,60.5,-5]) color("white") NEMA17_parallel_holes(10,9);
+			//translate([50,34,16]) color("blue") rotate([90,0,0]) cylinder(h=10,d=25);
+			translate([50,33.5-thickness,19]) color("red") rotate([90,0,0])
+				cyl(l=thickness+0.5, r=15, rounding1=-2, rounding2=-2, $fa=1, $fs=1);
+		}
+		translate([-b_width+33-thickness,-(b_length-85),32]) rotate([-30,0,0]) color("gray")
+			cubeX([thickness,b_width+10,7],2);
+		translate([-b_width+130-thickness,-(b_length-85),32]) rotate([-30,0,0]) color("gray")
+			cubeX([thickness,b_width+12,7],2);
+		translate([-27.5,81.5,-2.5]) color("khaki") cuboid([102.4,thickness,10],rounding=2,p1=[0,0]);
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -150,10 +176,10 @@ module DirectDriveZAxis(Quanity=1,Plates=0,ZNut=0,Coupler=1,Motorshaft=5,LeadScr
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module BeltDrivenZAxis(Quanity=1) { // arg is quanity
+module BeltDrivenZAxis(Quanity=1,Support=1) { // arg is quanity
 	//if($preview) %translate([-40,-100,-4.5]) cube([200,200,2]);
 	for(a=[0:Quanity-1]) {
-		translate([a*60,50,0]) bearing_mount(0,0,0,1);
+		translate([a*60,50,0]) bearing_mount(0,0,0,1,Support);
 	}
 }
 
@@ -232,14 +258,16 @@ module belt_mount(makerslide=0) { // motor mount
 
 ////////////////////////////////////////////////////////////////////////////
 
-module mount(makerslide=0) {
+module mount(makerslide=0,Support=1) {
 	difference() {
 		translate([0,22,-18]) color("cyan") cubeX([b_width,thickness,m_height],1, center=true);
 		ScreMounting(Screw=screw5);
 		if(makerslide) notchit();
 	}
-	side_support();
-	translate([-b_width+thickness,0,0]) side_support(); 
+	if(Support) {
+		side_support(Support);
+		translate([-b_width+thickness,0,0]) side_support(Support); 
+	}
 	if(makerslide) { // inside support at ns notches
 		translate([-5+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("blue") cubeX([10,thickness-1,m_height-2],1);
 		translate([-48+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("red") cubeX([10,thickness-1,m_height-2],1);
@@ -270,24 +298,13 @@ module notchit() {
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 
-module side_support(MSupport=1) {
-/*	difference() {	// side support
-		union() {
-			translate([b_width/2-thickness,-(b_length-27),-6.9]) rotate([-30,0,0])
-				color("gray") cubeX([thickness,b_width+6,m_height],2);
-			translate([b_width/2-thickness,-(b_length-22),-4]) rotate([-30,0,0])
-				color("lightgray") cubeX([thickness,b_width+6,m_height],2);
-		}
-		translate([b_width/2-thickness-0.5,-(b_length-20),1]) color("cyan") cube([6,90,60]);
-		translate([b_width/2-thickness-0.5,-(b_length-82),-50]) color("pink") cube([6,50,60]);
-		color("yellow") hull() {
-			translate([b_width/2-thickness-0.5,7,-11.2]) rotate([0,90,0]) cylinder(h=6,r=10,$fn=100);
-			translate([b_width/2-thickness-0.5,-12,-6.2]) rotate([0,90,0]) cylinder(h=6,r=5,$fn=100);
-		}
-		notchit();
-	}*/
-	translate([b_width/2-thickness,-(b_length-26),0]) rotate([-35,0,0]) color("gray") cubeX([thickness,b_width+12,7],2);
-	translate([b_width/2-thickness,-(b_length-60),-21]) rotate([40,0,0]) color("lightgray") cubeX([thickness,b_width-22,7],2);
+module side_support(MSupport=1,Support=1) {
+	if(Support) {
+		translate([b_width/2-thickness,-(b_length-26),-2.5]) rotate([-34,0,0]) color("gray")
+			cubeX([thickness,b_width+10,7],2);
+		translate([b_width/2-thickness,-(b_length-58),-23]) rotate([40,0,0]) color("lightgray")
+			cubeX([thickness,b_width-22,7],2);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -476,16 +493,17 @@ module testnut(Type) { 	// a shortened nut section for test fitting of the nut &
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // added a thrust bearing?
-module bearing_mount(Spc=0,SpcThk=idler_spacer_thickness,Idler=1,Makerslide=1) { // bearing holder at bottom of z-axis
+module bearing_mount(Spc=0,SpcThk=idler_spacer_thickness,Idler=1,Makerslide=1,Support=1) { // bearing holder at bottom of z-axis
 	rotate([180,0,0]) {										// didn't bother to make a left/right versions
-		mount(Makerslide);
+		mount(Makerslide,Support);
 		difference() {
 			translate([0,-(shaft_offset-base_offset),0]) color("navy") cubeX([b_width,b_length,thickness],1,center=true);
 			translate([0,-shaft_offset,-6]) color("red") cylinder(h=10,d=dia_608,$fn=100);
 			notchit();
 		}
 		translate([0,-shaft_offset,0]) bearing_hole();
-		//translate([-5+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("white") cubeX([10,thickness-1,m_height-2],1);
+		//translate([-5+ms_notch_offset,20-ms_notch_depth,-m_height+3]) color("white")
+		//	cubeX([10,thickness-1,m_height-2],1);
 		//translate([-48+ms_notch_offset,20-ms_notch_depth,-m_height+3])
 		//	color("green") cubeX([10,thickness-1,m_height-2],2);
 	}
@@ -511,7 +529,7 @@ module bearing_hole() {	// holds the bearing
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module bearing_hole_support() { // print support for bearing hole
-	translate([0,0,-5]) color("pink") cylinder(h=layer,d=dia_608+5,$fn=100);
+	translate([0,0,-5.05]) color("pink") cylinder(h=layer,d=dia_608+5,$fn=100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -556,10 +574,10 @@ module belt_motor_mount_support() {	// print support for inner hole
 
 ////////////////////////////////////////////////////////////////////////////
 
-module mountbelt() { // the three sides of the motor mount; same as mount(), but no screw holes
+module mountbelt(Support=1) { // the three sides of the motor mount; same as mount(), but no screw holes
 	translate([0,22,-18]) color("white") cubeX([b_width,thickness,m_height],2, center=true);
-	side_support();
-	translate([-b_width+thickness,0,0]) side_support(); 
+	side_support(Support);
+	translate([-b_width+thickness,0,0]) side_support(Support); 
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////

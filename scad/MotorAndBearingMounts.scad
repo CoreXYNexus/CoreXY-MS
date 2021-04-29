@@ -1,8 +1,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 // MotorAndBearingMounts.scad - hold the motors, belts & bearing bracket inside the frame
+// https://creativecommons.org/licenses/by-sa/3.0/
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
-// last update 4/8/21
+// last update 4/24/21
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16	- added built-in spacer to the bearing_bracket
 // 7/14/16	- adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -31,6 +32,7 @@
 // 8/8/20	- Changed the supports for the BearingSupport()
 // 10/17/20	- Can now use 5mm inserts
 // 4/1/21	- Added an adjustable front bearing mount
+// 4/24/21	- Added thrust washer to front bearing mount base
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in FrontBearingBracket() must match stepper motor shaft in MotorMount()
 //       If the motors get hot, print it from something that can handle it
@@ -39,7 +41,7 @@
 //		 Motor mounts have two holes on the makerslide side, to allow the makerslide to be installed
 //		 either way.
 //		 Adjustable front bearing has the motor adjustable, since you may not get the belts the same length.
-//		 Used M3x40 screw in the bearing holder, held in with a M3 mut.
+//		 Used M3x40 screw in the bearing holder, held in with a M3 mut.  Base uses 2 5x10x4 Thrust washers.
 // --------------------------------------------------------------------------------------
 //		 Taller motor_mount on left side rear.
 //		 NON-adjustable bearing brackets at inside front corners & supports on outside
@@ -54,7 +56,7 @@ b_posX = 20;		// bearing position Y
 b_height = 10;		// amount to raise bearings
 F625ZDoulbleStack = 11.78;	// just the length of two washers & two F625Z bearings
 F625ZDiameter = 18; // diameter of the f625z bearing
-LayerThickness = 0.2;		// layer thickness used to print
+LayerThickness = 0.3;		// layer thickness used to print
 Vthickness = 7;		// thickness of bearing support vertical section
 Tthickness = 5;		// thickness of bearing support top and fillet
 Use3mmInsert=1;
@@ -63,6 +65,7 @@ Use5mmInsert=1;
 Knob_Diameter=nut3*3;
 Knob_Height=3;
 WasherThickness=1;
+ThrustBrearingDiameter=10;
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //NonAdjustableBearingMountSet(); // all the needed parts
@@ -85,16 +88,17 @@ module NonAdjustableBearingMountSet() {
 
 module AdjustingKnob() {
 	difference() {
-		color("cyan") cylinder(h=27,d=nut3*2);
-		translate([0,0,-5]) color("black") cylinder(h=35,d=screw3+0.1);
-		if(Use3mmInsert)  translate([0,0,11]) color("red") cylinder(h=25,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
-		else translate([0,0,17]) color("red") cylinder(h=5,d=nut3,$fn=6);
-	}
-	difference() {
-		translate([0,0,0]) color("blue") cylinder(h=Knob_Height,d=Knob_Diameter);
-		translate([0,0,-5]) color("black") cylinder(h=30,d=screw3+0.1); // throuch hole for M3
-		for(i=[22.5:45:360]) translate([(Knob_Diameter)*sin(i)/2,(Knob_Diameter)*cos(i)/2,-1]) // knurls
-			color("purple") cylinder(r=0.7,h=Knob_Height+2);
+		union() {
+			color("cyan") cylinder(h=27,d=nut3*2);
+			translate([0,0,0]) color("blue") cylinder(h=Knob_Height,d=Knob_Diameter);
+		}
+		if(Use3mmInsert)  translate([0,0,-5]) color("red") cylinder(h=35,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		else translate([0,0,-4]) color("purple") cylinder(h=5,d=nut3,$fn=6);
+		translate([0,0,-5]) color("white") cylinder(h=35,d=screw3+0.1); // throuch hole for M3
+		for(i=[22.5:45:360]) {
+			translate([(Knob_Diameter)*sin(i)/2,(Knob_Diameter)*cos(i)/2,-1]) // knurls
+				color("purple") cylinder(r=0.7,h=Knob_Height+2);
+		}
 	}
 }
 
@@ -119,7 +123,8 @@ module AdjustableFrontBearingMount(Fit=0) {
 			translate([33,9,F625ZDoulbleStack*2+b_height+11.45-WasherThickness]) color("red")
 				cylinder(h=Tthickness-1,d=F625ZDiameter); // bottom
 			translate([0,0,F625ZDoulbleStack*2+b_height+38]) color("blue") cubeX([34,F625ZDiameter,Tthickness],1);
-			translate([33,9,F625ZDoulbleStack*2+b_height+38]) color("cyan") cylinder(h=Tthickness,d=F625ZDiameter); // top
+			translate([33,9,F625ZDoulbleStack*2+b_height+38]) color("cyan")
+				cylinder(h=Tthickness,d=F625ZDiameter); // top
 			translate([0,0,45]) color("green") cubeX([22,Tthickness-1,30],2);
 			translate([0,14,45]) color("lightgreen") cubeX([22,Tthickness-1,30],2);
 		}
@@ -137,22 +142,38 @@ module AdjustableFrontBearingMount(Fit=0) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module AdjustableFrontBearingMountBase() {
+module AdjustableFrontBearingMountBase(ThrustBearing=1) {
 	difference() {
 		union() {
-			translate([-5,-5,0]) color("purple") cubeX([Vthickness-2,F625ZDiameter+10,F625ZDoulbleStack*2+b_height+48],2);
+			translate([-5,-5,0]) color("purple")
+				cubeX([Vthickness-2,F625ZDiameter+10,F625ZDoulbleStack*2+b_height+48],2);
 			translate([-5,-5,78.75]) color("cyan") cubeX([28,F625ZDiameter+10,Tthickness],2);
 			translate([-5,-37,39.75]) color("khaki") cubeX([24,F625ZDiameter+75,Tthickness],2);
 			translate([-5,-5,40]) color("black") cubeX([28,Tthickness-0.25,42],2);
 			translate([-5,18.5,40]) color("white") cubeX([28,Tthickness-0.25,42],2);
 		}
-		translate([-10,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("plum") cylinder(h=50,d=screw3+0.1);
-		//translate([-10,9,F625ZDoulbleStack*2+b_height+19]) rotate([0,90,0]) color("pink") cylinder(h=50,d=screw3);
-		//translate([-10,9,F625ZDoulbleStack*2+b_height+37]) rotate([0,90,0]) color("green") cylinder(h=50,d=screw3);
-		translate([10,-28,30]) color("blue") cylinder(h=20,d=screw5);
-		translate([10,48,30]) color("red") cylinder(h=20,d=screw5);
-		translate([10,-28,44]) color("red") cylinder(h=5,d=screw5hd);
-		translate([10,48,44]) color("blue") cylinder(h=5,d=screw5hd);
+		translate([-10,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0])
+			color("plum") cylinder(h=50,d=screw3+0.1);
+		if(ThrustBearing) {
+			translate([-9,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("pink")
+				cylinder(h=5,d=ThrustBrearingDiameter);
+		}
+		color("blue") hull() {
+			translate([10,-30,30]) cylinder(h=20,d=screw5); // top
+			translate([10,-10,30]) cylinder(h=20,d=screw5); // top
+		}
+		color("red") hull() {
+			translate([10,50,30]) cylinder(h=20,d=screw5); // top
+			translate([10,29,30]) cylinder(h=20,d=screw5); // top
+		}
+		color("red") hull() {
+			translate([10,-30,44]) cylinder(h=5,d=screw5hd); // top
+			translate([10,-10,44]) cylinder(h=5,d=screw5hd); // top
+		}
+		color("blue") hull() {
+			translate([10,50,44]) cylinder(h=5,d=screw5hd); // top
+			translate([10,29,44]) cylinder(h=5,d=screw5hd); // top
+		}
 		translate([-11,9,10]) rotate([0,90,0]) color("red") cylinder(h=20,d=screw5);  // screw mounting holes
 		translate([-8,9,10]) rotate([0,90,0]) color("blue") cylinder(h=5,d=screw5hd); // countersink
 		translate([-11,9,30]) rotate([0,90,0]) color("blue") cylinder(h=20,d=screw5); // screw mounting holes
@@ -162,6 +183,10 @@ module AdjustableFrontBearingMountBase() {
 	translate([-3,9,30]) rotate([0,90,0]) color("white") cylinder(h=LayerThickness,d=screw5hd); // countersink support
 	translate([-5,-38,42]) rotate([90,0,90]) color("gray") cylinder(h=LayerThickness,d=screw5hd); // tab support
 	translate([-5,55,42]) rotate([90,0,90]) color("lightgray") cylinder(h=LayerThickness,d=screw5hd); // tab support
+	if(ThrustBearing) { // support
+		translate([-4,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("green")
+			cylinder(h=LayerThickness,d=ThrustBrearingDiameter);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

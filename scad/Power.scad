@@ -2,7 +2,7 @@
 // Power.scad - uses a pc style power socket with switch
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 7/4/2016
-// last update 8/27/20
+// last update 4/22/21
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/4/16	- Added cover
 // 8/5/16	- adjusted cover & 2020 mounting holes
@@ -12,14 +12,18 @@
 // 5/10/19	- Added a rear cover for the power switch
 // 5/11/19	- Added a power cover with rounded edges and square edges
 // 5/16/19	- Merged power supply mount into here and renamed this file
-// 5/28/19	- Added a housing version with seperate power plug and switch, added M5 countersinks to housing, modified the MMAX
+// 5/28/19	- Added a housing version with seperate power plug and switch, added M5 countersinks to housing, modified
+//			  the MMAX
 //			  power supply mounts for the CXY-MSv1 corexy
 // 7/24/19	- Adjusted PowerInletHousingCover() screw holes
 // 6/21/20	- Added power supply mount for a Sunpower SP-180A 12vdc, uses M3 mountind screws on the bottom
 // 8/4/20	- Renamed a few modules with a better name
 // 8/25/20	- Removed wings on PowerInletHousing()
 // 8/26/20	- PowerSwtch() can now have a specified label
-// 8/27/20	- Changed to cartoon bold font, size 7, PowerInletHousing() has mounting screw holes and recess for the power socket
+// 8/27/20	- Changed to cartoon bold font, size 7, PowerInletHousing() has mounting screw holes and recess for the
+//			  power socket
+// 4/20/21	- Added toggle switch mount
+// 4/22/21	- Adjusted some holes in the Power Inlet
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Version 0 uses Digi-Key Part number: CCM1666-ND : combined power socket and switch
 //		 http://www.digikey.com/product-detail/en/te-connectivity-corcom-filters/1609112-3/CCM1666-ND/758835
@@ -27,7 +31,8 @@
 //		 If the socket hole size changes, then the size & postions of the walls/wings & socket may need adjusting
 //		 The power socket uses 3mm screws to mount, drill with 2.5mm and tap after installing the socket
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
+//use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
+include <BOSL2/std.scad>
 include <inc/screwsizes.scad>
 use <inc/brassinserts.scad>
 $fn = 50;
@@ -35,12 +40,12 @@ $fn = 50;
 // vars
 Use3mmInsert=1;
 UseLargeInsert=1;
-SwitchSocketWidth=39;	// socket hole width
-SwitchSocketHeight=27;	// socket hole height
+SwitchSocketWidth=49;//39;	// socket hole width
+SwitchSocketHeight=28;//27;	// socket hole height
 SwitchLength=19.5;
 SwitchWidth=13;
 SwitchThickness=2;
-SocketShiftLR=0; // move socket left/right
+SocketShiftLR=-4;//0; // move socket left/right
 SocketShiftUD=0; // move socket up/down
 PowerSupplyCoverClearance=1;
 PowerSupplyCoverWidth=115+PowerSupplyCoverClearance;
@@ -51,12 +56,17 @@ PowerSupplySideMountingScrewSpacing=25;
 Length=113;
 Width=13;
 Thickness=10;
-LayerThickness=0.3;
+LayerThickness=0.4;
 SocketPlugWidth=SwitchSocketWidth;
 SocketPlugHeight=SwitchSocketHeight;
 PS12Offest=81;
 PS12Edge=10;
 PS12Width=100;
+ToggleSwitchLength=30;
+TogglwSwitchWidth=16;
+ToggleSwitchHeight=26;
+ToggleOffsetHoleSize=22;
+Clearance=0.7;  // clearance for hole
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 all();// 1st arg: flip power label; next 4 args: Width, length, clip Thickness; defaults to 0,13,19.5,2
@@ -72,15 +82,58 @@ all();// 1st arg: flip power label; next 4 args: Width, length, clip Thickness; 
 //PowerInletHousingCover(); // test fit cover to power inlet housing
 //PS12vdc(2);
 //PS5vdcMount();
+//PowerToggleSwitch();
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module cubeX(size,Rounding) { // temp module
+	cuboid(size,rounding=Rounding,p1=[0,0]);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module all(flip=0,Makerslide=1,PBQuantiy=2,Version=0) {
 	if($preview) %translate([25,20,0]) cube([200,200,2],center=true); // show the 200x200 bed
 	translate([0,-12,0]) PowerInletHousing(Version);
 	translate([0,-5,45]) rotate([180,0,0]) PowerInletHousingCover();
-	translate([-50,-45,0]) PowerSwitch();
+	translate([-50,-45,0])
+		//PowerSwitch();
+		PowerToggleSwitch();
 	//translate([-30,60,0]) powersupply_cover();
 	//translate([-35,-10,0]) rotate([0,0,90]) PowerSupplyMount(Makerslide,PBQuantiy);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module PowerToggleSwitch(Flip=0,HoleSize=12+Clearance) {
+	difference() {  // switch front and switch mounting hole
+        union() {
+            color("cyan") cuboid([ToggleSwitchLength+10,TogglwSwitchWidth+10,4],rounding=2,p1=[0,0],except_edges=TOP);
+			translate([0,0,0]) color("blue") cubeX([5,TogglwSwitchWidth+10,ToggleSwitchHeight+10],2); // left wall
+			translate([ToggleSwitchLength+5,0,0]) color("salmon")
+				cubeX([5,TogglwSwitchWidth+10,ToggleSwitchHeight+10],2); // right wall
+			translate([0,0,0]) color("tan") cubeX([ToggleSwitchLength+10,5,ToggleSwitchHeight+10],2); // rear wall
+			translate([0,TogglwSwitchWidth+5,0]) color("gray")
+				cubeX([ToggleSwitchLength+10,5,ToggleSwitchHeight+10],2); // rear wall
+			translate([0,-22,0]) ToggleSwitchExtrusionMount(Flip,ToggleSwitchLength+10);
+		}
+		translate([(ToggleSwitchLength+10)/2,(TogglwSwitchWidth+10)/2,-3]) color("red") cylinder(h=10,d=HoleSize);
+		translate([-3.5,4,0]) switch_label(Flip,"POWER",6);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module ToggleSwitchExtrusionMount(Flip=0,Width) {
+	difference() {
+		color("green") cubeX([Width,27,5],2);
+		translate([10,10,-2]) color("red") cylinder(h=10,d=screw5);
+		translate([30,10,-2]) color("blue") cylinder(h=10,d=screw5);
+		//translate([10,10,-4]) color("red") cylinder(h=5,d=screw5hd);
+		//translate([30,10,-4]) color("blue") cylinder(h=5,d=screw5hd);
+	}
+	//translate([10,10,1]) color("blue") cylinder(h=LayerThickness,d=screw5hd); // support
+	//translate([30,10,1]) color("red") cylinder(h=LayerThickness,d=screw5hd); // support
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,12 +232,18 @@ module pwr_supply_cover_vents(Qty=1) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PowerInletHousing(Version=0,Screw=Yes3mmInsert(Use3mmInsert,UseLargeInsert)) {
+module PowerInletHousing(Version=0,Screw=Yes3mmInsert(Use3mmInsert,UseLargeInsert),ChangeSocketMountingOffset=1) {
 	difference() {
-		color("blue") cubeX([SwitchSocketWidth+40,SwitchSocketHeight+40,5],2); // base
-		translate([SwitchSocketWidth-25,9,-2]) color("green") cylinder(h=10,r=screw5/2); // mounting hole
+		union() {
+			color("blue") cubeX([SwitchSocketWidth+40,SwitchSocketHeight+40,5],2); // base
+		translate([0,SwitchSocketHeight+35,0]) color("red") cubeX([SwitchSocketWidth+40,5,40],2); // top wall
+		translate([0,19,0]) color("black") cubeX([5,SwitchSocketHeight+21,40],2); // left wall
+		translate([SwitchSocketWidth+35,19,0]) color("white") cubeX([5,SwitchSocketHeight+21,40],2); // right wall
+		}
+		cover_screw_holes(Screw);
+		translate([SwitchSocketWidth-30,9,-2]) color("green") cylinder(h=10,r=screw5/2); // mounting hole
 		translate([SwitchSocketWidth+25,9,-2]) color("plum") cylinder(h=10,r=screw5/2); // mounting hole
-		translate([SwitchSocketWidth-25,9,-9]) color("white") cylinder(h=10,d=screw5hd); // countersink
+		translate([SwitchSocketWidth-30,9,-9]) color("white") cylinder(h=10,d=screw5hd); // countersink
 		translate([SwitchSocketWidth+25,9,-9]) color("lightgreen") cylinder(h=10,d=screw5hd); // countersink
 		// socket hole
 		if(Version==0) {
@@ -193,9 +252,9 @@ module PowerInletHousing(Version=0,Screw=Yes3mmInsert(Use3mmInsert,UseLargeInser
 			translate([SwitchSocketWidth/2+SocketShiftLR-4,SwitchSocketHeight/2+14+SocketShiftUD,2]) color("red")
 				cube([SwitchSocketWidth+8,SwitchSocketHeight,10]);
 			// mounting screws
-			translate([SwitchSocketWidth+SocketShiftLR,SwitchSocketHeight+SocketShiftUD-4.5,-3]) color("red")
+			translate([SwitchSocketWidth+SocketShiftLR,SwitchSocketHeight+SocketShiftUD-(4.5+ChangeSocketMountingOffset),-3]) color("red")
 				cylinder(h=10,d=Screw);
-			translate([SwitchSocketWidth+SocketShiftLR,SwitchSocketHeight*2+SocketShiftUD+5.5,-3]) color("cyan")
+			translate([SwitchSocketWidth+SocketShiftLR,SwitchSocketHeight*2+SocketShiftUD+(4.5+ChangeSocketMountingOffset),-3]) color("cyan")
 				cylinder(h=10,d=Screw);
 		} else {
 			translate([SwitchSocketWidth/2+SocketShiftLR-10,SwitchSocketHeight/2+14+SocketShiftUD,-2]) color("cyan")
@@ -204,19 +263,7 @@ module PowerInletHousing(Version=0,Screw=Yes3mmInsert(Use3mmInsert,UseLargeInser
 				cube([SwitchWidth,SwitchHeight,8]); // switch
 		}
 	}
-	translate([SwitchSocketWidth-35,2,1]) color("gray") cube([SwitchSocketWidth+30,15,LayerThickness]); // screw5 support
-	difference() {
-		translate([0,SwitchSocketHeight+35,0]) color("red") cubeX([SwitchSocketWidth+40,5,40],2); // top wall
-		cover_screw_holes(Screw);
-	}
-	difference() {
-		translate([0,19,0]) color("black") cubeX([5,SwitchSocketHeight+21,40],2); // left wall
-		cover_screw_holes(Screw);
-	}
-	difference() {
-		translate([SwitchSocketWidth+35,19,0]) color("white") cubeX([5,SwitchSocketHeight+21,40],2); // right wall
-		cover_screw_holes(Screw);
-	}
+	translate([SwitchSocketWidth-40,2,1]) color("gray") cube([SwitchSocketWidth+30,15,LayerThickness]); // screw5 support
 	coverscrewholes(Screw);
 }
 
@@ -229,17 +276,17 @@ module screwholesupport() {
 module coverscrewholes(Screw=screw3) {
 	difference() {
 		translate([5,40,20]) color("blue") cylinder(h=20,d=Screw*2); // left
-		translate([5,35,13]) rotate([0,-45,0]) color("red") cube([10,10,5]);
+		translate([6.5,35,14]) rotate([0,-45,0]) color("red") cube([10,10,5]);
 		cover_screw_holes(Screw);
 	}
 	difference() {
 		translate([SwitchSocketWidth+35,40,20]) color("red") cylinder(h=20,d=Screw*2); // right
-		translate([SwitchSocketWidth+27,35,22]) rotate([0,45,0]) color("blue") cube([10,10,5]);
+		translate([SwitchSocketWidth+26,35,22]) rotate([0,45,0]) color("blue") cube([10,10,5]);
 		cover_screw_holes(Screw);
 	}
 	difference() {
-		translate([SwitchSocketWidth,62,20]) color("white") cylinder(h=20,d=Screw*2); // top screw hole
-		translate([SwitchSocketWidth-5,55,20]) rotate([-45,0,0]) color("green") cube([10,10,5]);
+		translate([SwitchSocketWidth-6,62,20]) color("white") cylinder(h=20,d=Screw*2); // top screw hole
+		translate([SwitchSocketWidth-11,53,23]) rotate([-45,0,0]) color("green") cube([10,10,5]);
 		cover_screw_holes(Screw);
 	}
 }
@@ -247,9 +294,9 @@ module coverscrewholes(Screw=screw3) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module cover_screw_holes(Screw=screw3) {
-	translate([5,40,7]) color("white") cylinder(h=40,d=Screw); // left
-	translate([SwitchSocketWidth+35,40,7]) color("gray") cylinder(h=40,d=Screw); // right
-	translate([SwitchSocketWidth,62,7]) color("hotpink") cylinder(h=40,d=Screw); // top screw hole
+	translate([5,40,24]) color("white") cylinder(h=40,d=Screw); // left
+	translate([SwitchSocketWidth+35,40,24]) color("gray") cylinder(h=40,d=Screw); // right
+	translate([SwitchSocketWidth-6,62,24]) color("hotpink") cylinder(h=40,d=Screw); // top screw hole
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -274,8 +321,8 @@ module PowerInletHousingCover(Screw=screw3) {
 	difference() {
 		translate([0,13.8,25]) color("red") cubeX([SwitchSocketWidth+40,5,20],2); // base
 		color("white") hull() {
-			translate([SwitchSocketWidth,25,30]) rotate([90,0,0]) cylinder(h=15,d=10);
-			translate([SwitchSocketWidth,25,25]) rotate([90,0,0]) cylinder(h=15,d=10);
+			translate([SwitchSocketWidth-6,25,30]) rotate([90,0,0]) cylinder(h=15,d=10);
+			translate([SwitchSocketWidth-6,25,25]) rotate([90,0,0]) cylinder(h=15,d=10);
 		}
 	}
 }
@@ -291,7 +338,7 @@ module CoverScrewContersink() {
 		cylinder(h=0.5,d=screw3);
 		translate([0,0,2]) cylinder(h=0.5,d=7);
 	}
-	translate([SwitchSocketWidth,62,43]) color("plum") hull() {
+	translate([SwitchSocketWidth-6,62,43]) color("plum") hull() {
 		cylinder(h=0.5,d=screw3);
 		translate([0,0,2]) cylinder(h=0.5,d=7);
 	}
@@ -334,6 +381,7 @@ module sw_mount(Flip=0,Width,Text) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module switch_label(Flip=0,Text,Height=2,FontSize=7) {
+	echo(Text);
 	if(!Flip) translate([5.5,-0,1]) rotate([180,0,0]) printchar(Text,Height,FontSize);
 	else translate([29,-2,1]) rotate([0,180,0]) printchar(Text,Height,FontSize);
 }
