@@ -25,7 +25,7 @@ If you use metal couplers for the z-axis, use a 4mm ball bearing in between the 
 
 The Litemount.stl holds a 70mm LED ring in http://www.thingiverse.com/thing:8211 I used a LM2596 buck convertor to get the 12vdc to power the ring.
 
-Alternate lighting method is to use a 5050 LED light string stuck to the bottom of the x axis makerslide.
+Alternate lighting method is to use a 5050 LED light string stuck to the bottom of the x axis makerslide.  For EXOSlide, use PlainLEDStripHolderEXO.
 
 Blower.scad uses http://www.thingiverse.com/thing:387301
 
@@ -42,6 +42,8 @@ Spool holder: http://www.thingiverse.com/thing:1647748
 Parts cooling fan: 4040 blower.
 
 FancapL.stl is for the power supply fan to make it blow to the side.
+
+9/2021 - Added EXOSlide use for X-Carraige.
 
 Uses:
 		OPENSCAD https://www.openscad.org/downloads.html  Use version 2019.05 or later.

@@ -3,7 +3,7 @@
 // https://creativecommons.org/licenses/by-sa/3.0/
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
-// last update 4/24/21
+// last update 5/11/21
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16	- added built-in spacer to the bearing_bracket
 // 7/14/16	- adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -41,7 +41,7 @@
 //		 Motor mounts have two holes on the makerslide side, to allow the makerslide to be installed
 //		 either way.
 //		 Adjustable front bearing has the motor adjustable, since you may not get the belts the same length.
-//		 Used M3x40 screw in the bearing holder, held in with a M3 mut.  Base uses 2 5x10x4 Thrust washers.
+//		 Used M3x40 screw in the bearing holder, held in with a M3 mut. Each base uses a M3x10 Thrust washer.
 // --------------------------------------------------------------------------------------
 //		 Taller motor_mount on left side rear.
 //		 NON-adjustable bearing brackets at inside front corners & supports on outside
@@ -49,6 +49,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 include <inc/brassinserts.scad>
+include <bosl2/std.scad>
 /////////////////////////////////////////////////////////////////////////////////////////
 // vars for this file
 b_posY = 29.5;		// bearing position X
@@ -56,7 +57,7 @@ b_posX = 20;		// bearing position Y
 b_height = 10;		// amount to raise bearings
 F625ZDoulbleStack = 11.78;	// just the length of two washers & two F625Z bearings
 F625ZDiameter = 18; // diameter of the f625z bearing
-LayerThickness = 0.3;		// layer thickness used to print
+LayerThickness = 0.35;		// layer thickness used to print
 Vthickness = 7;		// thickness of bearing support vertical section
 Tthickness = 5;		// thickness of bearing support top and fillet
 Use3mmInsert=1;
@@ -105,10 +106,10 @@ module AdjustingKnob() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module AdjustableFrontBearingMountSet(Fit=0) {
-	translate([0,-35,2]) MotorMount(1,1);
-	translate([0,85,2]) MotorMount(0,1);
+	translate([0,-33,2.55]) MotorMount(1,1);
+	translate([0,86,2.55]) MotorMount(0,1);
 	rotate([0,-90,0]) AdjustableFrontBearingMount(Fit);
-	translate([90,0,0]) rotate([0,-90,0]) AdjustableFrontBearingMount(Fit);
+	translate([95,0,0]) rotate([0,-90,0]) AdjustableFrontBearingMount(Fit);
 	translate([-25,10,0]) AdjustingKnob();
 	translate([-5,10,0]) AdjustingKnob();
 }
@@ -118,7 +119,7 @@ module AdjustableFrontBearingMountSet(Fit=0) {
 module AdjustableFrontBearingMount(Fit=0) {
 	difference() { // vertical
 		union() {
-			translate([0,0,45]) color("gray") cubeX([Vthickness-2,F625ZDiameter,F625ZDoulbleStack*2+b_height-2],1);
+			translate([0,0,45]) color("cyan") cubeX([Vthickness,F625ZDiameter,F625ZDoulbleStack*2+b_height-2],1);
 			translate([0,0,45-WasherThickness]) color("white") cubeX([34,F625ZDiameter,Tthickness-1],1);
 			translate([33,9,F625ZDoulbleStack*2+b_height+11.45-WasherThickness]) color("red")
 				cylinder(h=Tthickness-1,d=F625ZDiameter); // bottom
@@ -133,29 +134,34 @@ module AdjustableFrontBearingMount(Fit=0) {
 			cylinder(h=50,d=Yes5mmInsert(Use5mmInsert)); // bottom
 		translate([Vthickness+26,9,F625ZDoulbleStack*2+b_height+42]) color("blue") cylinder(h=5,d=screw5hd);
 		translate([-10,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("plum") cylinder(h=50,d=screw3+0.1);
-		translate([Vthickness-4,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("white")
+		translate([Vthickness-1,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("white")
 			cylinder(h=50,d=screw3hd);
+		translate([Vthickness-8,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("plum")
+			cylinder(h=3,d=nut3,$fn=6);
 	}
+	translate([Vthickness-5,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("purple") // support for m3 hole
+		cylinder(h=LayerThickness,d=screw3hd);
 	if(Fit) translate([0,0,-1]) AdjustableFrontBearingMountBase();  // fit parts
 	else  translate([5,27,-5]) AdjustableFrontBearingMountBase();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module AdjustableFrontBearingMountBase(ThrustBearing=1) {
+module AdjustableFrontBearingMountBase(ThrustBearing=1,DoTabs=1) {
 	difference() {
 		union() {
-			translate([-5,-5,0]) color("purple")
+			translate([-5,-5,1]) color("purple")
 				cubeX([Vthickness-2,F625ZDiameter+10,F625ZDoulbleStack*2+b_height+48],2);
-			translate([-5,-5,78.75]) color("cyan") cubeX([28,F625ZDiameter+10,Tthickness],2);
+			translate([-5,-5,78.75]) color("cyan") cubeX([32,F625ZDiameter+10,Tthickness],2);
 			translate([-5,-37,39.75]) color("khaki") cubeX([24,F625ZDiameter+75,Tthickness],2);
-			translate([-5,-5,40]) color("black") cubeX([28,Tthickness-0.25,42],2);
-			translate([-5,18.5,40]) color("white") cubeX([28,Tthickness-0.25,42],2);
+			translate([-5,-5,40]) color("black") cubeX([32,Tthickness-0.25,42],2);
+			translate([-5,18.5,40]) color("white") cubeX([32,Tthickness-0.25,42],2);
+			translate([15,-5,39.75]) color("gray") cuboid([12,28.25,Tthickness],rounding=2,p1=[0,0]); 
 		}
 		translate([-10,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0])
 			color("plum") cylinder(h=50,d=screw3+0.1);
 		if(ThrustBearing) {
-			translate([-9,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("pink")
+			translate([-8,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("pink")
 				cylinder(h=5,d=ThrustBrearingDiameter);
 		}
 		color("blue") hull() {
@@ -181,10 +187,16 @@ module AdjustableFrontBearingMountBase(ThrustBearing=1) {
 	}
 	translate([-3,9,10]) rotate([0,90,0]) color("black") cylinder(h=LayerThickness,d=screw5hd); // countersink support
 	translate([-3,9,30]) rotate([0,90,0]) color("white") cylinder(h=LayerThickness,d=screw5hd); // countersink support
-	translate([-5,-38,42]) rotate([90,0,90]) color("gray") cylinder(h=LayerThickness,d=screw5hd); // tab support
-	translate([-5,55,42]) rotate([90,0,90]) color("lightgray") cylinder(h=LayerThickness,d=screw5hd); // tab support
+	if(DoTabs) {
+		translate([-5,-38,42]) rotate([90,0,90]) color("gray") cylinder(h=LayerThickness,d=screw5hd); // tab support
+		translate([-5,55,42]) rotate([90,0,90]) color("lightgray") cylinder(h=LayerThickness,d=screw5hd); // tab support
+		translate([-5,23,82]) rotate([90,0,90]) color("red") cylinder(h=LayerThickness,d=screw5hd); // tab support
+		translate([-5,-3.5,82]) rotate([90,0,90]) color("blue") cylinder(h=LayerThickness,d=screw5hd); // tab support
+		translate([-5,23,1]) rotate([90,0,90]) color("blue") cylinder(h=LayerThickness,d=screw5hd); // tab support
+		translate([-5,-3.5,1]) rotate([90,0,90]) color("red") cylinder(h=LayerThickness,d=screw5hd); // tab support
+	}
 	if(ThrustBearing) { // support
-		translate([-4,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("green")
+		translate([-3,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("green")
 			cylinder(h=LayerThickness,d=ThrustBrearingDiameter);
 	}
 }
@@ -359,8 +371,8 @@ module MotorMountSupport(Side) {
 	if(Side) {
 		difference() {
 			translate([6,24.5,-35]) rotate([0,-45,0]) color("gray") cubeX([80,5,50],2);
-			translate([-30,23.5,-35]) color("white") cube([60,10,35],2);
-			translate([27,23.5,57]) rotate([0,90,0]) color("black") cube([70,10,35],2);
+			translate([0,25.5,-17]) color("white") cube([60,10,35],2);
+			translate([45,25.5,20]) rotate([0,90,0]) color("black") cube([70,10,35],2);
 			color("plum") hull() {
 				translate([-7,33,7]) rotate([90,0,0]) cylinder(h=10,r=5);
 				translate([20,33,35]) rotate([90,0,0]) cylinder(h=10,r=5);
@@ -370,8 +382,8 @@ module MotorMountSupport(Side) {
 	} else {
 		translate([0,-54,0]) difference() {
 			translate([3,24.5,-38]) rotate([0,-40,0]) color("gray") cubeX([85,5,50],2);
-			translate([-30,23.5,-40]) color("white") cube([70,10,40],2);
-			translate([26,23.5,55]) rotate([0,90,0]) color("black") cube([70,10,48],2);
+			translate([0,25.5,-19]) color("white") cube([70,10,40],2);
+			translate([50,25.5,20]) rotate([0,90,0]) color("black") cube([70,10,48],2);
 		
 			color("plum") hull() {
 				translate([-7,33,6]) rotate([90,0,0]) cylinder(h=10,r=5);

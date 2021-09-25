@@ -2,26 +2,60 @@
 // BeraAirMount.scad
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // C:4/8/21
-// U:4/8/21
+// U:9/16/21
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 4/8/21	- BerdAirMount on the extruder
+// 4/8/21	- BerdAirMount on the extruder on EXOSlide
+// 9/14/21	- Added a mount to go on teh top of a E3DV6 heatsink: E3DV6Mount()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 include <BOSL2/std.scad>
 include <inc/brassinserts.scad>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// for EXOSlide use the one from M-Max
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $fn=100;
-uSE3MMiNSERT=1;
+Use3mmInsert=1;
 LargeInsert=0;
 LayerThickness=0.3;
+Clearance=0.9;
+E3DV6diameter=16+Clearance; // diameter of section right above heat sink
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//BerdAirMountLeft(35,2,0); // side with heater block
-BerdAirMountRight(13,2,0); // side without heater block
+//BerdAirMountLeft(35,2,0); // side with heater block, exoslide
+//BerdAirMountRight(13,2,0); // side without heater block, exoslide
+E3DV6Mount(2,0);  // moount on the top section of the heatsink
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module E3DV6Mount(PipeSize=2,DoClamp=1) {
+	difference() {
+		color("cyan") hull() {
+			cylinder(h=5,d=E3DV6diameter*2-3);
+			translate([-30,-E3DV6diameter/2,0]) cuboid([3,E3DV6diameter,8],rounding=1.5,p1=[0,0]);
+		}
+		translate([-32,-4,4.5]) color("pink") rotate([0,90,0]) cylinder(h=15,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		translate([-32,4,4.5]) color("pink") rotate([0,90,0]) cylinder(h=15,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		translate([0,0,-5]) color("red") cylinder(h=20,d=E3DV6diameter);
+		translate([0,0,2.5]) rotate([0,90,0]) color("blue") cylinder(h=20,d=screw3t); // holding screw
+	}
+	BAClamp(PipeSize);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BAClamp(PipeSize=2) {
+	translate([-39,0,32]) rotate([0,-90,0]) {
+		difference() { // clamp
+			union() {
+				translate([-32,-E3DV6diameter/2,0]) color("green") cuboid([3,E3DV6diameter,8],rounding=1.5,p1=[0,0]);
+				translate([-32,0,4]) rotate([0,90,0]) cylinder(h=LayerThickness,d=25);
+			}
+			translate([-33,-4,4.5]) color("blue") rotate([0,90,0]) cylinder(h=15,d=screw3);
+			translate([-33,4,4.5]) color("khaki") rotate([0,90,0]) cylinder(h=15,d=screw3);
+			translate([-29,0,-8]) color("gray") cylinder(h=20,d=PipeSize);
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module BerdAirMountLeft(Offset=35,PipeSize=2,Fit) { // side with heater block
 	difference() {

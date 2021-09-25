@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // XCarriage - x carriage for the COREXY-MSv1 using makerslide
 // created: 2/3/2014
-// last modified: 11/8/20
+// last modified: 9/23/21
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to carriage and put it into a seperate module
@@ -80,6 +80,7 @@
 //			  WireChainMount lets you change the monting holes on top of the belt mounting bracket to M4 or M5 inserts
 // 10/17/20	- changed extruder mount to allow dual titan areos
 // 11/8/20	- Added extra set of holes to mount the single titan aero extruder mount
+// 9/23/21	- BeltLoop adapter for exoslide
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -110,6 +111,7 @@
 include <CoreXY-MSv1-h.scad>
 use <inc/corner-tools.scad>
 include <inc/brassinserts.scad>
+include <BOSL2/std.scad>
 use <TitanAero.scad>
 use <yBeltClamp.scad>
 //-------------------------------------------------------------------------------------------------------------
@@ -168,7 +170,41 @@ WireChainMount=Yes5mmInsert(Use5mmInsert);
 //CarridgeAllInOneAndSingleTitanExtruder(0,1,1,Yes5mmInsert(Use5mmInsert));// Clamps,Loop,Titan
 //translate([30,70,-8]) // position either below to print with CarridgeAllInOneAndSingleTitanExtruder()
 //	BeltLoopHolderOppo(2,BeltLoopShiftY,screw3); // loop mounts opposite of each other
-	BeltLoopHolderOppo(BeltLoopShiftY,screw5); // loop mounts opposite of each other
+//	BeltLoopHolderOppo(BeltLoopShiftY,screw5); // loop mounts opposite of each other
+EXOSLideAdapter(9); // arg is beltloop holder screw hieght above bottom
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module EXOSLideAdapter(UpDownAdjust=0,Screw=Yes5mmInsert(Use5mmInsert)) {
+	difference() {
+		color("cyan") cuboid([30,48,30],rounding=2,p1=[0,0]);
+		translate([5,48/2,-10]) color("blue") cylinder(h=50,d=screw4);
+		translate([25,48/2,-10]) color("red") cylinder(h=50,d=screw4);
+		translate([5,48/2,16]) color("red") cylinder(h=20,d=screw4hd);
+		translate([25,48/2,16]) color("blue") cylinder(h=20,d=screw4hd);
+		translate([-10,6,UpDownAdjust]) {
+			color("blue") rotate([0,90,0]) cylinder(h=LoopHeight*3,d=Screw);
+			translate([0,LoopHoleOffset,0]) color("red") rotate([0,90,0])
+				cylinder(h=LoopHeight*3,d=Screw);
+		}
+		translate([-14,0.5,20]) rotate([0,0,0]) XWCMountHoles();
+		translate([-2,7.5,20]) rotate([0,0,0]) XStopMountHoles();
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module XStopMountHoles(Screw=Yes5mmInsert(Use5mmInsert)) {
+	translate([8,6,-1]) color("red") cylinder(h=15,d=Screw);
+	color("blue") translate([8,26.5,-1]) color("blue") cylinder(h=15,d=Screw);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module XWCMountHoles(Screw=Yes5mmInsert(Use5mmInsert)) {
+	color("gold") translate([37,13,-5]) cylinder(h=20, d=Screw);
+	color("red") translate([37,33,-5]) cylinder(h=20, d=Screw);
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

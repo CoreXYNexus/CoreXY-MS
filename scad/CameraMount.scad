@@ -2,7 +2,7 @@
 // CameraMount.scad - MS lifecam holder and a PI Zero & PI Cam holder
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 1/31/16
-// last update 3//2113
+// last update 9/4/2121
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ABS or something that can handle the heatbed temperature
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,8 @@
 // 3/6/21	- Added Raspberry PI HQ camera mount (not tested, don't have one)
 // 3/13/21	- Change allinone pi0w camera to center the camera mount on the pi0w holder and slotted the 2020 mounts
 //			- to allow shifth to one side of the 2020
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 9/4/21	- Added side mount selection to PICamera2020AllInOne()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://www.raspberrypi.org/documentation/hardware/raspberrypi/mechanical/README.md
 // https://www.raspberrypi-spy.co.uk/2013/05/pi-camera-module-mechanical-dimensions
 // https://static.raspberrypi.org/files/product-mechanical-drawings/20200428_HQ_Camera_Technical_drawing.pdf
@@ -79,7 +80,7 @@ HQCamHoleOffset=4;
 //MSWebCameraBracket(0); // must use support
 //MSWebCameraBracketV2(0); // must use support
 //PICamera2020(1,0.2,1);
-PICamera2020AllInOne(1,0.2,0);
+PICamera2020AllInOne(2,0.2,0);
 //MSWebCam2020(1);
 //HQCameraMount();
 
@@ -88,7 +89,7 @@ PICamera2020AllInOne(1,0.2,0);
 module MSWebCam2020(AddPI0Mount=0,Addtickness=0) {
 	rotate([0,-90,0]) difference() {
 			Mount2020();
-			translate([-10,-1.5,-1]) color("black") rotate([0,90,0]) cylinder(h=40,d=screw3);
+			translate([-10,-1.5,-1]) color("darkgray") rotate([0,90,0]) cylinder(h=40,d=screw3);
 	}
 	translate([37,15,0]) MSWebCamMount();
 	if(AddPI0Mount) {
@@ -132,7 +133,7 @@ module MSWebCamMount(DoTab=1) {
 	}
 	translate([22,-12,8.5]) rotate([0,-90,0]) difference() {
 		translate([ShiftCamera-4,CameraDiameter/2-12,CameraDiameter/2+OuterRingThickness+19])
-			color("black") cubeX([6,20,9],1);
+			color("darkgray") cubeX([6,20,9],1);
 		translate([ShiftCamera-5,CameraDiameter/2-3,CameraDiameter/2+OuterRingThickness+15])
 			color("plum") cube([8,2.5,35]); // expansion slot
 		translate([ShiftCamera-1,CameraDiameter/2+12,CameraDiameter/2+OuterRingThickness+25]) {
@@ -167,24 +168,36 @@ module PICamera2020(AddPI0Mount=0,AddThickness=0,HQ=0) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PICamera2020AllInOne(AddPI0Mount=0,AddThickness=0,HQ=0) {
+module PICamera2020AllInOne(Mount,AddThickness=0,HQ=0) {
 	difference() {
-		translate([0,0,6+AddThickness]) rotate([180,0,0]) ExtensionV3(1,0,AddThickness);
-		color("red") hull() {
-			translate([45,-24,-5]) cylinder(h=20,d=screw5);
-			translate([45,-13,-5]) cylinder(h=20,d=screw5);
+		translate([0,0,6+AddThickness]) rotate([180,0,0]) ExtensionV3(1,0,AddThickness,Mount);
+		if(Mount==1) {
+			color("red") hull() {
+				translate([45,-24,-5]) cylinder(h=20,d=screw5);
+				translate([45,-13,-5]) cylinder(h=20,d=screw5);
+			}
+			color("blue") hull() {
+				translate([45,-24,MountThickness-4]) cylinder(h=10,d=screw5hd);
+				translate([45,-13,MountThickness-4]) cylinder(h=10,d=screw5hd);
+			}
+			color("green") hull() {
+				translate([68,-24,-5]) cylinder(h=20,d=screw5);
+				translate([68,-13,-5]) cylinder(h=20,d=screw5);
+			}
+			color("purple") hull() {
+				translate([68,-24,MountThickness-4]) cylinder(h=10,d=screw5hd);
+				translate([68,-13,MountThickness-4]) cylinder(h=10,d=screw5hd);
+			}
 		}
-		color("blue") hull() {
-			translate([45,-24,MountThickness-4]) cylinder(h=10,d=screw5hd);
-			translate([45,-13,MountThickness-4]) cylinder(h=10,d=screw5hd);
-		}
-		color("green") hull() {
-			translate([68,-24,-5]) cylinder(h=20,d=screw5);
-			translate([68,-13,-5]) cylinder(h=20,d=screw5);
-		}
-		color("purple") hull() {
-			translate([68,-24,MountThickness-4]) cylinder(h=10,d=screw5hd);
-			translate([68,-13,MountThickness-4]) cylinder(h=10,d=screw5hd);
+	}
+	if(Mount==2) {
+		difference() {
+			translate([0,-49,0]) color("purple") cubeX([Length,16,MountThickness],2);
+			//translate([58,-36,4]) color("pink") cubeX([25,10,10],2); // clearance for power plug
+			color("red") translate([10,-43,-5]) cylinder(h=20,d=screw5);
+			color("blue") translate([10,-43,MountThickness-3]) cylinder(h=10,d=screw5hd);
+			color("green") translate([Length-10,-43,-5]) cylinder(h=20,d=screw5);
+			color("plum") translate([Length-10,-43,MountThickness-3]) cylinder(h=10,d=screw5hd);
 		}
 	}
 	translate([0,-16,0]) difference() {
@@ -192,7 +205,7 @@ module PICamera2020AllInOne(AddPI0Mount=0,AddThickness=0,HQ=0) {
 			translate([-5,-6,23]) color("red") cubeX([20.5,MountThickness,7],2);
 			translate([0,-6,0]) cubeX([15,MountThickness,5],2);
 		}
-		translate([-10,-2.75,27]) color("black") rotate([0,90,0]) cylinder(h=40,d=screw3);
+		translate([-10,-2.75,27]) color("darkgray") rotate([0,90,0]) cylinder(h=40,d=screw3);
 	}
 	if(HQ)
 		translate([0,5,0]) HQCameraMount();
@@ -209,7 +222,7 @@ module Mount2020v2(Tab=1,ExtraHeight=0,DoTab=1) {
 			//color("plum") cubeX([20+ExtraHeight,MountThickness,25],2);
 			if(Tab) translate([0,-6,10]) color("red") rotate([-45,0,0]) cubeX([20,15,MountThickness],2);
 		}
-		translate([-10,-1.5,9.5]) color("black") rotate([0,90,0]) cylinder(h=40,d=screw3);
+		translate([-10,-1.5,9.5]) color("darkgray") rotate([0,90,0]) cylinder(h=40,d=screw3);
 	}
 }
 
@@ -222,13 +235,13 @@ module Mount2020(Tab=1,ExtraHeight=0,DoTab=1) {
 			//color("plum") cubeX([20+ExtraHeight,MountThickness,25],2);
 			if(Tab) translate([0,-2,-6]) color("red") rotate([45,0,0]) cubeX([20,12,MountThickness],2);
 		}
-		translate([-10,-1.5,-1]) color("black") rotate([0,90,0]) cylinder(h=40,d=screw3);
+		translate([-10,-1.5,-1]) color("darkgray") rotate([0,90,0]) cylinder(h=40,d=screw3);
 		ScrewMount2020();
 	}
 	if(DoTab) {
 		difference() {
 			translate([0,-1,-1]) color("gray") rotate([0,90,0]) cylinder(h=Layer,d=20);
-			translate([-10,-1.5,-1]) color("black") rotate([0,90,0]) cylinder(h=40,d=screw3);
+			translate([-10,-1.5,-1]) color("darkgray") rotate([0,90,0]) cylinder(h=40,d=screw3);
 		}
 		translate([0,23,3]) color("lightgray") rotate([0,90,0]) cylinder(h=Layer,d=20);
 		//translate([0,3,23]) color("lightgreen") rotate([0,90,0]) cylinder(h=Layer,d=20);
@@ -316,7 +329,7 @@ module CameraHolder(Screw=screw2p5) {
 	difference() {
 		translate([3.6,25,5.5]) rotate([180,0,0]) CamSpacers(Screw);
 		translate([14,14,-4]) PICamMountingHoles(Screw);
-		translate([0,3.75,4]) color("black") cube([20,5,10]);
+		translate([0,3.75,4]) color("darkgray") cube([20,5,10]);
 		translate([0,19,4]) color("white") cube([20,5,10]);
 	}
 }
@@ -384,7 +397,7 @@ module PIShield(PI=0) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PIZeroBaseMount(Screw=Yes2p5mmInsert(Use2p5mmInsert)) {
+module PIZeroBaseMount(Screw=Yes2p5mmInsert(Use2p5mmInsert),Mount) {
 	translate([17,0.5,0]) {
 		translate([0,0,0]) color("red") cylinder(h=10,d=Screw);
 		translate([0,PIhw,0]) color("plum") cylinder(h=10,d=Screw);
@@ -528,9 +541,9 @@ module MSWebCameraV2() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module Extension(PI=0,PiCam=0,AddThickness=0) {
+module Extension(PI=0,PiCam=0,AddThickness=0,Mount) {
 	difference() {
-		translate([0,-Width/6,0]) color("black") cubeX([Length,Width,MountThickness+AddThickness],2);
+		translate([0,-Width/6,0]) color("darkgray") cubeX([Length,Width,MountThickness+AddThickness],2);
 		if(PiCam) translate([6,2,-2]) color("white") cubeX([3,20,15],1); // hole for camera ribbon cable
 		if(PI) {
 			PIZeroBaseMount();
@@ -541,14 +554,14 @@ module Extension(PI=0,PiCam=0,AddThickness=0) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module ExtensionV3(PI=0,PiCam=0,AddThickness=0) {
+module ExtensionV3(PI=0,PiCam=0,AddThickness=0,Mount=1) {
 	difference() {
-		color("black") cubeX([Length,Width,MountThickness+AddThickness],2);
+		color("darkgray") cubeX([Length,Width,MountThickness+AddThickness],2);
 		//if(PiCam) translate([6,2,-2]) color("white") cubeX([3,20,15],1); // hole for camera ribbon cable
 		if(PI) {
 			translate([10,6.5,0]) {
-				PIZeroBaseMount();
-				PIZeroClearance();
+				PIZeroBaseMount(Mount);
+				PIZeroClearance(Mount);
 			}
 		}
 	}
@@ -558,21 +571,21 @@ module ExtensionV3(PI=0,PiCam=0,AddThickness=0) {
 
 module ExtensionV2(PiCam=1) {
 	difference() {
-		translate([-5,-Width/6,0]) color("black") cubeX([Length-10,Width,MountThickness],2);
+		translate([-5,-Width/6,0]) color("darkgray") cubeX([Length-10,Width,MountThickness],2);
 		if(PiCam) translate([2,2,-5]) color("white") cubeX([3,20,15],1); // hole for camera ribbon cable
 		}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PIZeroClearance() {
+module PIZeroClearance(Mount=1) {
 	// clearance for the header pins, in either position
 	translate([20,19,-MountThickness+1.6]) color("white") cubeX([52,8,MountThickness],2);
 	translate([20,-3,-MountThickness+1.6]) color("plum") cubeX([52,8,MountThickness],2);
 	translate([66,0,-MountThickness+1.6]) color("green") cubeX([6,23,MountThickness],2);
 	translate([20,0,-MountThickness+1.6]) color("lightblue") cubeX([6,23,MountThickness],2);
-	translate([48,23,-8.4]) color("pink") cubeX([25,10,10],2); // clearance for power plug
-	translate([19,-8,-8.4]) color("khaki") cubeX([25,10,10],2); // clearance for power plug
+	if(Mount==1) translate([47,23,-8.4]) color("pink") cubeX([25,10,10],2); // clearance for power plug
+	translate([20,-8,-8.4]) color("khaki") cubeX([25,10,10],2); // clearance for power plug
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -602,7 +615,7 @@ module MountV2() {
 			color("gray") translate([Length+7,Width/3,-33]) cylinder(h=MountThickness*2.5,d=screw5);
 			color("plum") translate([Length+7,Width/3,-31]) cylinder(h=MountThickness,d=screw5hd);
 		}
-		translate([Length+6,12,-25]) color("black") cylinder(h=Layer,d=screw5hd+1);
+		translate([Length+6,12,-25]) color("darkgray") cylinder(h=Layer,d=screw5hd+1);
 	}
 }
 
@@ -679,7 +692,7 @@ module MSClamp(PI=0) {
 	if(!PI) {
 		difference() {
 			translate([ShiftCamera-4,CameraDiameter/2-12,CameraDiameter/2+OuterRingThickness+19]) rotate([0,-15,0])
-				color("black") cubeX([6,20,9],1);
+				color("darkgray") cubeX([6,20,9],1);
 			translate([ShiftCamera-5,CameraDiameter/2-2.5,CameraDiameter/2+OuterRingThickness+15]) rotate([0,-15,0])
 				color("plum") cube([8,1.5,35]); // expansion slot
 			translate([ShiftCamera-3.5,CameraDiameter/2+12,CameraDiameter/2+OuterRingThickness+25]) {
@@ -698,7 +711,7 @@ module MSClamp(PI=0) {
 module MSClampV2() {
 	difference() {
 		translate([ShiftCamera,CameraDiameter/2-12,CameraDiameter/2+OuterRingThickness+19])
-			color("black") cubeX([6,20,9],1);
+			color("darkgray") cubeX([6,20,9],1);
 		translate([ShiftCamera-1,CameraDiameter/2.5,CameraDiameter/2+OuterRingThickness+15])
 			color("plum") cube([8,2.5,35]); // expansion slot
 		translate([ShiftCamera+3,CameraDiameter/2-1.5,CameraDiameter/2+OuterRingThickness+25]) {
