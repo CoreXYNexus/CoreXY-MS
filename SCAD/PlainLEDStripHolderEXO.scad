@@ -30,7 +30,7 @@ PlainLEDStripHolder(1,0);
 module PlainLEDStripHolder(DoTabs=1,ShiftShortLEDTab=0) {
 	difference() {
 		translate([0,-10,0]) color("cyan") cuboid([110,45,4],rounding=2);
-		translate([-20,15,0]) {
+		translate([-37,15,0]) {
 			translate([0,-10,-3])color("red") cylinder(h=10,d=screw4);
 			translate([40,-10,-3]) color("blue") cylinder(h=10,d=screw4);
 			translate([0,-10,1.5])color("blue") cylinder(h=5,d=screw4hd);
@@ -38,11 +38,11 @@ module PlainLEDStripHolder(DoTabs=1,ShiftShortLEDTab=0) {
 		}
 		translate([0,11,0]) ZipTieHoleSlot();
 		translate([-50,11,0]) ZipTieHoleSlot();
-		translate([-99,11,0]) ZipTieHoleSlot();
+		translate([-98,11,0]) ZipTieHoleSlot();
 		translate([0,25,0]) {
 			ZipTieHoleSlot();
 			translate([-50,0,0]) ZipTieHoleSlot();
-			translate([-99,0,0]) ZipTieHoleSlot();
+			translate([-98,0,0]) ZipTieHoleSlot();
 		}
 	}
 	if(ShiftShortLEDTab != 0) {

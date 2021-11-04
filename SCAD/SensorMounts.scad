@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-// SensorAndFanMounts.scad
+// SensorMounts.scad
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // created: 6/2/1019
-// last update: 9/21/21
+// last update: 10/21/21
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/2/19	- Separated from single_titan_extruder_mount.scad
 // 4/12/20	- Made the mount to extruder plate the same for Proximity & BLTouch
@@ -10,7 +10,7 @@
 // 8/17/20	- Copied and edited from M-Max and added an adjustable mount for dc42's ir sensor
 // 8/30/20	- Added an adjustable BLTouch mount
 // 10/15/20	- Added IR mount for titan aero (mounts on printed extruder mount)
-// 9/18/21	- Added a mount for a bmg extrude
+// 9/18/21	- Added a bltount mount for the bmg extruder
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 use <inc/corner-tools.scad>
@@ -18,6 +18,7 @@ use <fanduct_v3.scad>
 include <inc/brassinserts.scad>
 include <BOSL2/std.scad>
 /////////////////////////////////////////////////////////////////////////////////////////////////
+// -- BLTouch 3.1 trigger position: 47.5 +-0.5; retracted 40mm-40.3mm
 //*****************************************************
 // adjustable proximity mount need beefing up 9/19/20
 //*****************************************************
@@ -50,23 +51,24 @@ StepperHoleOffset=31;
 //IRAdapter(0,0);
 //IRAdapterAero(0);
 //Spacer(3,7);
-BMGBLTMount(5);
+BMGBLTMount(7); // uses 50mm M3 screws to mount to extruder
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module BMGBLTMount(Offset=5) {
+module BMGBLTMount(Offset=5) { // X-24 Y0; 230/70: Z1
 	difference() {
 		union() {
-			translate([0,-Offset,0]) color("cyan") cuboid([StepperHoleOffset+10,10+Offset,9],rounding=2,p1=[0,0]);
+			translate([0,-Offset,0]) color("cyan") cuboid([StepperHoleOffset+10,10+Offset,12],rounding=2,p1=[0,0]);
 			//translate([0,-5-Offset,4]) color("plum") cuboid([StepperHoleOffset+10,10+Offset,5],rounding=2,p1=[0,0]);
 			translate([0,-Offset,0]) color("khaki") cuboid([StepperHoleOffset+10,5,25],rounding=2,p1=[0,0]);
 		}
-		translate([(StepperHoleOffset+10)/2,-Offset,-8]) color("red") rotate([90,0,0])  cyl(l=8, d=30, rounding=2);
+		translate([(StepperHoleOffset+20)/2-2,-7,-7]) color("plum") rotate([90,0,0])  cyl(l=15, d=30, rounding=2);
 		translate([5,5,-5]) color("blue") cylinder(h=20,d=screw3);
 		translate([StepperHoleOffset+5,5,-5]) color("red") cylinder(h=20,d=screw3);
-		translate([5,5,8]) color("red") cylinder(h=5,d=screw3hd);
-		translate([StepperHoleOffset+5,5,8]) color("blue") cylinder(h=5,d=screw3hd);
-		translate([20,-Offset,0]) rotate([90,90,0]) rotate([0,0,90]) BLTouch_Holes(2,Yes2p5mmInsert(Use2p5mmInsert));
+		translate([5,5,10.5]) color("red") cylinder(h=15,d=screw3hd);
+		translate([StepperHoleOffset+5,5,10.5]) color("blue") cylinder(h=15,d=screw3hd);
+		translate([23,-Offset,0]) rotate([90,90,0]) rotate([0,0,90]) BLTouch_Holes(2,Yes2p5mmInsert(Use2p5mmInsert));
+		translate([(StepperHoleOffset+20)/2-2,-9.5,-7]) color("purple") cuboid([20,10,15], rounding=2,p1=[0,0]);
 	}
 }
 

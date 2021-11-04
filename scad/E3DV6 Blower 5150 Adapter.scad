@@ -2,7 +2,7 @@
 // E3DV6 Blower 5150 Adpater.scad - mount a 5015 blower to a 40mm axial fan mount
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 8/26/2016
-// last update 6/29/2020
+// last update 10/26/21
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/26/16	- modified version from duet2020.v0.2.scad
 //			  Made base large enough to cover where 40mm fan was and added a second piller to hold blower
@@ -11,10 +11,12 @@
 // 6/1/19	- Made the base as thick as the supplied 30mm fan to be able to use the original screws
 //			  Added abiltiy to ajsut fan position to be adjusted left/right
 // 6/29/20	- Added use of 4mm brass insert
+// 10/26/21	- Added 5150Adapter() for adapting 5150 to 30mm
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // includes
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad> // http://www.thingiverse.com/thing:112008
+include <bosl2/std.scad>
 include <inc/brassinserts.scad>
 $fn=50;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,10 +27,50 @@ fan_support = 24; // 30mm fan=24
 40mmFanMountSpacing=32;
 fan_adjustLR=0.5;
 adjust_bevel=4;
+30mmFanDiameter=30;
+30mmOffset=24;
+30mmScrewOffset=7.9;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//blower_adapter(); // for a 5015 blower fan to 30mm square fan
-BlowerAdapterAero(); // for a 5015 blower fan to 30mm square fan
+//blower_adapterV1(); // for a 5015 blower fan to 30mm square fan
+//BlowerAdapterAero(); // for a 5015 blower fan to 30mm square fan
+5150Adapter();
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module 5150Adapter() {
+	difference() {
+		union() {
+			color("cyan") cuboid([30mmFanDiameter+2,30mmFanDiameter+2,10],rounding=1);
+			translate([-10.5,-6,45/2]) difference() {
+				translate([0,0,3]) color("purple") cuboid([5,10,56],rounding=1);
+				translate([-10,0,27]) color("green") rotate([0,90,0]) cylinder(h=20,d=Yes4mmInsert(Use4mmInsert));
+			}
+		}
+		translate([-8,-10,0]) color("green") cube([15,20,10]);
+		translate([0,0,-7]) hull() {
+			translate([0,0,-1]) color("blue") cylinder(h=5,d=30mmFanDiameter);
+			translate([-8,-10,4]) cube([15,20,5]);
+		}
+		translate([-20,-20,15]) 30mmMount(10);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module 30mmMount(Thickness) {
+	translate([30mmScrewOffset,30mmScrewOffset,-Thickness*2.5]) color("red") cylinder(h=Thickness*4,d=screw3);
+	translate([30mmScrewOffset+30mmOffset,30mmScrewOffset,-Thickness*2.5]) color("lightgray") cylinder(h=Thickness*4,d=screw3);
+	translate([30mmScrewOffset+30mmOffset,30mmScrewOffset+30mmOffset,-Thickness*2.5]) color("plum")
+		cylinder(h=Thickness*4,d=screw3);
+	translate([30mmScrewOffset,30mmScrewOffset+30mmOffset,-Thickness*2.5]) color("black") cylinder(h=Thickness*4,d=screw3);
+	translate([30mmScrewOffset,30mmScrewOffset,-Thickness-1]) color("black") cylinder(h=Thickness*4,d=screw3hd);
+	translate([30mmScrewOffset+30mmOffset,30mmScrewOffset,-Thickness-1]) color("plum") cylinder(h=Thickness*4,d=screw3hd);
+	translate([30mmScrewOffset+30mmOffset,30mmScrewOffset+30mmOffset,-Thickness-1]) color("red")
+		cylinder(h=Thickness*4,d=screw3hd);
+	translate([30mmScrewOffset,30mmScrewOffset+30mmOffset,-Thickness-1]) color("white") cylinder(h=Thickness*4,d=screw3hd);
+	translate([30mmScrewOffset+30mmOffset,30mmScrewOffset,-Thickness-1]) color("plum") cylinder(h=Thickness*7,d=screw3hd);
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

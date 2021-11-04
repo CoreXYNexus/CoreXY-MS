@@ -2,10 +2,11 @@
 // BeraAirMount.scad
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // C:4/8/21
-// U:9/16/21
+// U:10/24/21
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 4/8/21	- BerdAirMount on the extruder on EXOSlide
 // 9/14/21	- Added a mount to go on teh top of a E3DV6 heatsink: E3DV6Mount()
+// 10/5/21	- Added mount for titan and titan aero
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 include <BOSL2/std.scad>
@@ -17,26 +18,127 @@ LargeInsert=0;
 LayerThickness=0.3;
 Clearance=0.9;
 E3DV6diameter=16+Clearance; // diameter of section right above heat sink
+StepperHoleOffset=31;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //BerdAirMountLeft(35,2,0); // side with heater block, exoslide
 //BerdAirMountRight(13,2,0); // side without heater block, exoslide
-E3DV6Mount(2,0);  // moount on the top section of the heatsink
+E3DV6Mount(2,1,0);  // moount on the top section of the heatsink
+//BerdAirTitan(0,1,1,2);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BerdAirTitan(Side=0,DoClamp=1,DoTab=1,PipeSize=2) { // Side: 1=Right 
+	if(Side) {
+		difference() {
+			translate([0,-4.5,0]) color("cyan") cuboid([40,25,4],rounding=2,p1=[0,0]);
+			translate([4.5,17,-3]) {
+				color("blue") cylinder(h=10,d=screw3);
+				translate([StepperHoleOffset,-6,0]) color("red") cylinder(h=10,d=screw3);
+			}
+			translate([25,10,4]) BerdAirClampHoles();
+			union() {
+				translate([9,4,-3]) color("gray") cuboid([15,20,10],rounding=2,p1=[0,0]);
+				//translate([25,0.5,-3]) color("lightgray") rotate([0,0,45]) cuboid([9,10,10],rounding=2,p1=[0,0]);
+				translate([22,3.2,-3]) color("green") rotate([0,0,45]) cuboid([30,15,10],rounding=2,p1=[0,0]);
+			}
+		}
+		difference() {
+			translate([20,-6,0]) color("khaki") cuboid([10,10,16],rounding=2,p1=[0,0]);
+			translate([25,6,4]) BerdAirClampHoles();
+		}
+		if(DoTab) difference() {
+			union() {
+				translate([4,16,0]) color("purple") cylinder(h=LayerThickness,d=20);
+				translate([39,16,0]) color("gray") cylinder(h=LayerThickness,d=20);
+			}
+			translate([4.5,17,-3]) {
+				color("blue") cylinder(h=10,d=screw3);
+				translate([StepperHoleOffset,-6,0]) color("red") cylinder(h=10,d=screw3);
+			}
+		}
+	} else {
+		difference() {
+			translate([0,-4.5,0]) color("cyan") cuboid([45,20,4],rounding=2,p1=[0,0]);
+			translate([9.5,12,-3]) {
+				color("blue") cylinder(h=10,d=screw3);
+				translate([StepperHoleOffset,0,0]) color("red") cylinder(h=10,d=screw3);
+			}
+			translate([25,6,-8]) BerdAirClampHoles();
+			union() {
+				translate([13,4,-3]) color("gray") cuboid([15,15,10],rounding=2,p1=[0,0]);
+				translate([21,0.5,-3]) color("lightgray") rotate([0,0,45]) cuboid([10,10,10],rounding=2,p1=[0,0]);
+				translate([26,3.2,-3]) color("green") rotate([0,0,45]) cuboid([20,10,10],rounding=2,p1=[0,0]);
+			}
+		}
+		difference() {
+			translate([20,-6,-12]) color("khaki") cuboid([10,10,16],rounding=2,p1=[0,0]);
+			translate([21,0.5,-6]) color("lightgray") rotate([0,0,45]) cuboid([10,10,30],rounding=2,p1=[0,0]);
+			translate([25,6,-8]) BerdAirClampHoles();
+		}
+		if(DoTab) difference() {
+			union() {
+				translate([3,6,4-LayerThickness]) color("purple") cylinder(h=LayerThickness,d=20);
+				translate([42,6,4-LayerThickness]) color("gray") cylinder(h=LayerThickness,d=20);
+				//translate([25,-5.5,4-LayerThickness]) color("blue") cylinder(h=LayerThickness,d=10);
+			}
+			translate([9.5,12,-3]) {
+				color("blue") cylinder(h=10,d=screw3);
+				translate([StepperHoleOffset,0,0]) color("red") cylinder(h=10,d=screw3);
+			}
+		}
+	}
+	if(DoClamp)
+		if(Side) translate([0,-21,0]) AeroClamp(Side=0,DoTab,PipeSize);
+		else translate([0,-30,4]) rotate([180,0,0]) AeroClamp(Side=0,DoTab,PipeSize);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BerdAirClampHoles(Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) {
+	color("pink") rotate([90,0,0]) cylinder(h=15,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+	translate([0,0,8]) color("plum") rotate([90,0,0]) cylinder(h=15,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module AeroClamp(Side=0,DoTab=1,PipeSize=2) {
+	rotate([90,0,0]) difference() {
+		translate([20,0,0]) color("khaki") cuboid([10,4,16],rounding=2,p1=[0,0]);
+		if(Side) translate([15,4,8]) color("blue") rotate([0,90,0]) cylinder(h=20,d=PipeSize);
+		else  translate([15,-5,8]) color("blue") rotate([0,90,0]) cylinder(h=20,d=PipeSize);
+			translate([25,7,4]) {
+			color("pink") rotate([90,0,0]) cylinder(h=10,d=screw3);
+			translate([0,0,8]) color("plum") rotate([90,0,0]) cylinder(h=10,d=screw3);
+		}
+	}
+	difference() {
+		if(Side) translate([25,-8,0]) color("white") cylinder(h=LayerThickness,d=30);
+		else translate([25,-8,-1.6+LayerThickness]) color("white") cylinder(h=LayerThickness,d=30);
+		translate([25,-4,-4]) {
+			color("pink") rotate([0,0,0]) cylinder(h=10,d=screw3);
+			translate([0,-8,0]) color("plum") rotate([0,0,0]) cylinder(h=10,d=screw3);
+		}
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module E3DV6Mount(PipeSize=2,DoClamp=1) {
+module E3DV6Mount(PipeSize=2,DoClamp=1,SetScrew=0) {
 	difference() {
-		color("cyan") hull() {
-			cylinder(h=5,d=E3DV6diameter*2-3);
-			translate([-30,-E3DV6diameter/2,0]) cuboid([3,E3DV6diameter,8],rounding=1.5,p1=[0,0]);
+		union() {
+			color("cyan") hull() {
+				translate([0,0,2]) cyl(h=4,d=E3DV6diameter*2-3,rounding=1.5);
+				translate([-30,-E3DV6diameter/2,0]) cuboid([3,E3DV6diameter,4],rounding=1.5,p1=[0,0]);
+			}
+			translate([-22.5,0.25,3.5]) color("blue") cuboid([15,15.5,7],rounding=2);
 		}
-		translate([-32,-4,4.5]) color("pink") rotate([0,90,0]) cylinder(h=15,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
-		translate([-32,4,4.5]) color("pink") rotate([0,90,0]) cylinder(h=15,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		translate([-32,-4,3.5]) color("pink") rotate([0,90,0]) cylinder(h=16,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		translate([-32,4,3.5]) color("pink") rotate([0,90,0]) cylinder(h=16,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
 		translate([0,0,-5]) color("red") cylinder(h=20,d=E3DV6diameter);
-		translate([0,0,2.5]) rotate([0,90,0]) color("blue") cylinder(h=20,d=screw3t); // holding screw
+		if(SetScrew) translate([0,0,2]) color("purple") rotate([0,90,0]) cylinder(h=20,d=screw3t);
 	}
-	BAClamp(PipeSize);
+	if(DoClamp) BAClamp(PipeSize);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

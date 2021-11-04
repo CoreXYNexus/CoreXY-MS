@@ -5,7 +5,7 @@
 // Use 5mm to attached to the x carriage
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // create 7/5/2016
-// last update 11/14/20
+// last update 11/3/21
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 7/24/16	- added extra support to corner of xy()
 // 7/25/16	- added y() for the y axis wireguide
@@ -15,6 +15,7 @@
 //			- removed XAxisWireChainSpacer() since the XCMount() can have its height set, cleaned up code
 // 10/15/20	- Added use of a single wirechain to the x carraige
 // 11/14/20	- Fixed YAxisWirechainOnly(), add height to XAxisWireChainFrameMount()
+// 11/3/21	- Added a ziptie holes
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
@@ -58,7 +59,7 @@ module SingleWirechainX(Screw=Yes4mmInsert(Use4mmInsert)) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module XMountWCSingle(Screw=Yes4mmInsert(Use4mmInsert)) {
+module XMountWCSingle(Screw=Yes4mmInsert(Use4mmInsert),DoTab=1) {
 	difference() {
 		union() {
 			translate([0,40,0]) color("red") cubeX([55,thickness+2,35],2); // wirechain mount
@@ -66,22 +67,19 @@ module XMountWCSingle(Screw=Yes4mmInsert(Use4mmInsert)) {
 		}
 		translate([43,50,15]) rotate([90,0,0]) WCSingleHoles(Screw);
 		translate([0,-5,47]) rotate([0,90,0]) XMountHoles(screw5);
+		translate([5,52,29]) color("blue") rotate([90,0,0]) cylinder(h=20,d=screw5); // ziptie hole
 	}
-	translate([4,3,0]) color("black") cylinder(h=LayerThickness,d=20); // print support tab
-	translate([52,43,0]) color("gray") cylinder(h=LayerThickness,d=20); // print support tab
+	if(DoTab) {
+		translate([4,3,0]) color("green") cylinder(h=LayerThickness,d=20); // print support tab
+		translate([52,43,0]) color("gray") cylinder(h=LayerThickness,d=20); // print support tab
+	}
 }
 
 ////////////////////////////////////////////////////////////////
 
 module XMountHoles(Screw=screw5) {
-	color("gold") hull() {
-		translate([35,13,-5]) cylinder(h=20, d=Screw);
-		translate([39,13,-5]) cylinder(h=20, d=Screw);
-	}
-	color("red") hull() {
-		translate([35,13,7]) cylinder(h=5, d=screw5hd);
-		translate([39,13,7]) cylinder(h=5, d=screw5hd);
-	}
+	color("gold") translate([37,13,-5]) cylinder(h=20, d=Screw);
+	color("red") translate([37,13,7]) cylinder(h=5, d=screw5hd);
 	color("red") hull() {
 		translate([37,31,-5]) cylinder(h=20, d=Screw);
 		translate([37,35,-5]) cylinder(h=20, d=Screw);
@@ -111,6 +109,8 @@ module XAxisWireChainFrameMount(Screw=Yes4mmInsert(Use4mmInsert),XheightS=92) {	
 			translate([XheightS+ExtrusionSize-30,28,-1]) ExtrusionMountHoles();
 		}
 		translate([10,13,0]) WCSingleHoles(Screw);
+		translate([35,5,-5]) color("blue") cylinder(h=20,d=screw5); // ziptie hole
+		translate([35,30,-5]) color("green") cylinder(h=20,d=screw5); // ziptie hole
 	}
 }
 

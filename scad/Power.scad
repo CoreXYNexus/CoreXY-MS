@@ -69,7 +69,7 @@ ToggleOffsetHoleSize=22;
 Clearance=0.7;  // clearance for hole
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-all();// 1st arg: flip power label; next 4 args: Width, length, clip Thickness; defaults to 0,13,19.5,2
+//all();// 1st arg: flip power label; next 4 args: Width, length, clip Thickness; defaults to 0,13,19.5,2
 //PowerInlet(0,0);
 //testfit();	// print part of it to test fit the socket & 2020
 //PowerSwitch(0,"POWER");		// 1st arg: flip label; 2nd arg:Text Label, default="POWER"
@@ -82,7 +82,7 @@ all();// 1st arg: flip power label; next 4 args: Width, length, clip Thickness; 
 //PowerInletHousingCover(); // test fit cover to power inlet housing
 //PS12vdc(2);
 //PS5vdcMount();
-//PowerToggleSwitch();
+PowerToggleSwitch();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -388,8 +388,8 @@ module switch_label(Flip=0,Text,Height=2,FontSize=7) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-module printchar(String,Height=2,FontSize=14) { // print something
-	color("plum") linear_extrude(height = Height) text(text = String, font = "Balloon Bd BT:style=Bold", size=FontSize);
+module printchar(String,Height=2,FontSize=14,Font="Balloon Bd BT:style=Bold") { // print something
+	color("plum") linear_extrude(height = Height) text(text = String, font=Font, size=FontSize);
 }
 
 ///////////////////////////////////////////////////////////////////////////

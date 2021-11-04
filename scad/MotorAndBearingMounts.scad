@@ -3,7 +3,7 @@
 // https://creativecommons.org/licenses/by-sa/3.0/
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
-// last update 5/11/21
+// last update 10/16/21
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16	- added built-in spacer to the bearing_bracket
 // 7/14/16	- adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -33,6 +33,7 @@
 // 10/17/20	- Can now use 5mm inserts
 // 4/1/21	- Added an adjustable front bearing mount
 // 4/24/21	- Added thrust washer to front bearing mount base
+// 10/16/21	- Changed support on MotorMount()
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in FrontBearingBracket() must match stepper motor shaft in MotorMount()
 //       If the motors get hot, print it from something that can handle it
@@ -217,6 +218,7 @@ module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt
 		difference() { // make wall thicker at notch
 			translate([0,25,5]) color("white") cubeX([58,4,14],radius=2,center=true);
 			translate([0,0,10]) MakerslideNotchIt(Side);
+			MountScrews(28);
 		}
 		difference() {
 			translate([0,27,23]) color("cyan") cubeX([59,5,48],radius=2,center=true);
@@ -233,12 +235,13 @@ module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt
 		MotorMountSupport(Side);
 		difference() {
 			translate([0,-27,28]) color("cyan") cubeX([59,5,58],radius=2,center=true);
-			MountScrews(28);
 			translate([0,0,20]) MakerslideNotchIt(Side);
+			MountScrews(28);
 		}
 		difference() { // make wall thicker at notch
 			translate([0,-25,17]) color("white") cubeX([58,4,14],radius=2,center=true);
 			translate([0,0,10]) MakerslideNotchIt(Side);
+			MountScrews(28);
 		}
 		difference() {
 			translate([27,0,28]) color("pink") cubeX([5,59,58],radius=2,center=true);
@@ -268,13 +271,18 @@ module MakerslideNotch() {
 
 module MountScrews(Mount_S,Screw=screw5) { // all of them; Mount_S is hight of top screw holes
 	translate([-14,40,Mount_S]) rotate([90,0,0]) color("white") cylinder(h=80,d=Screw);
-//	translate([14,40,Mount_S]) rotate([90,0,0]) color("red") cylinder(h=80,d=Screw);
-	translate([-42,14,Mount_S]) rotate([0,90,0]) color("blue") cylinder(h=80,d=Screw);
-	translate([-42,-14,Mount_S]) rotate([0,90,0]) color("green") cylinder(h=80,d=Screw);
+	translate([-14,-21,Mount_S]) rotate([90,0,0]) color("gray") cylinder(h=5,d=screw5hd);
+	translate([-14,26,Mount_S]) rotate([90,0,0]) color("green") cylinder(h=5,d=screw5hd);
+	translate([-42,18,Mount_S]) rotate([0,90,0]) color("blue") cylinder(h=80,d=Screw);
+	translate([-42,-18,Mount_S]) rotate([0,90,0]) color("green") cylinder(h=80,d=Screw);
+	translate([21,18,Mount_S]) rotate([0,90,0]) color("green") cylinder(h=5,d=screw5hd);
+	translate([21,-18,Mount_S]) rotate([0,90,0]) color("blue") cylinder(h=5,d=screw5hd);
 	translate([-14,40,Mount_S+20]) rotate([90,0,0]) color("yellow") cylinder(h=80,d=Screw);
-//	translate([14,40,Mount_S+20]) rotate([90,0,0]) color("khaki") cylinder(h=80,d=Screw);
-	translate([-42,14,Mount_S+20]) rotate([0,90,0]) color("gold") cylinder(h=80,d=Screw);
-	translate([-42,-14,Mount_S+20]) rotate([0,90,0]) color("plum") cylinder(h=80,d=Screw);
+	translate([-14,26,Mount_S+20]) rotate([90,0,0]) color("khaki") cylinder(h=5,d=screw5hd);
+	translate([-42,18,Mount_S+20]) rotate([0,90,0]) color("gold") cylinder(h=80,d=Screw);
+	translate([21,18,Mount_S+20]) rotate([0,90,0]) color("gold") cylinder(h=5,d=screw5hd);
+	translate([-42,-18,Mount_S+20]) rotate([0,90,0]) color("plum") cylinder(h=80,d=Screw);
+	translate([21,-18,Mount_S+20]) rotate([0,90,0]) color("white") cylinder(h=5,d=screw5hd);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -369,33 +377,9 @@ module 	BearingBracketHorizontalSupport() {
 
 module MotorMountSupport(Side) {
 	if(Side) {
-		difference() {
-			translate([6,24.5,-35]) rotate([0,-45,0]) color("gray") cubeX([80,5,50],2);
-			translate([0,25.5,-17]) color("white") cube([60,10,35],2);
-			translate([45,25.5,20]) rotate([0,90,0]) color("black") cube([70,10,35],2);
-			color("plum") hull() {
-				translate([-7,33,7]) rotate([90,0,0]) cylinder(h=10,r=5);
-				translate([20,33,35]) rotate([90,0,0]) cylinder(h=10,r=5);
-				translate([20,33,7]) rotate([90,0,0]) cylinder(h=10,r=5);
-			}
-		}
+		translate([-29,24.5,1.5]) rotate([0,46,0]) color("gray") cubeX([6,5,76.5],2);
 	} else {
-		translate([0,-54,0]) difference() {
-			translate([3,24.5,-38]) rotate([0,-40,0]) color("gray") cubeX([85,5,50],2);
-			translate([0,25.5,-19]) color("white") cube([70,10,40],2);
-			translate([50,25.5,20]) rotate([0,90,0]) color("black") cube([70,10,48],2);
-		
-			color("plum") hull() {
-				translate([-7,33,6]) rotate([90,0,0]) cylinder(h=10,r=5);
-				translate([20,33,28]) rotate([90,0,0]) cylinder(h=10,r=5);
-				translate([20,33,7]) rotate([90,0,0]) cylinder(h=10,r=5);
-			}
-		}
-//		difference() {
-//			translate([-20,-29.5,-7]) rotate([0,-40,0]) color("lightgray") cubeX([75,5,10],2);
-//			translate([-30,-30.5,-10]) color("white") cube([50,10,10],2);
-//			translate([27,-30.5,55]) rotate([0,90,0]) color("black") cube([50,10,10],2);
-//		}
+		translate([-28,-29.5,1.5]) rotate([0,51,0]) color("gray") cubeX([6,5,69],2);
 	}
 }
 

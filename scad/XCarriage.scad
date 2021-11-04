@@ -116,10 +116,10 @@ use <TitanAero.scad>
 use <yBeltClamp.scad>
 //-------------------------------------------------------------------------------------------------------------
 $fn=75;
-TestLoop=0; // 1 = have original belt clamp mount hole visible
-LoopHoleOffset=37;	// distance between the belt loop mounting holes (same as in belt_holder.scad)
-LoopHOffset=0;		// shift horizontal the belt loop mounting holes
-LoopVOffset=-2;		// shift vertical the belt loop mounting holes
+TestLoop=0; 			// 1 = have original belt clamp mount hole visible
+LoopHoleOffset=34.5;	// distance between the belt loop mounting holes
+LoopHOffset=0;			// shift horizontal the belt loop mounting holes
+LoopVOffset=-2;			// shift vertical the belt loop mounting holes
 BeltLoopShiftY=-5;
 MountThickness=5;
 BeltSpacing=7;
@@ -139,6 +139,8 @@ ShiftIR = -20;			// shift ir sensor bracket mount holes
 ShiftBLTouch = 10;		// shift bltouch up/down
 ShiftProximity = 5;		// shift proximity sensor up/down
 ShiftProximityLR = 3;	// shift proximity sensor left/right
+EWCMountLength=48;
+EWCMountWidth=32;
 //-----------------------------------------------------------------------------------------
 // info from irsensorbracket.scad
 //-----------------------------------
@@ -171,24 +173,32 @@ WireChainMount=Yes5mmInsert(Use5mmInsert);
 //translate([30,70,-8]) // position either below to print with CarridgeAllInOneAndSingleTitanExtruder()
 //	BeltLoopHolderOppo(2,BeltLoopShiftY,screw3); // loop mounts opposite of each other
 //	BeltLoopHolderOppo(BeltLoopShiftY,screw5); // loop mounts opposite of each other
-EXOSLideAdapter(9); // arg is beltloop holder screw hieght above bottom
+EXOSLideAdapter(9,10.5); // arg is beltloop holder screw hieght above bottom
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module EXOSLideAdapter(UpDownAdjust=0,Screw=Yes5mmInsert(Use5mmInsert)) {
+module EXOSLideAdapter(UpDownAdjust=0,LRAdjust=0,Screw=Yes5mmInsert(Use5mmInsert),LRAdjust=10.5) {
 	difference() {
-		color("cyan") cuboid([30,48,30],rounding=2,p1=[0,0]);
-		translate([5,48/2,-10]) color("blue") cylinder(h=50,d=screw4);
-		translate([25,48/2,-10]) color("red") cylinder(h=50,d=screw4);
-		translate([5,48/2,16]) color("red") cylinder(h=20,d=screw4hd);
-		translate([25,48/2,16]) color("blue") cylinder(h=20,d=screw4hd);
-		translate([-10,6,UpDownAdjust]) {
+		color("cyan") cuboid([EWCMountWidth,EWCMountLength,30],rounding=2,p1=[0,0]);
+		translate([EWCMountWidth/6,0,0]) {
+			translate([0,EWCMountLength/2,-10]) color("blue") cylinder(h=50,d=screw4);
+			translate([20,EWCMountLength/2,-10]) color("red") cylinder(h=50,d=screw4);
+			translate([0,EWCMountLength/2,16]) color("red") cylinder(h=20,d=screw4hd);
+			translate([20,EWCMountLength/2,16]) color("blue") cylinder(h=20,d=screw4hd);
+		}
+		translate([-10,LoopHoleOffset/2-LRAdjust,UpDownAdjust]) {
 			color("blue") rotate([0,90,0]) cylinder(h=LoopHeight*3,d=Screw);
 			translate([0,LoopHoleOffset,0]) color("red") rotate([0,90,0])
 				cylinder(h=LoopHeight*3,d=Screw);
 		}
-		translate([-14,0.5,20]) rotate([0,0,0]) XWCMountHoles();
-		translate([-2,7.5,20]) rotate([0,0,0]) XStopMountHoles();
+		translate([EWCMountWidth-39,0,0]) {
+			translate([-5,0.5,20]) XWCMountHoles();
+			translate([5,7.5,20]) XStopMountHoles();
+		}
+		translate([15,8,-5]) color("green")  hull() { // reduce plastic/weight
+			cylinder(h=50,d=8);
+			translate([0,32,0]) cylinder(h=50,d=8);
+		}
 	}
 }
 
