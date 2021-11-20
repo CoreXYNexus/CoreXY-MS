@@ -69,7 +69,7 @@ ToggleOffsetHoleSize=22;
 Clearance=0.7;  // clearance for hole
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//all();// 1st arg: flip power label; next 4 args: Width, length, clip Thickness; defaults to 0,13,19.5,2
+all(1);// Horizontal(0) Vertical(1) Toggle; flip=0;Makerslide=1,PBQuantiy=2,Version=0
 //PowerInlet(0,0);
 //testfit();	// print part of it to test fit the socket & 2020
 //PowerSwitch(0,"POWER");		// 1st arg: flip label; 2nd arg:Text Label, default="POWER"
@@ -82,7 +82,7 @@ Clearance=0.7;  // clearance for hole
 //PowerInletHousingCover(); // test fit cover to power inlet housing
 //PS12vdc(2);
 //PS5vdcMount();
-PowerToggleSwitch();
+//PowerToggleSwitch(1);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -92,21 +92,16 @@ module cubeX(size,Rounding) { // temp module
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module all(flip=0,Makerslide=1,PBQuantiy=2,Version=0) {
-	if($preview) %translate([25,20,0]) cube([200,200,2],center=true); // show the 200x200 bed
+module all(VerticalToogle=0,Version=0) {
 	translate([0,-12,0]) PowerInletHousing(Version);
 	translate([0,-5,45]) rotate([180,0,0]) PowerInletHousingCover();
-	translate([-50,-45,0])
-		//PowerSwitch();
-		PowerToggleSwitch();
-	//translate([-30,60,0]) powersupply_cover();
-	//translate([-35,-10,0]) rotate([0,0,90]) PowerSupplyMount(Makerslide,PBQuantiy);
+	translate([-50,-45,0]) PowerToggleSwitch(VerticalToogle);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PowerToggleSwitch(Flip=0,HoleSize=12+Clearance) {
-	difference() {  // switch front and switch mounting hole
+module PowerToggleSwitch(Vertical=1,Flip=0,HoleSize=12+Clearance) {
+	difference() {
         union() {
             color("cyan") cuboid([ToggleSwitchLength+10,TogglwSwitchWidth+10,4],rounding=2,p1=[0,0],except_edges=TOP);
 			translate([0,0,0]) color("blue") cubeX([5,TogglwSwitchWidth+10,ToggleSwitchHeight+10],2); // left wall
@@ -115,25 +110,38 @@ module PowerToggleSwitch(Flip=0,HoleSize=12+Clearance) {
 			translate([0,0,0]) color("tan") cubeX([ToggleSwitchLength+10,5,ToggleSwitchHeight+10],2); // rear wall
 			translate([0,TogglwSwitchWidth+5,0]) color("gray")
 				cubeX([ToggleSwitchLength+10,5,ToggleSwitchHeight+10],2); // rear wall
-			translate([0,-22,0]) ToggleSwitchExtrusionMount(Flip,ToggleSwitchLength+10);
+			translate([0,-22,0]) ToggleSwitchExtrusionMount(Flip,ToggleSwitchLength+10,Vertical);
 		}
-		translate([(ToggleSwitchLength+10)/2,(TogglwSwitchWidth+10)/2,-3]) color("red") cylinder(h=10,d=HoleSize);
-		translate([-3.5,4,0]) switch_label(Flip,"POWER",6);
+		translate([(ToggleSwitchLength+10)/2,(TogglwSwitchWidth+10)/2,-3]) color("red")
+			cylinder(h=10,d=HoleSize); // switch hole
+		if(Vertical)
+			translate([2.5,28,0]) rotate([0,0,-90]) switch_label(Flip,"PWR",6,6);
+		else
+			translate([-3.5,4,0]) switch_label(Flip,"POWER",6);
 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module ToggleSwitchExtrusionMount(Flip=0,Width) {
-	difference() {
-		color("green") cubeX([Width,27,5],2);
-		translate([10,10,-2]) color("red") cylinder(h=10,d=screw5);
-		translate([30,10,-2]) color("blue") cylinder(h=10,d=screw5);
-		//translate([10,10,-4]) color("red") cylinder(h=5,d=screw5hd);
-		//translate([30,10,-4]) color("blue") cylinder(h=5,d=screw5hd);
+module ToggleSwitchExtrusionMount(Flip=0,Width,Vertical=0) {
+	if(Vertical) {
+		difference() {	
+			translate([-20,22,0]) color("green") cubeX([TogglwSwitchWidth+10,26,5],2);
+			translate([-10,35,-2]) color("red") cylinder(h=10,d=screw5);
+			translate([-10,35,-4]) color("blue") cylinder(h=5,d=screw5hd);
+		}
+		translate([-10,35,1]) color("purple") cylinder(h=LayerThickness,d=screw5hd);
+	} else {
+		difference() {	
+			color("green") cubeX([Width,27,5],2);
+			translate([10,10,-2]) color("red") cylinder(h=10,d=screw5);
+			translate([30,10,-2]) color("blue") cylinder(h=10,d=screw5);
+			translate([10,10,-4]) color("red") cylinder(h=5,d=screw5hd);
+			translate([30,10,-4]) color("blue") cylinder(h=5,d=screw5hd);
+		}
+		translate([10,10,1]) color("pink") cylinder(h=LayerThickness,d=screw5hd);
+		translate([30,10,1]) color("white") cylinder(h=LayerThickness,d=screw5hd);
 	}
-	//translate([10,10,1]) color("blue") cylinder(h=LayerThickness,d=screw5hd); // support
-	//translate([30,10,1]) color("red") cylinder(h=LayerThickness,d=screw5hd); // support
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

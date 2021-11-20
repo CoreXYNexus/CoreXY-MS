@@ -33,6 +33,7 @@
 // https://static.raspberrypi.org/files/product-mechanical-drawings/20200428_HQ_Camera_Technical_drawing.pdf
 // MS USB Webcam: Duet 3 w/SBC https://pimylifeup.com/raspberry-pi-webcam-server/
 // For a PI Cam only: https://elinux.org/RPi-Cam-Web-Interface -- freezes on Duet 3 with PI4 during printing
+// 11/21 - pi cam only works with PI OS Buster
 // For the pi zero cover: https://www.thingiverse.com/thing:2165844, I used the RPI_Zero_W_Case_-_Top_-_Heatsink.stl
 // https://randomnerdtutorials.com/video-streaming-with-raspberry-pi-camera/
 // Uses four M2 to mount the PI Zero and four M2 to mount the PI Camera
@@ -45,7 +46,7 @@
 // Print in PETG, ABS, or anything that handle your bed temperatrue without drooping
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
-use <inc/cubeX.scad>
+include <BOSL2/std.scad>
 include <inc/brassinserts.scad>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $fn=100;
@@ -83,6 +84,15 @@ HQCamHoleOffset=4;
 PICamera2020AllInOne(2,0.2,0);
 //MSWebCam2020(1);
 //HQCameraMount();
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+module cubeX(Size,Round,Center) { // temporary module; remove when all cubeX() are converted
+	if(Center)
+		cuboid(Size,rounding=Round);
+	else
+		cuboid(Size,rounding=Round,p1=[0,0]);
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
