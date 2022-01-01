@@ -7,6 +7,7 @@
 $fn=100;
 include <inc/cubex.scad>
 include <inc/brassinserts.scad>
+include <bosl2/std.scad>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Thickness=5;
 Clearance=0.5;
@@ -14,7 +15,7 @@ PTFEDiameter=4.12+Clearance;
 Offsets=20;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Bracket(15); // CXY-MSv1
+Bracket(20); // CXY-MSv1
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -22,7 +23,7 @@ module Bracket(Length=40,Size=9.5) {
 	difference() {
 		color("cyan") cubeX([Length+Offsets,20,Thickness],2);
 		translate([10,10,-2]) ExtrusionMount();
-		translate([Length+Offsets-10,10,-2]) cylinder(h=10,d=PTFEDiameter);
+		translate([Length+Offsets-11,10,-2]) rotate([0,25,0]) cylinder(h=20,d=PTFEDiameter);
 	}
 	translate([Length+Offsets-10,10,0]) ConnectorMount(Size);
 }
@@ -31,9 +32,14 @@ module Bracket(Length=40,Size=9.5) {
 
 module ConnectorMount(Size=9.5) {
 	difference() {
-		color("green") cylinder(h=10,d=Size*1.5);
-		translate([0,0,-2]) color("black") cylinder(h=15,d=Size);
-		translate([0,0,14]) color("gray") hull() { // bevel edge to make it easier to insert fitting
+		rotate([0,25,0]) {
+			difference() {
+				translate([0,0,3]) color("green") cyl(h=25,d=Size*1.5,rounding=1);
+				translate([0,0,-3]) color("black") cylinder(h=20,d=Size);
+			}
+		}
+		translate([-15,-10,-20]) color("gray") cube([25,20,20]);
+		rotate([0,25,0]) translate([0,0,19]) color("gray") hull() { // bevel edge to make it easier to insert fitting
 			cylinder(h=1,d=Size*1.5);
 			translate([0,0,-5])cylinder(h=1,d=Size);
 		}

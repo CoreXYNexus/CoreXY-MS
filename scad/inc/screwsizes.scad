@@ -2,7 +2,7 @@
 // screwsizes.scad - has the screw sizes I use
 /////////////////////////////////////////////////////////////////////////////////
 // created 7/13/2016
-// last update 9/16/21
+// last update 1/1/22
 ////////////////////////////////////////////////////////////////////////////////
 // 8/6/19	- Add nut3 wrench size and corner to cornrer size
 // 5/31/20	- Added some countersink depth sizes
@@ -21,7 +21,7 @@ screw2p5hd=4.5;
 screw2p5in = 3.4;	// 2.5mm brass insert
 screw3 = 3.6;
 screw3inS = 4.1;	// 3mm small brass insert
-screw3inL = 4.9;	// 3mm large brass insert
+screw3inL = 4.8;	// 3mm large brass insert
 screw3t = 2.6;
 screw3hd = 6.5;
 screw3cs = 3;

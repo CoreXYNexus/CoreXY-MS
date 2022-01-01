@@ -2,7 +2,7 @@
 // Power.scad - uses a pc style power socket with switch
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 7/4/2016
-// last update 4/22/21
+// last update 12/25/21
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/4/16	- Added cover
 // 8/5/16	- adjusted cover & 2020 mounting holes
@@ -24,6 +24,7 @@
 //			  power socket
 // 4/20/21	- Added toggle switch mount
 // 4/22/21	- Adjusted some holes in the Power Inlet
+// 12/25/21	- Fixed Meanwell RS-15-5 mount
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Version 0 uses Digi-Key Part number: CCM1666-ND : combined power socket and switch
 //		 http://www.digikey.com/product-detail/en/te-connectivity-corcom-filters/1609112-3/CCM1666-ND/758835
@@ -35,7 +36,7 @@
 include <BOSL2/std.scad>
 include <inc/screwsizes.scad>
 use <inc/brassinserts.scad>
-$fn = 50;
+$fn = 100;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vars
 Use3mmInsert=1;
@@ -69,7 +70,7 @@ ToggleOffsetHoleSize=22;
 Clearance=0.7;  // clearance for hole
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-all(1);// Horizontal(0) Vertical(1) Toggle; flip=0;Makerslide=1,PBQuantiy=2,Version=0
+//all(1);// Horizontal(0) Vertical(1) Toggle; flip=0;Makerslide=1,PBQuantiy=2,Version=0
 //PowerInlet(0,0);
 //testfit();	// print part of it to test fit the socket & 2020
 //PowerSwitch(0,"POWER");		// 1st arg: flip label; 2nd arg:Text Label, default="POWER"
@@ -81,7 +82,7 @@ all(1);// Horizontal(0) Vertical(1) Toggle; flip=0;Makerslide=1,PBQuantiy=2,Vers
 //PowerInletHousing(0); // built in switch
 //PowerInletHousingCover(); // test fit cover to power inlet housing
 //PS12vdc(2);
-//PS5vdcMount();
+PS5vdcMount();
 //PowerToggleSwitch(1);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,14 +158,16 @@ module PS5vdcMount() { // meanwell RS-15-5
 	difference() {
 		color("cyan") cubeX([50,60,4],2);
 		translate([10,10,-2]) color("red") cylinder(h=10,d=screw5);
-		translate([10,10,3]) color("blue") cylinder(h=5,d=screw5hd);
+		translate([10,10,-4]) color("blue") cylinder(h=5,d=screw5hd);
 		translate([10,50,-2]) color("blue") cylinder(h=10,d=screw5);
-		translate([10,50,3]) color("red") cylinder(h=5,d=screw5hd);
-		translate([36,10.4+1.5,0]) color("plum") cylinder(h=10,d=screw3);
+		translate([10,50,-4]) color("red") cylinder(h=5,d=screw5hd);
+		translate([36,10.4+1.5,-1]) color("plum") cylinder(h=10,d=screw3);
 		translate([36,10.4+1.5,3]) color("black") cylinder(h=5,d=screw3hd);
-		translate([36,49.55+1.5,0]) color("black") cylinder(h=10,d=screw3);
+		translate([36,49.55+1.5,-1]) color("black") cylinder(h=10,d=screw3);
 		translate([36,49.55+1.5,3]) color("plum") cylinder(h=5,d=screw3hd);
 	}
+		translate([10,10,1]) color("white") cylinder(h=LayerThickness,d=screw5hd);
+		translate([10,50,1]) color("gray") cylinder(h=LayerThickness,d=screw5hd);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

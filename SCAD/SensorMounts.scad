@@ -2,7 +2,7 @@
 // SensorMounts.scad
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // created: 6/2/1019
-// last update: 10/21/21
+// last update: 11/27/21
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // 6/2/19	- Separated from single_titan_extruder_mount.scad
 // 4/12/20	- Made the mount to extruder plate the same for Proximity & BLTouch
@@ -11,6 +11,7 @@
 // 8/30/20	- Added an adjustable BLTouch mount
 // 10/15/20	- Added IR mount for titan aero (mounts on printed extruder mount)
 // 9/18/21	- Added a bltount mount for the bmg extruder
+// 11/27/21	- Added BMGIRMount() for dc42's IR Sensor
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 use <inc/corner-tools.scad>
@@ -39,7 +40,7 @@ Spacing = 17; 			// ir sensor bracket mount hole spacing
 //------------------------------------------------------------------------------------------------
 Use2p5mmInsert=1;
 Use3mmInsert=1; // set to 1 to use 3mm brass inserts
-LargeInsert=1;
+LargeInsert=0;
 //Use4mmInsert=1; // set to 1 to use 4mm brass inserts
 //Use5mmInsert=1; // set to 1 to use 5mm brass inserts
 //-----------------------------------------------------------------------------------------
@@ -51,7 +52,45 @@ StepperHoleOffset=31;
 //IRAdapter(0,0);
 //IRAdapterAero(0);
 //Spacer(3,7);
-BMGBLTMount(7); // uses 50mm M3 screws to mount to extruder
+//BMGBLTMount(7); // uses 50mm M3 screws to mount to extruder
+BMGIRMount(20); // uses 50mm M3 screws to mount to extruder
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BMGIRMount(Offset=5) { // X-24 Y0; 230/70; Z1 -- print upside down
+	difference() {
+		union() {
+			translate([0,-Offset-10,0]) color("cyan") cuboid([StepperHoleOffset+10,20+Offset,12],rounding=2,p1=[0,0]);
+			//translate([0,-5-Offset,4]) color("plum") cuboid([StepperHoleOffset+10,10+Offset,5],rounding=2,p1=[0,0]);
+			//translate([0,-Offset,0]) color("khaki") cuboid([StepperHoleOffset+10,5,25],rounding=2,p1=[0,0]);
+		}
+		translate([(StepperHoleOffset+20)/2-2,-23,-7]) color("plum") rotate([90,0,0])
+			cyl(l=50, d=35, rounding=2); // hotend clearance
+		translate([(StepperHoleOffset+20)/2-2,-8,-5]) color("purple")
+			cuboid([20,10,15], rounding=2,p1=[0,0]); // berdair mount notch
+		translate([5,5,-5]) color("blue") cylinder(h=20,d=screw3);
+		translate([StepperHoleOffset+5,5,-5]) color("red") cylinder(h=20,d=screw3);
+		translate([5,5,10.5]) color("red") cylinder(h=15,d=screw3hd);
+		translate([StepperHoleOffset+5,5,10.5]) color("blue") cylinder(h=15,d=screw3hd);
+		translate([14,-Offset-5,15]) rotate([90,90,0]) rotate([0,0,90])
+			IRMountHoles(Screw=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		union() {
+			translate([(StepperHoleOffset+10)/2+2,-6,2]) color("pink") // fan exhaust notch
+				cyl(h=20,d=16,rounding=-2);
+			translate([(StepperHoleOffset+10)/2+2,-7,2]) color("green") // fan exhaust notch
+				cyl(h=20,d=16,rounding=-2);
+			translate([(StepperHoleOffset+10)/2+2,-9,2]) color("blue") // fan exhaust notch
+				cyl(h=20,d=16,rounding=-2);
+			translate([(StepperHoleOffset+10)/2+2,-11,2]) color("white") // fan exhaust notch
+				cyl(h=20,d=16,rounding=-2);
+			translate([(StepperHoleOffset+10)/2+2,-12,2]) color("gray") // fan exhaust notch
+				cyl(h=20,d=16,rounding=-2);
+		}
+	}
+	translate([5,5,10.5-LayerThickness]) color("blue") cylinder(h=LayerThickness,d=screw3hd); // support
+	translate([StepperHoleOffset+5,5,10.5-LayerThickness]) color("red") cylinder(h=LayerThickness,d=screw3hd); // support
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -62,13 +101,15 @@ module BMGBLTMount(Offset=5) { // X-24 Y0; 230/70: Z1
 			//translate([0,-5-Offset,4]) color("plum") cuboid([StepperHoleOffset+10,10+Offset,5],rounding=2,p1=[0,0]);
 			translate([0,-Offset,0]) color("khaki") cuboid([StepperHoleOffset+10,5,25],rounding=2,p1=[0,0]);
 		}
-		translate([(StepperHoleOffset+20)/2-2,-7,-7]) color("plum") rotate([90,0,0])  cyl(l=15, d=30, rounding=2);
+		translate([(StepperHoleOffset+20)/2-2,-7,-7]) color("plum") rotate([90,0,0])
+			cyl(l=15, d=30, rounding=2);  // hotend clearance
+		translate([(StepperHoleOffset+20)/2-2,-9.5,-7]) color("purple")
+			cuboid([20,10,15], rounding=2,p1=[0,0]);  // berdair mount notch
 		translate([5,5,-5]) color("blue") cylinder(h=20,d=screw3);
 		translate([StepperHoleOffset+5,5,-5]) color("red") cylinder(h=20,d=screw3);
 		translate([5,5,10.5]) color("red") cylinder(h=15,d=screw3hd);
 		translate([StepperHoleOffset+5,5,10.5]) color("blue") cylinder(h=15,d=screw3hd);
 		translate([23,-Offset,0]) rotate([90,90,0]) rotate([0,0,90]) BLTouch_Holes(2,Yes2p5mmInsert(Use2p5mmInsert));
-		translate([(StepperHoleOffset+20)/2-2,-9.5,-7]) color("purple") cuboid([20,10,15], rounding=2,p1=[0,0]);
 	}
 }
 

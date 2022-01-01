@@ -14,7 +14,7 @@ include <inc/brassinserts.scad>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $fn=100;
 Use3mmInsert=1;
-LargeInsert=0;
+LargeInsert=1;
 LayerThickness=0.3;
 Clearance=0.9;
 E3DV6diameter=16+Clearance; // diameter of section right above heat sink
@@ -128,10 +128,10 @@ module E3DV6Mount(PipeSize=2,DoClamp=1,SetScrew=0) {
 	difference() {
 		union() {
 			color("cyan") hull() {
-				translate([0,0,2]) cyl(h=4,d=E3DV6diameter*2-3,rounding=1.5);
+				translate([0,0,2-0.3]) cyl(h=3.5,d=E3DV6diameter*2-3,rounding=1.5);
 				translate([-30,-E3DV6diameter/2,0]) cuboid([3,E3DV6diameter,4],rounding=1.5,p1=[0,0]);
 			}
-			translate([-22.5,0.25,3.5]) color("blue") cuboid([15,15.5,7],rounding=2);
+			translate([-22.5,0.25,4]) color("blue") cuboid([15,15.5,7],rounding=2);
 		}
 		translate([-32,-4,3.5]) color("pink") rotate([0,90,0]) cylinder(h=16,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
 		translate([-32,4,3.5]) color("pink") rotate([0,90,0]) cylinder(h=16,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
