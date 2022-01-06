@@ -1,15 +1,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Spool_Sount.scad - mount a spool onto 2020
 // created: 1/27/2019
-// last modified: 11/27/20
+// last modified: 1/4/22
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/27/19	- Mounting a spool to 2020, uses 4 M3x8mm screws, 4 M3 post install nuts, 200mm of 8mm threaded rod,
 //			  three M8 nuts, two M8 washers, 20mm of 2020, one M5 insall nut, one M5x5mm or M5x25mm cap screw
 // 11/27/20	- Added spacers for the mounting rod for the sppol, since it's longer than needed for my current spools
+// 1/4/22	- BOSL2
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // uses http://www.thingiverse.com/thing:1647748 to hold the spool
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-include <inc/cubex.scad>
+include <bosl2/std.scad>
 include <inc/screwsizes.scad>
 $fn=100;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,23 +38,23 @@ module Spacer(Quanity=1,Length=50) {
 
 module spool() {
 	frame_mount();
-	rod_mount();
+	translate([0,0,-9]) rod_mount();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module rod_mount() {
 	difference() {
-		translate([length/2,outer_w,outer_w]) rotate([90,0,0]) color("cyan") cylinder(h=outer_w,d=30);
+		translate([0,0,outer_w]) rotate([90,0,0]) color("cyan") cyl(h=outer_w,d=30,rounding=2);
 		spool_screw_hole();
-		notch_2020();
+		translate([0,0,10]) notch_2020();
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module spool_screw_hole(Screw=screw8) {
-	translate([length/2,outer_w+2,outer_w]) rotate([90,0,0]) color("blue") cylinder(h=outer_w+5,d=Screw);
+	translate([0,0,outer_w]) rotate([90,0,0]) color("blue") cyl(h=outer_w+5,d=Screw);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,24 +62,24 @@ module spool_screw_hole(Screw=screw8) {
 
 module frame_mount() {
 	difference() {
-		color("lightgrey") cubeX([length,outer_w,outer_w],2); 
+		color("lightgrey") cuboid([length,outer_w,outer_w],rounding=2); 
 		notch_2020();
 		spool_screw_hole();
-		mount_2020();
+		translate([-20,0,0]) mount_2020();
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module mount_2020() {
-	translate([15,outer_w+3,10]) color("plum") rotate([90,0,0]) cylinder(h=outer_w+5,d=screw3);
-	translate([45,outer_w+3,10]) color("yellow") rotate([90,0,0]) cylinder(h=outer_w+5,d=screw3);
+module mount_2020(Screw=screw5) {
+	color("plum") rotate([90,0,0]) cyl(h=outer_w+10,d=Screw);
+	translate([40,0,0]) color("yellow") rotate([90,0,0]) cyl(h=outer_w+10,d=Screw);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module notch_2020() {
-	translate([-2,(outer_w-w2020)/2,-5+clearance]) color("red") cube([length+5,w2020,25],2);
+	translate([0,(outer_w-w2020)/2-3.5,-3]) color("red") cuboid([length+5,w2020,25],rounding=1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -2,11 +2,13 @@
 // Lead-Screw-Top.scad - something to make it easy to see z screw rotation
 //////////////////////////////////////////////////////////////////////////
 // created 9/4/16
-// last upate 10/31/20
+// last upate 1/4/22
 //////////////////////////////////////////////////////////////////////////
 // 10/31/20	- Add for loop for quanity
+// 1/4/22	- BOSL2
 ///////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
+include <bosl2/std.scad>
 //////////////////////////////////////////////////////////////////////////
 $fn=100;
 /////////////////////////////////////////////////////////////////////////////
@@ -19,12 +21,12 @@ module top(Qty=1) {
 	for(x=[0:Qty-1]) {
 		translate([0,x*12,0]) {
 			difference() {
-				color("cyan") cylinder(h=8,d=screw8+2);
-				translate([0,0,2]) color("red") cylinder(h=8,d=screw8);
+				color("cyan") cyl(h=8,d=screw8+2,rounding=1);
+				translate([0,0,2]) color("red") cyl(h=8,d=screw8);
 			}
-			color("black") hull() {
-				cylinder(h=2,d=screw8+2);
-				translate([10,0,0]) cylinder(h=2,d=screw2);
+			translate([0,0,-3]) color("blue") hull() {
+				cyl(h=2,d=screw8+2);
+				translate([10,0,0]) cyl(h=2,d=screw2);
 			}
 		}
 	}

@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 10/22/20
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Last Update: 12/25/21
+// Last Update: 1/4/22
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/15/17	- Added bearing pivot style carriage & 2040 mounts for multi-motor leveling
 // 1/29/17	- Added pivot version using just a M5 screw
@@ -26,16 +26,14 @@
 //			- Added a long bed pivot mount for 2020 in ZPivot2020() and 2040 in ZPivot2040()
 // 10/22/20	- Finished use of 5mm brass inserts
 // 12/25/21	- Bed Leveling pivot mounts made more robust, removed unused code and renamed some modules
+// 1/4/22	- Converted to BOSL2; rounded the pivots
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
-//use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
 include <inc/brassinserts.scad>
 include <BOSL2/std.scad>
-$fn=50;
+$fn=100;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-// Requires good bridging for z_pivot_2040()
-/////////////////////////////////////////////////////////////////////////////////////////////////
 Use5mmInsert=1;
 LayerThickness=0.3;
 //-----------------------------------------------------
@@ -57,25 +55,19 @@ LengthAdjust=0;
 BedMountLength=80;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//Pivots(3,1);// arg1: Quanity;Arg2: 0 for M5 pivots, 1 for 625z bearing pivots;Arg3: 0 for none, 1 for 2020, 2 for 2040
+Pivots(3,1);// arg1: Quanity;Arg2: 0 for M5 pivots, 1 for 625z bearing pivots;Arg3: 0 for none, 1 for 2020, 2 for 2040
 // Length is between the mackerslide carriage plate and the bed frame
-PivotBed(2,BedMountLength+LengthAdjust);		// equal length long bed pivots for 2020
-translate([50,0,0]) PivotBed(1,ZCarriadgeWidth-BedWidth-BedMountLength+LengthAdjust); // equal length long bed pivots for 2020
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module cubeX(Size,Round) {
-	cuboid(Size,rounding=Round,p1=([0,0]));
-}
+//PivotBed(2,BedMountLength+LengthAdjust);		// equal length long bed pivots for 2020
+//translate([50,0,0]) PivotBed(1,ZCarriadgeWidth-BedWidth-BedMountLength+LengthAdjust); // equal length long bed pivots for 2020
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Pivots(Qty,Bearing=0,Extrusion=0) {
-	//if($preview) %translate([-40,-30,-5]) cubeX([200,200,5]);
+	//if($preview) %translate([-40,-30,-5]) cuboid([200,200,5]);
 	for(i=[0:Qty-1]){
-		translate([75,i*45+20,21.6]) rotate([180,90,0]) CenterPivot(Bearing);
-		if(Bearing)	translate([80,i*45,0])PivotCarriage(1);
-		else translate([15,i*45+10,0]) SpacerPivot();
+		translate([0,i*25+23,21.6]) rotate([180,90,0]) CenterPivot(Bearing);
+		if(Bearing)	translate([5,i*25,0])PivotCarriage(1);
+		else translate([15,i*25+10,0]) SpacerPivot();
 	}
 }
 
@@ -83,7 +75,7 @@ module Pivots(Qty,Bearing=0,Extrusion=0) {
 
 module PivotCarriage(Spacer=0,Holes_offset=42.5) { // bearing between bolt holes
 	difference() {
-		color("cyan") cubeX([60,24,8+flange_625z],1);
+		color("cyan") cuboid([60,24,8+flange_625z],rounding=2,p1=[0,0]);
 		bearing_hole2(30,12,0,1);
 		bearing_flange(30,12,-15+body_ht_625z+flange_625z);
 		translate([51.5,12,-2]) color("blue") cylinder(h=20,d=Yes5mmInsert(Use5mmInsert),$fn=100); // mounting hole
@@ -98,9 +90,9 @@ module PivotCarriage(Spacer=0,Holes_offset=42.5) { // bearing between bolt holes
 		}
 	}
 	translate([out_dia_625z+2,2,flange_625z+4]) color("plum") cube([out_dia_625z+1,out_dia_625z+1,LayerThickness]);
-	if(Spacer) difference() { // spacer to hold bearing in place
-		translate([30,-10,0]) color("gray") cylinder(h=3.5,d=out_dia_625z-1,$fn=100);
-		translate([30,-10,-1]) color("plum") cylinder(h=5,d=screw5hd,$fn=100);
+	if(Spacer) translate([70,12,0]) difference() { // spacer to hold bearing in place
+		translate([0,0,3.5/2]) color("gray") cyl(h=3.5,d=out_dia_625z-1,rounding=1);
+		translate([0,0,-1]) color("plum") cylinder(h=5,d=screw5hd,$fn=100);
 	}
 }
 
@@ -108,8 +100,8 @@ module PivotCarriage(Spacer=0,Holes_offset=42.5) { // bearing between bolt holes
 
 module Notch20mm(Width=29,X=0,Y=0,Z=0) {
 	translate([X,Y,Z]) difference() {
-		translate([2,13,0]) color("pink") cubeX([Width,7,20],1);
-		translate([5.725,0,-2]) color("gray") cubeX([20.5,25,25],1);
+		translate([2,13,0]) color("pink") cuboid([Width,7,20],rounding=1,p1=[0,0]);
+		translate([5.725,0,-2]) color("gray") cuboid([20.5,25,25],rounding=1,p1=[0,0]);
 	}
 }
 
@@ -165,7 +157,7 @@ module roundover2() { // round a corner
 
 module CenterPivot(Bearing) { // middle pivot
 	difference() {
-		translate([0,0.5,dia_625z/2]) color("cyan") cubeX([dia_625z+5,dia_625z+4,dia_625z+5],1);
+		translate([0,0.5,dia_625z/2]) color("cyan") cuboid([dia_625z+5,dia_625z+4,dia_625z+5],rounding=2,p1=[0,0]);
 		double_bearing_mount_hole();
 		translate([dia_625z/2+2.5,dia_625z/2+2.5,dia_625z-3]) color("yellow") cylinder(h=40,d=Yes5mmInsert(Use5mmInsert));
 		if(!Use5mmInsert) {
@@ -202,8 +194,8 @@ module screw_hole_support(X,Y,Z) { // support the bottom of the carriage side M5
 
 module double_bearing_mount(Bearing) {
 	difference() {
-		translate([0,dia_625z/2+2.5,dia_625z/2+2]) rotate([0,90,0])
-			color("pink") cylinder(h=dia_625z+5,d=dia_625z+5,$fn=100);
+		translate([10.5,dia_625z/2+2.5,dia_625z/2+2]) rotate([0,90,0])
+			color("pink") cyl(h=dia_625z+5,d=dia_625z+5,rounding=1);
 		translate([-10,dia_625z/2+2.5,dia_625z/2+2]) rotate([0,90,0]) bearing_hole2(0,0,0,Bearing);
 		translate([30,dia_625z/2+2.5,dia_625z/2+2]) rotate([0,-90,0]) bearing_hole2(0,0,0,Bearing);
 		translate([dia_625z/2+2.5,dia_625z/2+2.5,dia_625z-3]) color("yellow")

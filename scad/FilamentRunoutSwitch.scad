@@ -1,18 +1,19 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // FilamentRunoutSwitch.scad - basic filament runout sensor
 // created: 1/6/2017
-// last modified: 10/10/20
+// last modified: 1/4/22
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Colors are for making it easier to edit the correct bits
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/7/16	- Made smaller & added squares to hold ptfe in place
 // 10/10/20	- Changed to 1.75mm filament tubing, now uses brass inserts
+// 1/5/22	- BOSL2
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Uses black microswitch
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/brassinserts.scad>
-use <inc/cubex.scad>
-$fn=50;
+include <bosl2/std.scad>
+$fn=100;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // vars
 switch_w = 20.5;	// microswitch size
@@ -37,15 +38,15 @@ translate([60,0,0]) // for printing
 module gizmo() {
 	union() {
 		difference() {
-			translate([0,1.5*switch_w,0]) color("cyan") cubeX([switch_l+30,switch_w,switch_t+8],2);
-			translate([-2,-2,switch_t+4]) color("salmon") cube([switch_l+35,switch_w+45,switch_t+8],2);
+			translate([0,1.5*switch_w,0]) color("cyan") cuboid([switch_l+30,switch_w,switch_t+8],rounding=2,p1=[0,0]);
+			translate([-2,-2,switch_t+4]) color("salmon") cuboid([switch_l+35,switch_w+45,switch_t+8],rounding=1,p1=[0,0]);
 			screw_assemble(screw3);
 			filament_slot();
 			switch_hole(0);
 		}
 		difference() {
-			translate([switch_l/2,0,0]) color("cyan") cubeX([switch_l+9,switch_w+15,switch_t+8],2);
-			translate([-2,-2,switch_t+4]) color("salmon") cube([switch_l+35,switch_w+45,switch_t+8],2);
+			translate([switch_l/2,0,0]) color("cyan") cuboid([switch_l+9,switch_w+15,switch_t+8],rounding=2,p1=[0,0]);
+			translate([-2,-2,switch_t+4]) color("salmon") cuboid([switch_l+35,switch_w+45,switch_t+8],rounding=1,p1=[0,0]);
 			screw_assemble(screw3);
 			switch_hole(0);
 			wire_hole();
@@ -63,16 +64,16 @@ module gizmo() {
 module gizmo_lid() {
 	union() {
 		difference() {
-			translate([0,1.5*switch_w,0]) color("cyan") cubeX([switch_l+30,switch_w,switch_t+8],2);
-			translate([-2,-2,switch_t+4]) color("salmon") cube([switch_l+35,switch_w+45,switch_t+8],2);
+			translate([0,1.5*switch_w,0]) color("cyan") cuboid([switch_l+30,switch_w,switch_t+8],rounding=2,p1=[0,0]);
+			translate([-2,-2,switch_t+4]) color("salmon") cuboid([switch_l+35,switch_w+45,switch_t+8],rounding=1,p1=[0,0]);
 			screw_assemble(Yes3mmInsert(Use3mmInsert,LargeInsert));
 			filament_slot();
 			switch_hole(1);
 			translate([6,0,0]) ptfe_stops();
 		}
 		difference() {
-			translate([switch_l/2,0,0]) color("cyan") cubeX([switch_l+9,switch_w+15,switch_t+8],2);
-			translate([-2,-2,switch_t+4]) color("salmon") cube([switch_l+35,switch_w+45,switch_t+8],2);
+			translate([switch_l/2,0,0]) color("cyan") cuboid([switch_l+9,switch_w+15,switch_t+8],rounding=2,p1=[0,0]);
+			translate([-2,-2,switch_t+4]) color("salmon") cuboid([switch_l+35,switch_w+45,switch_t+8],rounding=1,p1=[0,0]);
 			screw_assemble(Yes3mmInsert(Use3mmInsert,LargeInsert));
 			switch_hole(1);
 			switch_mount(0.5,1);
@@ -95,18 +96,22 @@ module ptfe_stops() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module screw_assemble(Size=screw3) {
-	translate([15,5,-1]) color("red") cylinder(h=30,d=Size,$fn=100);
-	translate([switch_w+25,switch_l+25,-1]) color("black") cylinder(h=30,d=Size,$fn=100);
-	translate([5,switch_l+25,-1]) color("white") cylinder(h=30,d=Size,$fn=100);
-	translate([switch_w+15,5,-1]) color("blue") cylinder(h=30,d=Size,$fn=100);
+	translate([15,5,-1]) color("red") cylinder(h=30,d=Size);
+	translate([switch_w+25,switch_l+25,-1]) color("black") cylinder(h=30,d=Size);
+	translate([5,switch_l+25,-1]) color("white") cylinder(h=30,d=Size);
+	translate([switch_w+15,5,-1]) color("blue") cylinder(h=30,d=Size);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module switch_hole(Lid=0) {
-	translate([switch_l-switch_w/4-0.75,10.5,4+switch_t/2]) cubeX([switch_w,switch_w+10,switch_t]);
-	if(!Lid) translate([switch_l-switch_w/4-6.5,switch_w+12.5,4+switch_t/2]) cubeX([8,8,switch_t]); // lever notch
-	else translate([switch_l-switch_w/4+17,switch_w+12.5,4+switch_t/2]) cubeX([8,8,switch_t]); // lever notch
+	translate([switch_l-switch_w/4-0.75,10.5,4+switch_t/2]) cuboid([switch_w,switch_w+10,switch_t],rounding=2,p1=[0,0]);
+	if(!Lid)
+		translate([switch_l-switch_w/4-6.5,switch_w+12.5,4+switch_t/2])
+			cuboid([8,8,switch_t],rounding=1,p1=[0,0]); // lever notch
+	else
+		translate([switch_l-switch_w/4+17,switch_w+12.5,4+switch_t/2])
+			cuboid([8,8,switch_t],rounding=1,p1=[0,0]); // lever notch
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,18 +123,18 @@ module filament_slot() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module wire_hole() {
-	translate([switch_l+switch_w/4-0.5,15,7+switch_t/2]) rotate([90,0,0]) cylinder(h=20,d=screw4,$fn=100);
+	translate([switch_l+switch_w/4-0.5,15,7+switch_t/2]) rotate([90,0,0]) cylinder(h=20,d=screw4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module switch_mount(Resize=0,Lid=0) {
 	if(!Lid) {
-		translate([20.5,27.5,switch_t/2]) color("purple") cylinder(h=2*switch_t,d=switch_h+Resize,$fn=100);
-		translate([20.5+switch_ho,27.5,switch_t/2]) color("magenta") cylinder(h=2*switch_t,d=switch_h+Resize,$fn=100);
+		translate([20.5,27.5,switch_t/2]) color("purple") cylinder(h=2*switch_t,d=switch_h+Resize);
+		translate([20.5+switch_ho,27.5,switch_t/2]) color("magenta") cylinder(h=2*switch_t,d=switch_h+Resize);
 	} else {
-		translate([21,27.5,switch_t/2]) color("purple") cylinder(h=2*switch_t,d=switch_h+Resize,$fn=100);
-		translate([21+switch_ho,27.5,switch_t/2]) color("magenta") cylinder(h=2*switch_t,d=switch_h+Resize,$fn=100);
+		translate([21,27.5,switch_t/2]) color("purple") cylinder(h=2*switch_t,d=switch_h+Resize);
+		translate([21+switch_ho,27.5,switch_t/2]) color("magenta") cylinder(h=2*switch_t,d=switch_h+Resize);
 	}
 }
 

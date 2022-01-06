@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <inc/brassinserts.scad>
-use <inc/cubeX.scad>	// http://www.thingiverse.com/thing:112008
+use <bosl2/std.scad>	// http://www.thingiverse.com/thing:112008
 $fn = 50;
 //////////////////////////////////////////////////////////////////////////////////////
 // vars
@@ -78,12 +78,12 @@ module XBeltEnds(upper,spacers) {	// bearing mount bracket
 module XEndWalls(upper,lower) {	// the walls that hold the bearings
 	if(lower) {
 		difference() {	// lower bearing support wall
-			color("red") cubeX([width,5,belt_height+f625z_d],2);
+			color("red") cuboid([width,5,belt_height+f625z_d],rounding=2,p1=[0,0]);
 			bearscrews(upper);
 		}
 	} else {
 		difference() {	// upper bearing support wall
-			translate([0,one_stack*2+5,0]) color("blue") cubeX([width,5,belt_height+f625z_d],2);
+			translate([0,one_stack*2+5,0]) color("blue") cuboid([width,5,belt_height+f625z_d],rounding=2,p1=[0,0]);
 			bearscrews(upper,Yes5mmInsert(Use5mmInsert));
 		}
 	}
@@ -108,9 +108,9 @@ module bearscrews(upper,Screw=screw5) {	// bearing screw holes
 //////////////////////////////////////////////////////////////////////////////////////
 
 module bearspacer(length=one_stack) {	// fill in the non-bearing space
-	difference() {
-		rotate([90,0,0]) color("pinK") cylinder(h=length,r=screw5);
-		translate([0,1,0]) rotate([90,0,0]) color("cyan") cylinder(h=length+5,r=screw5/2);
+	rotate([90,0,0]) difference() {
+		color("pink") cyl(h=length,r=screw5,rounding=1);
+		color("cyan") cyl(h=length+5,d=screw5);
 	}
 
 }
@@ -119,7 +119,7 @@ module bearspacer(length=one_stack) {	// fill in the non-bearing space
 
 module Base() { // base mount
 	difference() {
-		color("cyan") cubeX([width,one_stack*2+10,5],2);
+		color("cyan") cuboid([width,one_stack*2+10,5],rounding=2,p1=[0,0]);
 		translate([width/4-1,22,-1]) color("salmon") cylinder(h=10,r=screw5/2);	// mounting screw holes
 		translate([width-width/4+1,12,-1]) color("green") cylinder(h=10,r=screw5/2);
 	}

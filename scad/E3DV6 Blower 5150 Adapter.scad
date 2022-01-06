@@ -15,7 +15,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // includes
 include <inc/screwsizes.scad>
-use <inc/cubeX.scad> // http://www.thingiverse.com/thing:112008
 include <bosl2/std.scad>
 include <inc/brassinserts.scad>
 $fn=50;
@@ -41,9 +40,9 @@ adjust_bevel=4;
 module 5150Adapter() {
 	difference() {
 		union() {
-			color("cyan") cuboid([30mmFanDiameter+2,30mmFanDiameter+2,10],rounding=1);
+			color("cyan") cuboid([30mmFanDiameter+2,30mmFanDiameter+2,10],rounding=2);
 			translate([-10.5,-6,45/2]) difference() {
-				translate([0,0,3]) color("purple") cuboid([5,10,56],rounding=1);
+				translate([0,0,3]) color("purple") cuboid([5,10,56],rounding=2);
 				translate([-10,0,27]) color("green") rotate([0,90,0]) cylinder(h=20,d=Yes4mmInsert(Use4mmInsert));
 			}
 		}

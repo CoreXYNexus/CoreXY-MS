@@ -2,12 +2,11 @@
 // PTFEBracket.scad
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created 11/19/20
-// Last Update 11/19/20
+// Last Update 1/4/22
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 $fn=100;
-include <inc/cubex.scad>
-include <inc/brassinserts.scad>
 include <bosl2/std.scad>
+include <inc/brassinserts.scad>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Thickness=5;
 Clearance=0.5;
@@ -21,7 +20,7 @@ Bracket(20); // CXY-MSv1
 
 module Bracket(Length=40,Size=9.5) {
 	difference() {
-		color("cyan") cubeX([Length+Offsets,20,Thickness],2);
+		color("cyan") cuboid([Length+Offsets,20,Thickness],rounding=2,p1=[0,0]);
 		translate([10,10,-2]) ExtrusionMount();
 		translate([Length+Offsets-11,10,-2]) rotate([0,25,0]) cylinder(h=20,d=PTFEDiameter);
 	}

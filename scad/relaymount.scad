@@ -2,7 +2,7 @@
 // relaymount.scad - something to mount a relay/buckconvertor board to 2020
 ///////////////////////////////////////////////////////////////////////////////
 // created 2/13/16
-// last update 10/20/20
+// last update 1/4/22
 ///////////////////////////////////////////////////////////////////////////////
 // 2/24/16	- added zip tie option
 // 5/17/16	- changed to use CubeX and the corrected the math for the mount holes
@@ -10,8 +10,9 @@
 // 8/18/16	- Added x,y vars for pc board holes
 // 5/10/19	- made the mount() parametric via the passed variables
 // 10/20/20	- Added use of brass inserts
+// 1/4/22	- BOSL2
 ///////////////////////////////////////////////////////////////////////////////
-use <inc/cubex.scad>
+include <bosl2/std.scad>
 include <inc/screwsizes.scad>
 include <inc/brassinserts.scad>
 $fn=50;
@@ -35,7 +36,7 @@ RelayMount(2,21.2,43.1,5,6.3,3); // ebay buck convertor
 
 module RelayMount(type,width,length,thickness,side_dx,side_dy) {
 	difference() {
-		cubeX([length,width+2,thickness],2);
+		cuboid([length,width+2,thickness],rounding=2,p1=[0,0]);
 		translate([0,1,0]) BoardHoles(Yes3mmInsert(Use3mmInsert,LargeInsert),thickness,side_dx,side_dy,length,width);
 		if(type==0)	ZipTieSlot(width,length,thickness);
 		if(type==1) translate([0,1,0]) MountHole(screw5,width,length,thickness);
@@ -54,7 +55,7 @@ module RelayMount(type,width,length,thickness,side_dx,side_dy) {
 
 module RelayMountBrassM5(width,length,thickness,side_dx,side_dy) {
 	difference() {
-		cubeX([length,width+2,thickness],2);
+		cuboid([length,width+2,thickness],rounding=2,p1=[0,0]);
 		translate([0,1,0]) BoardHoles(Yes3mmInsert(Use3mmInsert,LargeInsert),thickness,side_dx,side_dy,length,width);
 		translate([0,1,0]) BrassInsertMount(Yes5mmInsert(Use5mmInsert),width,length,thickness);
 	}

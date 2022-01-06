@@ -14,7 +14,7 @@
 // 8/7/20	- Removed more partial blockages inside and adjust the inside of the duct extensions
 // 9/5/20	- Change the FanDuct4040.scad to use a 5015 blower - CircularFanDuct5015.scad
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-use </inc/cubex.scad>
+include <bosl2/std.scad>
 include <inc/screwsizes.scad>
 use <inc/brassinserts.scad>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,12 +105,12 @@ module MainDuct() {
 
 module Blower5015Output() { // the output conector for the blower
 	difference() {
-		translate([-1,0,0]) color("cyan") cubeX([BlowerLength+3,BlowerWidth+2,15],1);
+		translate([-1,0,0]) color("cyan") cuboid([BlowerLength+3,BlowerWidth+2,15],rounding=1,p1=[0,0]);
 		translate([0.7,0.7,1]) color("red") cube([BlowerLength,BlowerWidth,15]);
 		translate([-1.5,-6,1]) color("white") cube([25,10,8]);
 	}
 	difference() {
-		translate([-2,0,0]) color("green") cubeX([27,6.5,11],1);
+		translate([-2,0,0]) color("green") cuboid([27,6.5,11],rounding=1,p1=[0,0]);
 		translate([0,-6,8]) color("khaki") cube([BlowerLength+1,BlowerWidth,4]);
 		translate([-1.5,-6,1]) color("white") cube([25,10,8]);
 		translate([0,-6,1]) color("blue") cube([BlowerLength+1,BlowerWidth,8]);
@@ -123,8 +123,8 @@ module CircularFanBase(Height=55,ScrewHZ=0,ShiftLR,Angle=0) {
 	difference() {
 		rotate([Angle,0,0])  difference() {
 			union() {
-				color("plum") translate([-3,-16,10]) cubeX([60,Height,5],2);
-				translate([ShiftLR-BlowerScrewUpperOffset+4,-15.15,10]) color("red") cubeX([11,64,5],2);
+				color("plum") translate([-3,-16,10]) cuboid([60,Height,5],rounding=2,p1=[0,0]);
+				translate([ShiftLR-BlowerScrewUpperOffset+4,-15.15,10]) color("red") cuboid([11,64,5],rounding=2,p1=[0,0]);
 			}
 			translate([ShiftLR-BlowerScrewUpperOffset+6,0.5,9]) FanMount5015Holes(-4,Yes4mmInsert(Use4mmInsert));
 		}

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TitanAero.scad - titan aero - single or dual
 // created: 10/14/2020
-// last modified: 11/23/20
+// last modified: 1/6/22
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16	- added bevel on rear carriage for x-stop switch to ride up on
 // 5/30/20	- Added ability to use a Titan Aero on mirrored version
@@ -11,6 +11,7 @@
 // 10/14/20	- Converted to single to dual
 // 10/25/20	- You can nan remove the stepper notch, added tabs to prevent lifting
 // 11/23/20	- Added mounts for a brace mount to top of SingleAero() and brace bracket
+// 1/6/22	- BOSL2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 include <inc/brassinserts.scad>
@@ -38,14 +39,14 @@ module Brace(DoTab=0,Length=35,Dual=0) {
 	if(!Dual) {
 		difference() {
 			union() {
-				color("cyan") cubeX([Length+20,4,5],1);
-				translate([0,59,0]) color("blue") cubeX([Length+20,4,5],1);
-				color("red") cubeX([4,63,5],1);
+				color("cyan") cuboid([Length+20,4,5],rounding=1,p1=[0,0]);
+				translate([0,59,0]) color("blue") cuboid([Length+20,4,5],rounding=1,p1=[0,0]);
+				color("red") cuboid([4,63,5],rounding=1,p1=[0,0]);
 			}
 			translate([Length+17,65,2.6]) color("plum") rotate([90,0,0]) cylinder(h=70,d=screw3);
 		}
 		if(DoTab) {
-			translate([Length+17,59,0]) color("black") cylinder(h=LayerThickness,d=20);
+			translate([Length+17,59,0]) color("lightgray") cylinder(h=LayerThickness,d=20);
 			translate([Length+17,2,0]) color("gray") cylinder(h=LayerThickness,d=20);
 			translate([2,59,0]) color("green") cylinder(h=LayerThickness,d=20);
 			translate([2,2,0]) color("pink") cylinder(h=LayerThickness,d=20);
@@ -64,7 +65,7 @@ module DualAero(Mounting=1,StepperNotch=1,DoTab=1,StepperLength=42) {
 
 module SingleAero(Mounting=1,StepperNotch=1,DoTab=1,StepperLength=42,ShowLength=0,BraceAttachment=0) {
 	TitanSingle(Mounting,StepperNotch,DoTab,StepperLength,ShowLength,BraceAttachment);
-	translate([50,-38,-4]) Brace(DoTab,StepperLength,0);  // something to help with drooping over time
+	if(BraceAttachment) translate([50,-38,-4]) Brace(DoTab,StepperLength,0);  // something to help with drooping over time
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,10 +84,11 @@ module TitanDual(Mounting=1,StepperNotch=1,DoTab=1) {
 	difference() {
 		union() {
 			//%translate([-15,0,wall*2]) cube([45,10,10]); // check for room for a 42mm long stepper
-			translate([13,-34,-wall/2])	color("lightgray") cubeX([30,HorizontallCarriageWidth+23,wall],1); // extruder side
-			translate([-21,-34,-wall/2]) color("gray") cubeX([40,10,wall],1); // extruder side
-			translate([-21,10,-wall/2]) color("black") cubeX([40,10,wall],1); // extruder side
-			translate([-21,54,-wall/2]) color("white") cubeX([40,10,wall],1); // extruder side
+			translate([13,-34,-wall/2])	color("lightgray") 
+				cuboid([30,HorizontallCarriageWidth+23,wall],rounding=1,p1=[0,0]); // extruder side
+			translate([-21,-34,-wall/2]) color("gray") cuboid([40,10,wall],rounding=1,p1=[0,0]); // extruder side
+			translate([-21,10,-wall/2]) color("purple") cuboid([40,10,wall],rounding=1,p1=[0,0]); // extruder side
+			translate([-21,54,-wall/2]) color("white") cuboid([40,10,wall],rounding=1,p1=[0,0]); // extruder side
 		}
 		if(Mounting) translate([37,16,10]) rotate([90,0,90]) ExtruderMountHoles();
 		if(LEDLight) LEDRingMount();
@@ -99,8 +101,8 @@ module TitanDual(Mounting=1,StepperNotch=1,DoTab=1) {
 	if(LEDLight && LEDSpacer) translate([0,40,-4]) LED_Spacer(LEDSpacer,screw5);
 	difference() {
 		translate([-0.5,-32,0]) rotate([90,0,90]) TitanMotorMount();
-		translate([-24,19,-2]) color("plum") cubeX([wall*2,36,wall],3); // clearance for hotend
-		translate([-24,-25,-2]) color("pink") cubeX([wall*2,36,wall],3); // clearance for hotend
+		translate([-24,19,-2]) color("plum") cuboid([wall*2,36,wall],rounding=3,p1=[0,0]); // clearance for hotend
+		translate([-24,-25,-2]) color("pink") cuboid([wall*2,36,wall],rounding=3,p1=[0,0]); // clearance for hotend
 		translate([-16,90,0]) SensorAnd1LCMounting(Yes3mmInsert(Use3mmInsert,LargeInsert)); // mounting holes for irsensor bracket
 		translate([11,90,0]) SensorAnd1LCMounting(Yes3mmInsert(Use3mmInsert,LargeInsert)); // mounting holes for irsensor bracket
 		translate([-16,175,0]) SensorAnd1LCMounting(Yes3mmInsert(Use3mmInsert,LargeInsert)); // mounting holes for irsensor bracket
@@ -132,34 +134,34 @@ module TitanSingle(Mounting=1,StepperNotch=1,DoTab=1,StepperLength=42,ShowLength
 			if(ShowLength) %translate([-15,0,wall/2]) cube([StepperLength,10,10]); // check for room for the StepperLength
 			translate([StepperLength,0,0]) difference() {
 				translate([-20,-35,-wall/2]) color("lightgray")
-					cubeX([20,HorizontallCarriageWidth-18,wall],1); // extruder side
+					cuboid([20,HorizontallCarriageWidth-18,wall],rounding=1,p1=[0,0]); // extruder side
 				if(Mounting) translate([-5,1,10]) rotate([90,0,90]) ExtruderMountHoles();
 				if(LEDLight) translate([-38,-15,0]) LEDRingMount();
 			}
-			translate([-21,-35,-wall/2]) color("gray") cubeX([45,10,wall],1); // extruder side
-			translate([-21,12,-wall/2]) color("black") cubeX([45,10,wall],1); // extruder side
-			//translate([-21,54,-wall/2]) color("white") cubeX([40,10,wall],1); // extruder side
+			translate([-21,-35,-wall/2]) color("gray") cuboid([45,10,wall],rounding=1,p1=[0,0]); // extruder side
+			translate([-21,12,-wall/2]) color("green") cuboid([45,10,wall],rounding=1,p1=[0,0]); // extruder side
+			//translate([-21,54,-wall/2]) color("white") cuboid([40,10,wall],rounding=1,p1=[0,0]); // extruder side
 		}
 		SensorAnd1LCMountSingle();
 	}
 	if(BraceAttachment) {
-		translate([-14,21,52]) {
+		translate([-14,19,52]) {
 			difference() {
-				color("blue") rotate([90,0,0]) cylinder(h=4,d=screw5hd+1);
-				translate([0,1,0]) color("pink") rotate([90,0,0]) cylinder(h=6,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+				color("green") rotate([90,0,0]) cyl(h=4,d=screw5hd+1,rounding=1);
+				color("pink") rotate([90,0,0]) cyl(h=6,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
 			}
 		}
-		translate([-14,-30,52]) {
+		translate([-14,-32,52]) {
 			difference() {
-				color("blue") rotate([90,0,0]) cylinder(h=4,d=screw5hd+1);
-				translate([0,1,0]) color("pink") rotate([90,0,0]) cylinder(h=6,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+				color("lightgray") rotate([90,0,0]) cyl(h=4,d=screw5hd+1,rounding=1);
+				color("pink") rotate([90,0,0]) cyl(h=6,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
 			}
 		}
 	}
 	if(LEDLight && LEDSpacer) translate([0,40,-4]) LED_Spacer(LEDSpacer,screw5);
 	difference() {
 		translate([-0.5,-32,0]) rotate([90,0,90]) TitanMotorMountSingle();
-		translate([-24,-26,-3]) color("plum") cubeX([wall*2,39,wall],3); // clearance for hotend
+		translate([-24,-26,-3]) color("plum") cuboid([wall*2,39,wall],rounding=3,p1=[0,0]); // clearance for hotend
 		SensorAnd1LCMountSingle();
 		if(StepperNotch) color("green") hull() {
 			translate([-22,-11.5,55])cube([wall,10,1]); // cut out to allow motor be install after nount to xcarriage
@@ -175,7 +177,7 @@ module TitanSingle(Mounting=1,StepperNotch=1,DoTab=1,StepperLength=42,ShowLength
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module AddTab() {
-	color("black") cylinder(h=LayerThickness,d=20);
+	color("khaki") cylinder(h=LayerThickness,d=20);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,7 +202,7 @@ module SensorAnd1LCMounting(Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) // ir 
 module LEDRingMount(Screw=Yes5mmInsert(Use5mmInsert)) {
 	// a mounting hole for a holder for 75mm circle led
 	translate([25,2,-10]) color("white") cylinder(h=20,d=Screw);
-	if(!Use5mmInsert) translate([30.5+ShiftHotend2,12.5+ShiftHotend,1.5]) color("black") nut(nut5,5);
+	if(!Use5mmInsert) translate([30.5+ShiftHotend2,12.5+ShiftHotend,1.5]) color("cyan") nut(nut5,5);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +218,7 @@ module LED_Spacer(Length=10,Screw=screw5) {
 
 module TitanMotorMount() {
 	difference() {	// motor mount
-		translate([-1,0,-20.5]) color("red") cubeX([96,51,5],1);
+		translate([-1,0,-20.5]) color("red") cuboid([96,51,5],rounding=1,p1=[0,0]);
 		translate([25,27,-22]) rotate([0,0,45]) color("purple") NEMA17_x_holes(8,1);
 		translate([70,27,-22]) rotate([0,0,45]) color("blue") NEMA17_x_holes(8,1);
 	}
@@ -228,7 +230,7 @@ module TitanMotorMount() {
 
 module TitanMotorMountSingle() {
 	difference() {	// motor mount
-		translate([-2,0,-20.5]) color("red") cubeX([55,51,5],1);
+		translate([-2,0,-20.5]) color("red") cuboid([55,51,5],rounding=1,p1=[0,0]);
 		translate([25,27,-22]) rotate([0,0,45]) color("purple") NEMA17_x_holes(8,1);
 		//translate([70,27,-22]) rotate([0,0,45]) color("blue") NEMA17_x_holes(8,1);
 	}
@@ -240,7 +242,7 @@ module TitanMotorMountSingle() {
 
 module TitanSupport() {
 	difference() { // rear support
-		translate([49,47.5,-1.5]) rotate([50]) color("cyan") cubeX([4,6,69],1);
+		translate([49,47.5,-1.5]) rotate([50]) color("cyan") cuboid([4,6,69],rounding=1,p1=[0,0]);
 		translate([47,-1,-67]) color("gray") cube([7,70,70]);
 		translate([47,-73,-26]) color("lightgray") cube([7,75,75]);
 	}
@@ -252,7 +254,7 @@ module TitanSupport() {
 module ExtruderMountHoles(Screw=screw3,All=1) {		// screw holes to mount extruder plate
 	translate([0,0,0]) rotate([90,0,0]) color("blue") cylinder(h = 20, d = Screw);
 	translate([HorizontallCarriageWidth/2-5,0,0]) rotate([90,0,0]) color("red") cylinder(h = 20, d = Screw);
-	translate([-(HorizontallCarriageWidth/2-5),0,0]) rotate([90,0,0]) color("black") cylinder(h = 20, d = Screw);
+	translate([-(HorizontallCarriageWidth/2-5),0,0]) rotate([90,0,0]) color("green") cylinder(h = 20, d = Screw);
 	if(All) {	
 		translate([HorizontallCarriageWidth/4-2,0,0]) rotate([90,0,0]) color("gray") cylinder(h = 20, d = Screw);
 		translate([-(HorizontallCarriageWidth/4-2),0,0]) rotate([90,0,0]) color("cyan") cylinder(h = 20, d = Screw);

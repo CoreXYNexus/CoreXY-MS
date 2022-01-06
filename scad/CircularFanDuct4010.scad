@@ -15,7 +15,7 @@
 // 10/1/20	- Added a tab to the CircularFanBase() to help prevent the braket end from lifting
 // 10/3/20	- Added an horiszontla 4040 the mount underneath the extruder
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-use </inc/cubex.scad>
+include <bosl2/std.scad>
 include <inc/screwsizes.scad>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $fn=100;
@@ -49,15 +49,15 @@ module HorizontalFanDuct() {
 module Blower() {
 	difference() {
 		color("lightgray") hull() {
-			translate([0,-9,0]) cubeX([27,1,8],1);
-			translate([7,5,0]) cubeX([14,1,8],1);
+			translate([0,-9,0]) cuboid([27,1,8],rounding=1,p1=[0,0]);
+			translate([7,5,0]) cuboid([14,1,8],rounding=1,p1=[0,0]);
 		}
 		color("white") hull() {
-			translate([1,-11,1]) cubeX([25,1,6],1);
-			translate([7,4,1]) cubeX([12,1,6],1);
+			translate([1,-11,1]) cuboid([25,1,6],rounding=1,p1=[0,0]);
+			translate([7,4,1]) cuboid([12,1,6],rounding=1,p1=[0,0]);
 		}
-		translate([8.5,0,3]) color("plum") cubeX([10,10,4],1);
-		//translate([0.5,-28.5,1]) color("red") cubeX([26,7,20],2);
+		translate([8.5,0,3]) color("plum") cuboid([10,10,4],rounding=1,p1=[0,0]);
+		//translate([0.5,-28.5,1]) color("red") cuboid([26,7,20],rounding=2,p1=[0,0]);
 	}
 }
 
@@ -65,8 +65,8 @@ module Blower() {
 
 module Blower4010Output2() { // the output conector for the blower with no outlet
 	difference() {
-		translate([0,0,0]) color("cyan") cubeX([27,15,8],1);
-		translate([0.7,-2,1.2]) color("red") cubeX([25,20,6],2);
+		translate([0,0,0]) color("cyan") cuboid([27,15,8],rounding=1,p1=[0,0]);
+		translate([0.7,-2,1.2]) color("red") cuboid([25,20,6],rounding=2,p1=[0,0]);
 	}
 }
 
@@ -76,7 +76,7 @@ module HorizontalFanDuctBase(ScrewZ=0,Screw=screw2) {
 	difference() {
 		color("blue") hull() {
 			cubeX([45,10,4]);
-			translate([15,38,0]) cubeX([14,1,4],1);
+			translate([15,38,0]) cuboid([14,1,4],rounding=1,p1=[0,0]);
 		}
 		translate([5,-23,-2]) FanMountHoles(ScrewZ,Screw);
 		translate([23,5,-2]) color("red") cylinder(h=10,d=screw5);
@@ -143,7 +143,7 @@ module MainDuct() {
 module Blower4010Output() { // the output conector for the blower
 	difference() {
 		translate([0,-21,0]) color("cyan") rotate([90,0,0]) cube([27,15,8]);
-		translate([1,-28,1]) color("red") cubeX([25,6,20],2);
+		translate([1,-28,1]) color("red") cuboid([25,6,20],rounding=2,p1=[0,0]);
 		translate([1.5,-25,1]) color("white") cube([25,15,8]);
 	}
 }
@@ -156,8 +156,8 @@ module CircularFanBase(Height=0,ScrewHZ=0,ShiftLR=0,Angle=0) {
 	difference() {
 		rotate([Angle,0,0])  difference() {
 			union() {
-				translate([-5,-16.15,10]) color("purple") cubeX([61,Height,5],2);
-				translate([33-ShiftLR,-16.15,10]) color("red") cubeX([7,53,5],2);
+				translate([-5,-16.15,10]) color("purple") cuboid([61,Height,5],rounding=2,p1=[0,0]);
+				translate([33-ShiftLR,-16.15,10]) color("red") cuboid([7,53,5],rounding=2,p1=[0,0]);
 			}
 			translate([2-ShiftLR,0.5,9]) FanMountHoles(-4,screw2t);
 			translate([2-ShiftLR,0.5,9]) FanMountHoles(-4,screw2t);

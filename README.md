@@ -1,15 +1,13 @@
 # CXY-MSv1
 A corexy printer using Makerslide and a Duet 3 on 24vdc. Photos show a DuetWifi. :-)
 
-August 2020: Upgraded to a Duet 3 6HC.  Currently using in stand alone, no Pi.
+August 2020: Upgraded to a Duet 3 6HC with 1LC.  Currently using in stand alone, no Pi.
 
 An older version is available at http://www.thingiverse.com/thing:1470253
 
 https://creativecommons.org/licenses/by-sa/3.0/
 
 https://youtu.be/llArYEVT2ow
-
-The STL & SCAD files with multiple parts are setup for printing on a 200x200 bed.
 
 All the horizontal extrusions, and the horizontal makerslide ends are tapped for 5mm.
 Vertical 2020 is drilled with a 5.5mm bit for access to the screws that hold everything together. Four in the top and two in the bottom. Use drillguide.stl for drilling the holes.
@@ -25,7 +23,7 @@ If you use metal couplers for the z-axis, use a 4mm ball bearing in between the 
 
 The Litemount.stl holds a 70mm LED ring in http://www.thingiverse.com/thing:8211 I used a LM2596 buck convertor to get the 12vdc to power the ring.
 
-Alternate lighting method is to use a 5050 LED light string stuck to the bottom of the x axis makerslide.  For EXOSlide, use PlainLEDStripHolderEXO.
+Alternate lighting method is to use a 5050 LED light string stuck to the bottom of the x axis makerslide.  For EXOSlide, use PlainLEDStripHolderEXO and two short pieces for led strip.
 
 Blower.scad uses http://www.thingiverse.com/thing:387301
 
@@ -33,13 +31,13 @@ Feet: http://www.thingiverse.com/thing:15880
 or
 Wheels: https://www.amazon.com/gp/product/B07FM76212
 
-The 400mm x 300mm 1/4" MIC-6 AL plate bed uses 2020 to support the bed, they're attached just like rest of the extrusions. I used three 45mm x 25mm x 9mm 6061 with a 5mm hole for the extrusion mount and tapped a 3mm hole to hold the bed. I used some silicon tubing for the bed spacers. I used two keenovo 200x300 600w 110vac silicon heaters, using the thermistor in the center and wired the ac in parallel to a SSR. The printer uses 11.28 amps until PID kicks in, while printing it uses about 5 amps.
+The 400mm x 300mm 1/4" MIC-6 AL plate bed uses 2020 to support the bed, they're attached just like rest of the extrusions. I used three 45mm x 25mm x 9mm 6061 with a 5mm hole for the extrusion mount and tapped a 3mm hole to hold the bed. I used some silicon tubing for the bed spacers. I used two keenovo 200x300 600w 110vac silicon heaters, using the thermistor in the center and wired the ac in parallel to a SSR. The printer uses 11.28 amps until PID kicks in, while printing it uses about 5 amps.  For auto-leveling (3 z leadscrew), use a 2020 frame under the bed consisting of 2 425mm and 3 385mm.
 
 Cover for the SSR: http://www.thingiverse.com/thing:1001385
 
 Spool holder: http://www.thingiverse.com/thing:1647748
 
-Parts cooling fan: 4040 blower.
+Parts cooling fan: 4040 blower or a berd air
 
 FancapL.stl is for the power supply fan to make it blow to the side.
 
@@ -49,6 +47,8 @@ Uses:
 		OPENSCAD https://www.openscad.org/downloads.html  Use version 2019.05 or later.
 
 		cubeX from http://www.thingiverse.com/thing:112008
+		
+		BOSL2: https://github.com/revarbat/BOSL2
 		
 		NEMA17 from https://github.com/mtu-most/most-scad-libraries
 		

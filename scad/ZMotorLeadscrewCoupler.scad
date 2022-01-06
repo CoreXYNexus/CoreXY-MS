@@ -1,8 +1,11 @@
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // nice (and horribly long) variable names for Thingiverse Customizer
-// 12/17/18 (SRC) - edited to use in another scad file and added preview colors
-// 					Z-Motor-Leadscrew-Coupler.scad
-// 10/22/20 (SRC) - Added use of brass inserts
-
+// 12/17/18 (SRC)	- edited to use in another scad file and added preview colors
+// 					  renamed to ZMotorLeadscrewCoupler.scad
+// 10/22/20 (SRC)	- Added use of brass inserts
+// 1/6/22 (SRC)		- BOSL2
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+include <bosl2/std.scad>
 include <inc/brassinserts.scad>
 Use3mmInsert=1;
 
@@ -38,19 +41,19 @@ $fs = 0.25;
 little = 0.01; // just a little number
 big = 100; // just a big number
 
-module coupler(motorShaftDiameter = 5,threadedRodDiameter = 5)
+module coupler(motorShaftDiameter = 5,threadedRodDiameter = 8)
 {
 	shaftScrewsDistance = motorShaftDiameter+screwDiameter+1;
 	rodScrewsDistance = threadedRodDiameter+screwDiameter+1;
 	difference() {
         // main body
-        color("cyan") cylinder(d=couplerExternalDiameter, h=shaftLen + rodLen);
+        translate([0,0,shaftLen]) color("cyan") cyl(d=couplerExternalDiameter, h=shaftLen + rodLen,rounding=2);
         // shaft
-        translate([0,0,-little])
-            color("red") cylinder(d=motorShaftDiameter, h=shaftLen+2*little);
+        translate([0,0,7])
+            color("red") cyl(d=motorShaftDiameter, h=shaftLen+2*little+5);
         // rod
-        translate([0,0,shaftLen])
-            color("gray") cylinder(d=threadedRodDiameter, h=rodLen+little);
+        translate([0,0,shaftLen+8])
+            color("gray") cyl(d=threadedRodDiameter, h=rodLen+little);
         // screws
         translate([0,shaftScrewsDistance/2,shaftLen/2])
             rotate([90,0,90])
@@ -65,26 +68,26 @@ module coupler(motorShaftDiameter = 5,threadedRodDiameter = 5)
             rotate([90,0,270])
                 screw();
         // cut between the two halves
-        color("black") cube([halvesDistance,big,big], center=true);
-    }
+        color("green") cube([halvesDistance,big,big], center=true);
+	}
     
 }
 
 module screw()
 {
     // thread
-    color("plum") cylinder(d=screwDiameter, h=big, center=true);
+    color("plum") cyl(d=screwDiameter, h=big);
     // head
-    translate([0,0,(screwThreadLength-nutThickness)/2])
-        color("gold") cylinder(d=screwHeadDiameter, h=big);
+    translate([0,0,(screwThreadLength-nutThickness)/2+big/2])
+        color("gold") cyl(d=screwHeadDiameter, h=big);
 	if(Use3mmInsert) {
-		translate([0,0,-(screwThreadLength-nutThickness)/2+3.5])
+		translate([0,0,-(screwThreadLength-nutThickness)/2+3.5-big/2])
 			rotate([180,0,30])
-				color("gray") cylinder(d=Yes3mmInsert(Use3mmInsert), h=15);
+				color("lightgray") cyl(d=Yes3mmInsert(Use3mmInsert), h=big);
     } else { // nut
-    translate([0,0,-(screwThreadLength-nutThickness)/2])
-        rotate([180,0,30])
-            color("salmon") cylinder(d=nutWidth*2*tan(30), h=big, $fn=6);
+		translate([0,0,-(screwThreadLength-nutThickness)/2-5-big/2])
+			rotate([180,0,30])
+				color("salmon") cyl(d=nutWidth*2*tan(30), h=big, $fn=6);
 	}
 }
 

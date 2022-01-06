@@ -2,14 +2,14 @@
 // FanDuct_v3.scad - nozzle to put on a 5510 blower fan outlet
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created 8/10/2019
-// last upate 8/27/19
+// last upate 1/4/22
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/10/19	- Created fan duct of my own design
 // 8/12/19	- Added ability to set length
 // 8/27/19	- Crerated v3 with a taper next to the fan to claer the mount better
+// 1/4/22	- BOSL2
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-use </inc/cubex.scad>
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+include <bosl2/std.scad>//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $fn=100;
 clearance=0.10;
 WallThickness=1;
@@ -47,8 +47,8 @@ module FanDuct_v3(Length=50) {
 module FanDuct_Base_v3() {
 	//echo(parent_module(0));
 	color("plum") hull() {
-		cube([15.2+(WallThickness+clearance)*2,20+(WallThickness+clearance)*2,3]);
-		translate([0,0,5]) cube([15.2+(WallThickness+clearance)*2,10+(WallThickness+clearance)*2,3]);
+		cuboid([15.2+(WallThickness+clearance)*2,20+(WallThickness+clearance)*2,3],rounding=1,p1=[0,0]);
+		translate([0,0,5]) cuboid([15.2+(WallThickness+clearance)*2,10+(WallThickness+clearance)*2,3],rounding=1,p1=[0,0]);
 	}
 }
 
@@ -57,7 +57,8 @@ module FanDuct_Base_v3() {
 module FanDuct_Outlet_v3(Length) {
 	//echo(parent_module(0));
 	color("cyan") hull() {
-		translate([5,5,Length-5]) rotate([60,0,0]) cubeX([5.2+(WallThickness+clearance)*2,5+(WallThickness+clearance)*2,3,2]);
+		translate([5,5,Length-5]) rotate([60,0,0])
+			cuboid([5.2+(WallThickness+clearance)*2,5+(WallThickness+clearance)*2,3,2],rounding=1,p1=[0,0]);
 		translate([0,0,5]) cube([15.2+(WallThickness+clearance)*2,10+(WallThickness+clearance)*2,3]);
 	}
 }

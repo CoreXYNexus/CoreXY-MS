@@ -1,13 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Single Titan - titan, titan aero
 // created: 2/3/2014
-// last modified: 10/13/20
+// last modified: 1/4/22
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16	- added bevel on rear carriage for x-stop switch to ride up on
 // 5/30/20	- Added ability to use a Titan Aero on mirrored version
 // 6/4/20	- Removed some unecessary code
 // 8/2/20	- Edited for the CXY-MSv1 files
 // 10/13/20	- Changed width of base to allow 42mm long stepper motor
+// 1/4/22	- BOSL2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 use <inc/corner-tools.scad>
@@ -72,7 +73,7 @@ module Extruder(Extruder=1,Sensor=5,Aero=1,Mounting=1) {
 module ExtruderPlatform(recess=0) // bolt-on extruder platform
 {										 // used for extruder mount via a wades extruder style
 	difference() {
-		color("red") cubeX([HorizontallCarriageWidth,heightE,wall],radius=1,center=true); // extruder side
+		color("red") cuboid([HorizontallCarriageWidth,heightE,wall],rounding=2); // extruder side
 		translate([0,-height/3-6,0]) ExtruderPlatformNotch(); // extruder notch
 		translate([0,26,10]) rotate([90,0,0]) ExtruderMountHoles(screw3);	// screw holes to mount extruder plate
 		// extruder mounting holes
@@ -109,10 +110,10 @@ module TitanExtruderPlatform(recess=2,InnerSupport=0,MountingHoles=1,Aero=0,Moun
 	// extruder platform for e3d titan with (0,1)BLTouch or (2)Proximity or (3)dc42's ir sensor
 	difference() {
 		union() {
-			translate([-37.5+17,-37,-wall/2])
-				color("cyan") cubeX([HorizontallCarriageWidth+ShiftHotend2/1.3-12,heightE+8,wall],1); // extruder side
-			translate([14,23,-wall/2]) color("plum") cubeX([23,wall,wall],1);
-			translate([-38,23,-wall/2]) color("blue") cubeX([25,wall,wall],1);
+			translate([-37.5+17,-37,-wall/2]) color("cyan")
+				cuboid([HorizontallCarriageWidth+ShiftHotend2/1.3-12,heightE+8,wall],rounding=2,p1=[0,0]); // extruder side
+			translate([14,23,-wall/2]) color("plum") cuboid([23,wall,wall],rounding=2,p1=[0,0]);
+			translate([-38,23,-wall/2]) color("blue") cuboid([25,wall,wall],rounding=2,p1=[0,0]);
 		}
 		//if(MountingHoles && Yes3mmInsert(Use3mmInsert,LargeInsert)==screw3)
 		if(Mounting) translate([0,27,10]) rotate([90,0,0]) ExtruderMountHoles();
@@ -256,7 +257,7 @@ module ScrewSpacer(Length=10,Screw=screw5) {
 
 module TitanMotorMount(WallMount=0,Screw=screw4,InnerSupport=1) {
 	difference() {	// motor mount
-		translate([-1,0,0]) color("red") cubeX([54,60+ShiftTitanUp,5],1);
+		translate([-1,0,0]) color("red") cuboid([54,60+ShiftTitanUp,5],rounding=2,p1=[0,0]);
 		translate([25,35+ShiftTitanUp,-1]) rotate([0,0,45]) color("purple") NEMA17_x_holes(8,1);
 		if(ShiftTitanUp > -2.6) {
 			color("blue") hull() {
@@ -273,7 +274,7 @@ module TitanMotorMount(WallMount=0,Screw=screw4,InnerSupport=1) {
 module TitanMountSupports(WallMount=0,InnerSupport=0,Screw=screw4) {
 	if(WallMount) {
 		difference() { // front support
-			translate([52,0,0]) color("cyan") cubeX([4,45+ShiftTitanUp,45],1);
+			translate([52,0,0]) color("cyan") cuboid([4,45+ShiftTitanUp,45],rounding=2,p1=[0,0]);
 			// lower mounting screw holes
 			translate([40,15,11]) rotate([0,90,0]) color("cyan") cylinder(h=20,d=Screw);
 			translate([40,15,11+mount_seperation]) rotate([0,90,0])  color("blue") cylinder(h=20,d=Screw);
@@ -292,7 +293,7 @@ module TitanMountSupports(WallMount=0,InnerSupport=0,Screw=screw4) {
 
 module TitanSupport(Clear=0, Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) {
 	difference() { // rear support
-		translate([49,47.5,-1.5]) rotate([50]) color("cyan") cubeX([4,6,69],1);
+		translate([49,47.5,-1.5]) rotate([50]) color("cyan") cuboid([4,6,69],rounding=2,p1=[0,0]);
 		translate([47,-1,-67]) color("gray") cube([7,70,70]);
 		translate([47,-73,-26]) color("lightgray") cube([7,75,75]);
 		if(Clear) translate([44,44.5,75]) rotate([0,90,0]) PCFanMounting(Screw=Yes3mmInsert(Use3mmInsert,LargeInsert));

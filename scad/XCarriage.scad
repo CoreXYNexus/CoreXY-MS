@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // XCarriage - x carriage for the COREXY-MSv1 using makerslide
 // created: 2/3/2014
-// last modified: 9/23/21
+// last modified: 1/5/22
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 1/12/16 - added bevel on rear carriage for x-stop switch to ride up on
 // 1/21/16 - added Prusa i3 style extruder mount to carriage and put it into a seperate module
@@ -81,6 +81,7 @@
 // 10/17/20	- changed extruder mount to allow dual titan areos
 // 11/8/20	- Added extra set of holes to mount the single titan aero extruder mount
 // 9/23/21	- BeltLoop adapter for exoslide
+// 1/6/22	- BOSL2 finished
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // The screw2 holes must be drilled with a 2.5mm drill for a 3mm tap or to allow a 3mm to be screwed in without tapping
@@ -109,7 +110,6 @@
 // corner-tools.scad fillet_r() doesn't show in preview
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
-use <inc/corner-tools.scad>
 include <inc/brassinserts.scad>
 include <BOSL2/std.scad>
 use <TitanAero.scad>
@@ -220,10 +220,12 @@ module XWCMountHoles(Screw=Yes5mmInsert(Use5mmInsert)) {
 
 module CarridgeAllInOneAndSingleTitanExtruder(Clamps=1,Loop=0,Titan=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert),ExtType=1,Stiffner=0) {
 	CarridgeAllInOne(Clamps,Loop,Titan,0,Screw);
-	translate([0,-wall,-4]) color("plum") cubeX([width,wall,wall],1); // make front xcarriage even with extruder mount
-	translate([-0.6,35,-4]) color("red") cubeX([width,wall,wall],1); // make rear xcarriage even with front
+	translate([0,-wall,-4]) color("plum")
+		cuboid([width,wall,wall],rounding=1,p1=[0,0]); // make front xcarriage even with extruder mount
+	translate([-0.6,35,-4]) color("red") cuboid([width,wall,wall],rounding=1,p1=[0,0]); // make rear xcarriage even with front
 	translate([33,-42,0]) rotate([0,0,90]) TitanSingle(0);
-	if(Stiffner) translate([49,-14,42.5]) color("blue") cubeX([6.75,14,wall],1);  // don't use this if flexibility is needed
+	if(Stiffner) translate([49,-14,42.5]) color("blue")
+		cuboid([6.75,14,wall],rounding=1,p1=[0,0]);  // don't use this if flexibility is needed
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,11 +265,12 @@ module RearCarridge(Clamps=0,Loop=0,DoBelt=0) {
 
 module partial() {
 	//if($preview) %translate([-100,-100,-1]) cube([200,200,1]); // parts may not be on the preview plate
-	//Carriage_v2(1,0,0,1,0,0,0);	// x-carriage, 1st arg: Titan mount; 2nd arg:Shift Titan mount;
+	//roundedinner();
+	Carriage_v2(1,0,0,1,0,0,0);	// x-carriage, 1st arg: Titan mount; 2nd arg:Shift Titan mount;
 					// 3rd arg: belt clamps; 4th arg: Loop style belt holders
 					// 5:arg DoBeltDrive if 1; 6th arg: Rear carriage plate if 1; 7th arg: 1 or 2 Moves the Belt loops
 					// defaults: Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,Rear=0,MoveBeltLoops=0
-	Carriage_v3();	//Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,ExtMountingHoles=1
+	//Carriage_v3();	//Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,ExtMountingHoles=1
 	//ExtruderPlatform(0);	// for BLTouch: 0 & 1, 2 is proximity, 3 is dc42 ir sensor, 4- none
 	//translate([-50,0,0]) CarriageBeltDrive(1);	// 1 - belt loop style
 	//MirrorTitanExtruderPlatform(5,1,1,1); // reverse the platform to have the titan adjusting screw to the front
@@ -289,8 +292,9 @@ module partial() {
 module Carriage_v2(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=0,Rear=0,MoveBeltLoops=0,ExtMountingHoles=1) { // extruder side
 	difference() {
 		union() {
-			translate([VerticalCarriageWidth/2,0,0]) color("cyan") cubeX([VerticalCarriageWidth,height,wall],1);
-			color("blue") cubeX([width,HorizontalCarriageHeigth,wall],1);
+			translate([VerticalCarriageWidth/2,0,0]) color("cyan")
+				cuboid([VerticalCarriageWidth,height,wall],rounding=1,p1=[0,0]);
+			color("blue") cuboid([width,HorizontalCarriageHeigth,wall],rounding=1,p1=[0,0]);
 				translate([VerticalCarriageWidth/2+31,HorizontalCarriageHeigth+0.9,0]) roundedinner();
 			translate([VerticalCarriageWidth/2+6.5,HorizontalCarriageHeigth+0.9,8]) rotate([0,180,0]) roundedinner();
 		}
@@ -347,8 +351,9 @@ module Carriage_v2(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=0,Rear=0,MoveBel
 module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,ExtMountingHoles=1,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert),TitanAero=0) { // main carriage assembly
 	rotate([90,0,0]) difference() { // front
 		union() {
-			translate([VerticalCarriageWidth/2,0,0]) color("cyan") cubeX([VerticalCarriageWidth,height,wall],1);
-			color("blue") cubeX([width,HorizontalCarriageHeigth,wall],1);
+			translate([VerticalCarriageWidth/2,0,0]) color("cyan")
+				cuboid([VerticalCarriageWidth,height,wall],rounding=1,p1=[0,0]);
+			color("blue") cuboid([width,HorizontalCarriageHeigth,wall],rounding=1,p1=[0,0]);
 				translate([VerticalCarriageWidth/2+31,HorizontalCarriageHeigth+0.9,0]) roundedinner();
 			translate([VerticalCarriageWidth/2+6.5,HorizontalCarriageHeigth+0.9,8]) rotate([0,180,0]) roundedinner();
 			if(ExtMountingHoles) {  // front print support tabs
@@ -391,8 +396,9 @@ module Carriage_v3(Titan=0,Tshift=0,Clamps=0,Loop=0,DoBeltDrive=1,LoopMounts=1,E
 	//%translate([0,0,4]) cube([10,35,10]); // show distance needed between carriages
 	translate([VerticalCarriageWidth*2,35,0]) rotate([90,0,180]) difference() { // rear
 		union() {
-			translate([VerticalCarriageWidth/2,0,0]) color("cyan") cubeX([VerticalCarriageWidth,height,wall],1);
-			color("blue") cubeX([width,HorizontalCarriageHeigth,wall],1);
+			translate([VerticalCarriageWidth/2,0,0]) color("cyan")
+				cuboid([VerticalCarriageWidth,height,wall],rounding=1,p1=[0,0]);
+			color("blue") cuboid([width,HorizontalCarriageHeigth,wall],rounding=1,p1=[0,0]);
 				translate([VerticalCarriageWidth/2+31,HorizontalCarriageHeigth+0.9,0]) roundedinner();
 			translate([VerticalCarriageWidth/2+6.5,HorizontalCarriageHeigth+0.9,8]) rotate([0,180,0]) roundedinner();
 		}
@@ -541,7 +547,7 @@ module NotchBottom()
 
 module CarriageBeltDrive(Loop=0,DoRearWall=1,DoLayer=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) {
 	difference() {	// base
-		translate([-3,-0,0]) color("cyan") cubeX([47,40,wall],1);
+		translate([-3,-0,0]) color("cyan") cuboid([47,40,wall],rounding=1,p1=[0,0]);
 		if(!Loop && Screw == screw3) {
 			hull() {	// belt clamp nut access slot
 				translate([-4,belt_adjust,8]) rotate([0,90,0]) color("red") nut(m3_nut_diameter,14); // make room for nut
@@ -567,7 +573,7 @@ module CarriageBeltDrive(Loop=0,DoRearWall=1,DoLayer=0,Screw=Yes3mmInsert(Use3mm
 	if(DoLayer) translate([1,2,7.7]) color("black") cube([44,40,layer]);
 	difference() {	// right wall
 		difference() {
-			translate([-wall/2-1,0,0]) color("yellow") cubeX([wall-2,40,35],1);
+			translate([-wall/2-1,0,0]) color("yellow") cuboid([wall-2,40,35],rounding=1,p1=[0,0]);
 			translate([-23,-4,31]) rotate([0,40,0]) color("lightgray") cube([20,60,20]);
 		}
 		if(!Loop) {
@@ -582,7 +588,7 @@ module CarriageBeltDrive(Loop=0,DoRearWall=1,DoLayer=0,Screw=Yes3mmInsert(Use3mm
 	}
 	if(!Loop) BeltMountingHoleBump(0);
 	difference() {	// left wall
-		translate([36+wall/2,0,0]) color("pink") cubeX([wall-2,40,31],1);
+		translate([36+wall/2,0,0]) color("pink") cuboid([wall-2,40,31],rounding=1,p1=[0,0]);
 		translate([35,-4,34]) rotate([0,50,0]) color("red") cube([20,60,20]);
 		if(!Loop) {
 			translate([32,belt_adjust,4]) rotate([0,90,0]) color("red") cylinder(h = 2*wall, d=screw3);
@@ -596,7 +602,7 @@ module CarriageBeltDrive(Loop=0,DoRearWall=1,DoLayer=0,Screw=Yes3mmInsert(Use3mm
 	}
 	if(DoRearWall) {
 		difference() {	// rear wall - adds support to walls holding the belts
-			translate([-wall/2+1,42-wall,0]) color("gray") cubeX([47,wall-2,belt_adjust],1);
+			translate([-wall/2+1,42-wall,0]) color("gray") cuboid([47,wall-2,belt_adjust],rounding=1,p1=[0,0]);
 			translate([4,33,-5]) color("blue") cylinder(h=25,d=screw5);	// clearance for endstop screws
 			translate([37,33,-5]) color("red") cylinder(h=25, d=screw5);
 			if(Loop) BeltLoopHolderMountingHoles(Screw);
@@ -604,18 +610,18 @@ module CarriageBeltDrive(Loop=0,DoRearWall=1,DoLayer=0,Screw=Yes3mmInsert(Use3mm
 	} else { // fillers
 		difference() {
 			union() {
-				translate([-3,0,4]) color("black") cubeX([10,wall,30],1);
-				translate([35,0,4]) color("gray") cubeX([10,wall,30],1);
+				translate([-3,0,4]) color("black") cuboid([10,wall,30],rounding=1,p1=[0,0]);
+				translate([35,0,4]) color("gray") cuboid([10,wall,30],rounding=1,p1=[0,0]);
 				difference() {
-					translate([-5,wall+28,4]) color("white") cubeX([10,wall+7,30],1);
+					translate([-5,wall+28,4]) color("white") cuboid([10,wall+7,30],rounding=1,p1=[0,0]);
 					EndStopAndWireChainHoles();
 				}
 				difference() {
-					translate([36,wall+28,4]) color("plum") cubeX([10,wall+7,30],1);
+					translate([36,wall+28,4]) color("plum") cuboid([10,wall+7,30],rounding=1,p1=[0,0]);
 					EndStopAndWireChainHoles();
 				}
 				difference() {
-					translate([-1,wall-8,1]) color("green") cubeX([42,wall,9],1);
+					translate([-1,wall-8,1]) color("green") cuboid([42,wall,9],rounding=1,p1=[0,0]);
 					translate([VerticalCarriageWidth-17,tri_sep-56.8,22]) rotate([90,0,0]) color("red") hull() {
 						// bevel the countersink to get easier access to adjuster
 						translate([0,0,3]) cylinder(h = depth+10,d = screw5hd/2);
@@ -623,7 +629,7 @@ module CarriageBeltDrive(Loop=0,DoRearWall=1,DoLayer=0,Screw=Yes3mmInsert(Use3mm
 					}
 				}
 				difference() {
-					translate([-5,wall+27.5,0]) color("blue") cubeX([51,wall+7.5,15],1);
+					translate([-5,wall+27.5,0]) color("blue") cuboid([51,wall+7.5,15],rounding=1,p1=[0,0]);
 					EndStopAndWireChainHoles();
 				}
 			}
@@ -650,7 +656,7 @@ module EndStopAndWireChainHoles(Screw=WireChainMount) {
 
 module CarriageBeltDriveStandAlone(Loop=0,DoRearWall=1,DoLayer=0,Screw) {
 	difference() {	// base
-		translate([-3,-0,0]) color("cyan") cubeX([47,50,wall],1);
+		translate([-3,-0,0]) color("cyan") cuboid([47,50,wall],rounding=1,p1=[0,0]);
 		if(!Loop && (Yes3mmInsert(Use3mmInsert,LargeInsert) == screw3)) {
 			hull() {	// belt clamp nut access slot
 				translate([-4,belt_adjust,8]) rotate([0,90,0]) color("red") nut(m3_nut_diameter,14); // make room for nut
@@ -672,7 +678,7 @@ module CarriageBeltDriveStandAlone(Loop=0,DoRearWall=1,DoLayer=0,Screw) {
 		EndStopAndWireChainHoles();
 	}
 	difference() {	// right wall
-		translate([-wall/2-1,0,0]) color("yellow") cubeX([wall-2,50,31],1);
+		translate([-wall/2-1,0,0]) color("yellow") cuboid([wall-2,50,31],rounding=1,p1=[0,0]);
 		if(!Loop) {
 			translate([-wall/2-2,belt_adjust,27]) rotate([0,90,0]) color("red") cylinder(h = 2*wall, d=screw3);
 			translate([-wall/2-2,belt_adjust,4]) rotate([0,90,0]) color("cyan") cylinder(h = 2*wall, d=screw3);
@@ -685,7 +691,7 @@ module CarriageBeltDriveStandAlone(Loop=0,DoRearWall=1,DoLayer=0,Screw) {
 	}
 	if(!Loop) BeltMountingHoleBump(0);
 	difference() {	// left wall
-		translate([36+wall/2,0,0]) color("pink") cubeX([wall-2,50,31],1);
+		translate([36+wall/2,0,0]) color("pink") cuboid([wall-2,50,31],rounding=1,p1=[0,0]);
 		//translate([35,-4,34]) rotate([0,50,0]) color("red") cube([20,60,20]);
 		if(!Loop) {
 			translate([32,belt_adjust,4]) rotate([0,90,0]) color("red") cylinder(h = 2*wall, d=screw3);
@@ -737,7 +743,7 @@ module BeltMountingHoleBump(Bump) { // add a little plastic at the belt clamp sc
 
 module BeltAdjuster() {
 	difference() {
-		translate([-1,0,0]) color("blue") cubeX([9,30,9],1);
+		translate([-1,0,0]) color("blue") cuboid([9,30,9],rounding=1,p1=[0,0]);
 		translate([-1.5,5.5,7]) color("red") cube([11,7,3.5]);
 		translate([-1.5,16.5,7]) color("cyan") cube([11,7,3.5]);
 		translate([4,3,-5]) color("white") cylinder(h = 2*wall, d=screw3);
@@ -808,7 +814,7 @@ module BeltClamps(Clamps=0,Loop=0) // belt clamps
 
 module TitanExtruderBowdenMount() { // extruder bracket for e3d titan to mount on a AL extruder plate
 	difference() {
-		translate([0,0,0]) cubeX([40,53,5],1); // extruder side
+		translate([0,0,0]) cuboid([40,53,5],rounding=1,p1=[0,0]); // extruder side
 		translate([20,28,-10]) cylinder(h=20,d=20); // remove some plastic under the motor
 		translate([10,10,-1]) cylinder(h=20,d=screw4); // mounting screw hole
 		translate([30,10,-1]) cylinder(h=20,d=screw4); // mounting screw hole
@@ -841,7 +847,7 @@ module ExtruderMountHoles(Screw=screw3,All=0) {		// screw holes to mount extrude
 
 module TitanMotorMount(WallMount=0,Screw=screw4,InnerSupport=1) {
 	difference() {	// motor mount
-		translate([-1,0,0]) color("red") cubeX([54,60+ShiftTitanUp,5],1);
+		translate([-1,0,0]) color("red") cuboid([54,60+ShiftTitanUp,5],rounding=1,p1=[0,0]);
 		translate([25,35+ShiftTitanUp,-1]) rotate([0,0,45]) color("purple") NEMA17_x_holes(8, 2);
 		color("blue") hull() {
 			translate([14,5,0]) cylinder(h=wall*2,d=20); // hotend cooling hole
@@ -849,7 +855,7 @@ module TitanMotorMount(WallMount=0,Screw=screw4,InnerSupport=1) {
 		}
 	}
 	difference() { // front support
-		translate([-1,24,-48]) color("blue") rotate([60,0,0]) cubeX([4,60,60],1);
+		translate([-1,24,-48]) color("blue") rotate([60,0,0]) cuboid([4,60,60],rounding=1,p1=[0,0]);
 		translate([-3,-30,-67]) cube([7,90,70]);
 		translate([-3,-67,-45]) cube([7,70,90]);
 		color("gray") hull() {
@@ -860,7 +866,7 @@ module TitanMotorMount(WallMount=0,Screw=screw4,InnerSupport=1) {
 	}
 	if(WallMount) {
 		difference() { // front support
-			translate([52,0,0]) color("cyan") cubeX([4,45+ShiftTitanUp,45],1);
+			translate([52,0,0]) color("cyan") cuboid([4,45+ShiftTitanUp,45],rounding=1,p1=[0,0]);
 			// lower mounting screw holes
 			translate([40,15,11]) rotate([0,90,0]) color("cyan") cylinder(h=20,d=Screw);
 			translate([40,15,11+mount_seperation]) rotate([0,90,0])  color("blue") cylinder(h=20,d=Screw);
@@ -872,7 +878,7 @@ module TitanMotorMount(WallMount=0,Screw=screw4,InnerSupport=1) {
 	} else {
 		if(!InnerSupport) {
 			difference() { // rear support
-				translate([49,24,-48]) rotate([60]) color("cyan") cubeX([4,60,60],1);
+				translate([49,24,-48]) rotate([60]) color("cyan") cuboid([4,60,60],rounding=1,p1=[0,0]);
 				translate([47,0,-67]) cube([7,70,70]);
 				translate([47,-69,-36]) cube([7,70,70]);
 				color("lightgray") hull() {
@@ -890,7 +896,7 @@ module TitanMotorMount(WallMount=0,Screw=screw4,InnerSupport=1) {
 module BeltLoopHolder(Quanity=1,ShiftY=-3) {
 	for(a=[0:Quanity-1]) {
 		difference() {
-			translate([a*-30,ShiftY,BeltMSSpacing-BeltWidth]) color("blue") cubeX([23,16,LoopHeight],1);
+			translate([a*-30,ShiftY,BeltMSSpacing-BeltWidth]) color("blue") cuboid([23,16,LoopHeight],rounding=1,p1=[0,0]);
 			translate([a*-30-1,ShiftY+3,-2]) beltLoop(); // lower
 			translate([a*-30-1,ShiftY+3,BeltMSSpacing+BeltSpacing-1]) beltLoop(); // upper
 			translate([a*-30+19,-8,0]) BeltLoopMountingCountersink();
@@ -913,7 +919,8 @@ module BeltLoopHolder(ShiftY=-3,Screw=screw3,Invert=0) {
 	if(Invert) {
 			mirror([0,1,0]) rotate([0,0,180]) {
 				difference() {
-					translate([0,ShiftY-10,BeltMSSpacing-BeltWidth]) color("blue") cubeX([23,29,LoopHeight],1);
+					translate([0,ShiftY-10,BeltMSSpacing-BeltWidth]) color("blue")
+						cuboid([23,29,LoopHeight],rounding=1,p1=[0,0]);
 					translate([0,ShiftY+3,-2]) beltLoop(); // lower
 					translate([0,ShiftY+3,BeltMSSpacing+BeltSpacing-2]) rotate([0,0,0]) beltLoop(); // upper
 					if(Screw==screw5)
@@ -925,7 +932,7 @@ module BeltLoopHolder(ShiftY=-3,Screw=screw3,Invert=0) {
 			}
 	} else {
 		difference() {
-			translate([0,ShiftY-10,BeltMSSpacing-BeltWidth]) color("blue") cubeX([23,29,LoopHeight],1);
+			translate([0,ShiftY-10,BeltMSSpacing-BeltWidth]) color("blue") cuboid([23,29,LoopHeight],rounding=1,p1=[0,0]);
 			translate([0,ShiftY+3,-2]) beltLoop(); // lower
 			translate([0,ShiftY+3,BeltMSSpacing+BeltSpacing-2]) rotate([0,0,0]) beltLoop(); // upper
 			if(Screw==screw5)
@@ -941,7 +948,8 @@ module BeltLoopHolder(ShiftY=-3,Screw=screw3,Invert=0) {
 
 module BeltLoopMountingBlock(ExtraThickness=0,Screw=screw3) {
 	difference() {
-		translate([0,-15,BeltMSSpacing-BeltWidth]) color("pink") cubeX([MountThickness+ExtraThickness,45,LoopHeight],1);
+		translate([0,-15,BeltMSSpacing-BeltWidth]) color("pink") 
+			cuboid([MountThickness+ExtraThickness,45,LoopHeight],rounding=1,p1=[0,0]);
 		translate([0,-13,0]) BeltLoopMouningHoles(Screw);
 		if(Screw==screw5)
 			translate([-3,-13,0]) BeltLoopMountingCountersink(ExtraThickness,screw5hd);
@@ -985,10 +993,8 @@ module BeltLoopMountingCountersink(ExtraThickness=0,Screw=screw3hd) {
 module roundedinner() {
 	rotate([0,0,-45]) {
 		difference() {
-			translate([0,0,0]) color("red") cube([10,10,wall]);
-			translate([5,11.9,-2]) color("blue") cylinder(h=wall+5,d=12);
-			translate([5,12,wall]) fillet_r(1.5,6,-1,100);
-			translate([5,12,0]) rotate([0,180,0]) fillet_r(1.5,6,-1,100);
+			translate([0,0,0]) color("red") cuboid([10,10,wall],p1=[0,0]);
+			translate([5,11.9,wall/2]) color("blue") cyl(h=wall+0.1,d=12,rounding=-1);
 		}
 	}
 }

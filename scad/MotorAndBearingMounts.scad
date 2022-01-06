@@ -3,7 +3,7 @@
 // https://creativecommons.org/licenses/by-sa/3.0/
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
-// last update 10/16/21
+// last update 1/4/22
 /////////////////////////////////////////////////////////////////////////////////////////
 // 7/7/16	- added built-in spacer to the bearing_bracket
 // 7/14/16	- adjusted 2002 mounting holes to have motor mount clear the makerslide rails
@@ -34,11 +34,12 @@
 // 4/1/21	- Added an adjustable front bearing mount
 // 4/24/21	- Added thrust washer to front bearing mount base
 // 10/16/21	- Changed support on MotorMount()
+// 1/4/22	- BOSL2
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in FrontBearingBracket() must match stepper motor shaft in MotorMount()
 //       If the motors get hot, print it from something that can handle it
 //       Bearing stack is 5mm washer,F625Z,F625Z,5mm washer,5mm washer,F625Z,F625Z,5mm washer,
-//       M5x50, and a 5mm nut in the nut trap
+//       M5x50, and a 5mm nut in the nut trap or brass insert
 //		 Motor mounts have two holes on the makerslide side, to allow the makerslide to be installed
 //		 either way.
 //		 Adjustable front bearing has the motor adjustable, since you may not get the belts the same length.
@@ -50,7 +51,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 include <inc/brassinserts.scad>
-include <bosl2/std.scad>
+$fn=100;
 /////////////////////////////////////////////////////////////////////////////////////////
 // vars for this file
 b_posY = 29.5;		// bearing position X
@@ -91,8 +92,8 @@ module NonAdjustableBearingMountSet() {
 module AdjustingKnob() {
 	difference() {
 		union() {
-			color("cyan") cylinder(h=27,d=nut3*2);
-			translate([0,0,0]) color("blue") cylinder(h=Knob_Height,d=Knob_Diameter);
+			translate([0,0,27/2]) color("cyan") cyl(h=27,d=nut3*2,rounding=1);
+			translate([0,0,Knob_Height/2]) color("blue") cyl(h=Knob_Height,d=Knob_Diameter,rounding=1);
 		}
 		if(Use3mmInsert)  translate([0,0,-5]) color("red") cylinder(h=35,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
 		else translate([0,0,-4]) color("purple") cylinder(h=5,d=nut3,$fn=6);
@@ -120,15 +121,17 @@ module AdjustableFrontBearingMountSet(Fit=0) {
 module AdjustableFrontBearingMount(Fit=0) {
 	difference() { // vertical
 		union() {
-			translate([0,0,45]) color("cyan") cubeX([Vthickness,F625ZDiameter,F625ZDoulbleStack*2+b_height-2],1);
-			translate([0,0,45-WasherThickness]) color("white") cubeX([34,F625ZDiameter,Tthickness-1],1);
-			translate([33,9,F625ZDoulbleStack*2+b_height+11.45-WasherThickness]) color("red")
-				cylinder(h=Tthickness-1,d=F625ZDiameter); // bottom
-			translate([0,0,F625ZDoulbleStack*2+b_height+38]) color("blue") cubeX([34,F625ZDiameter,Tthickness],1);
-			translate([33,9,F625ZDoulbleStack*2+b_height+38]) color("cyan")
-				cylinder(h=Tthickness,d=F625ZDiameter); // top
-			translate([0,0,45]) color("green") cubeX([22,Tthickness-1,30],2);
-			translate([0,14,45]) color("lightgreen") cubeX([22,Tthickness-1,30],2);
+			translate([0,0,45]) color("cyan")
+				cuboid([Vthickness,F625ZDiameter,F625ZDoulbleStack*2+b_height-2],rounding=1,p1=[0,0]);
+			translate([0,0,45-WasherThickness]) color("white") cuboid([34,F625ZDiameter,Tthickness-1],rounding=1,p1=[0,0]);
+			translate([33,9,F625ZDoulbleStack*2+b_height+11.45-WasherThickness+2]) color("red")
+				cyl(h=Tthickness-1,d=F625ZDiameter,rounding=1); // bottom
+			translate([0,0,F625ZDoulbleStack*2+b_height+38]) color("blue") 
+				cuboid([34,F625ZDiameter,Tthickness],rounding=1,p1=[0,0]);
+			translate([33,9,F625ZDoulbleStack*2+b_height+40.5]) color("cyan")
+				cyl(h=Tthickness,d=F625ZDiameter,rounding=1); // top
+			translate([0,0,45]) color("green") cuboid([22,Tthickness-1,30],rounding=2,p1=[0,0]);
+			translate([0,14,45]) color("lightgreen") cuboid([22,Tthickness-1,30],rounding=2,p1=[0,0]);
 		}
 		translate([Vthickness+26,9,F625ZDoulbleStack+b_height+30]) color("lightgray") cylinder(h=50,d=screw5); // top
 		translate([Vthickness+26,9,F625ZDoulbleStack+b_height-5]) color("gray")
@@ -152,11 +155,11 @@ module AdjustableFrontBearingMountBase(ThrustBearing=1,DoTabs=1) {
 	difference() {
 		union() {
 			translate([-5,-5,1]) color("purple")
-				cubeX([Vthickness-2,F625ZDiameter+10,F625ZDoulbleStack*2+b_height+48],2);
-			translate([-5,-5,78.75]) color("cyan") cubeX([32,F625ZDiameter+10,Tthickness],2);
-			translate([-5,-37,39.75]) color("khaki") cubeX([24,F625ZDiameter+75,Tthickness],2);
-			translate([-5,-5,40]) color("black") cubeX([32,Tthickness-0.25,42],2);
-			translate([-5,18.5,40]) color("white") cubeX([32,Tthickness-0.25,42],2);
+				cuboid([Vthickness-2,F625ZDiameter+10,F625ZDoulbleStack*2+b_height+48],rounding=2,p1=[0,0]);
+			translate([-5,-5,78.75]) color("cyan") cuboid([32,F625ZDiameter+10,Tthickness],rounding=2,p1=[0,0]);
+			translate([-5,-37,39.75]) color("khaki") cuboid([24,F625ZDiameter+75,Tthickness],rounding=2,p1=[0,0]);
+			translate([-5,-5,40]) color("black") cuboid([32,Tthickness-0.25,42],rounding=2,p1=[0,0]);
+			translate([-5,18.5,40]) color("white") cuboid([32,Tthickness-0.25,42],rounding=2,p1=[0,0]);
 			translate([15,-5,39.75]) color("gray") cuboid([12,28.25,Tthickness],rounding=2,p1=[0,0]); 
 		}
 		translate([-10,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0])
@@ -206,7 +209,7 @@ module AdjustableFrontBearingMountBase(ThrustBearing=1,DoTabs=1) {
 
 module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt motor
 	difference() {	// motor mounting holes
-		color("blue") cubeX([59,59,5],radius=2,center=true);
+		color("blue") cuboid([59,59,5],rounding=2);
 		if(Adjustable)
 			translate([-2,0,-4]) color("red") NEMA17_parallel_holes(7,5);
 		else 
@@ -216,17 +219,17 @@ module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt
 	if(!Side) {
 		MotorMountSupport(Side);
 		difference() { // make wall thicker at notch
-			translate([0,25,5]) color("white") cubeX([58,4,14],radius=2,center=true);
+			translate([0,25,5]) color("white") cuboid([58,4,14],rounding=2);
 			translate([0,0,10]) MakerslideNotchIt(Side);
 			MountScrews(28);
 		}
 		difference() {
-			translate([0,27,23]) color("cyan") cubeX([59,5,48],radius=2,center=true);
+			translate([0,27,23]) color("cyan") cuboid([59,5,48],rounding=2);
 			MountScrews(18);
 			translate([0,0,10]) MakerslideNotchIt(Side);
 		}
 		difference() {
-			translate([27,0,23]) color("pink") cubeX([5,59,48],radius=2,center=true);
+			translate([27,0,23]) color("pink") cuboid([5,59,48],rounding=2);
 			MountScrews(18);
 			translate([0,0,10]) MakerslideNotchIt(Side);
 		}
@@ -234,17 +237,17 @@ module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt
 	} else {
 		MotorMountSupport(Side);
 		difference() {
-			translate([0,-27,28]) color("cyan") cubeX([59,5,58],radius=2,center=true);
+			translate([0,-27,28]) color("cyan") cuboid([59,5,58],rounding=2);
 			translate([0,0,20]) MakerslideNotchIt(Side);
 			MountScrews(28);
 		}
 		difference() { // make wall thicker at notch
-			translate([0,-25,17]) color("white") cubeX([58,4,14],radius=2,center=true);
+			translate([0,-25,17]) color("white") cuboid([58,4,14],rounding=2);
 			translate([0,0,10]) MakerslideNotchIt(Side);
 			MountScrews(28);
 		}
 		difference() {
-			translate([27,0,28]) color("pink") cubeX([5,59,58],radius=2,center=true);
+			translate([27,0,28]) color("pink") cuboid([5,59,58],rounding=2);
 			MountScrews(28);
 			translate([0,0,20]) MakerslideNotchIt(Side);
 		}
@@ -289,7 +292,7 @@ module MountScrews(Mount_S,Screw=screw5) { // all of them; Mount_S is hight of t
 
 module FrontBearingBracket(TapIt=0,Label="") {
 	difference() {
-		color("white") cubeX([40,30,40],2);
+		color("white") cuboid([40,30,40],rounding=2,p1=[0,0]);
 		translate([b_posY,b_posX,-2]) color("gray") cylinder(h=50,d=Yes5mmInsert(Use5mmInsert));
 		translate([-2,10,30]) rotate([0,90,0]) color("red") cylinder(h=45,d=screw5);
 		translate([5,10,30]) rotate([0,90,0]) color("white") cylinder(h=45,d=screw5hd);
@@ -323,11 +326,13 @@ module BearingSupport(Qty=1,NotchIt=0) {	// keep the idler bearings from tilting
 			difference() { // vertical
 				union() {
 					// long vertical section
-					translate([0,0,0]) color("gray") cubeX([Vthickness-2,F625ZDiameter,F625ZDoulbleStack*2+b_height+43],1);
+					translate([0,0,0]) color("gray")
+						cuboid([Vthickness-2,F625ZDiameter,F625ZDoulbleStack*2+b_height+43],rounding=1,p1=[0,0]);
 					// support
-					translate([0,0,40]) color("white") cubeX([15+Vthickness,F625ZDiameter,Tthickness-2],1);
-					translate([0,0,40]) color("cyan") cubeX([15+Vthickness,Tthickness-2,35],1);
-					translate([0,F625ZDiameter-Tthickness+2,40]) color("green") cubeX([15+Vthickness,Tthickness-2,35],1);
+					translate([0,0,40]) color("white") cuboid([15+Vthickness,F625ZDiameter,Tthickness-2],rounding=1,p1=[0,0]);
+					translate([0,0,40]) color("cyan") cuboid([15+Vthickness,Tthickness-2,35],1);
+					translate([0,F625ZDiameter-Tthickness+2,40]) color("green")
+						cuboid([15+Vthickness,Tthickness-2,35],rounding=1,p1=[0,0]);
 					BearingBracketHorizontal();
 				}
 				translate([-3,9,10]) rotate([0,90,0]) color("red") cylinder(h=20,d=screw5); // screw mounting holes
@@ -341,9 +346,11 @@ module BearingSupport(Qty=1,NotchIt=0) {	// keep the idler bearings from tilting
 			if(NotchIt) {
 				difference() {	// extra support at notch
 					// strengthen at the notch
-					translate([-2,F625ZDiameter,35]) rotate([90,0,0]) color("cyan") cubeX([5,10,F625ZDiameter],2);
+					translate([-2,F625ZDiameter,35]) rotate([90,0,0]) color("cyan")
+						cuboid([5,10,F625ZDiameter],rounding=2,p1=[0,0]);
 					translate([-5,9,30]) rotate([0,90,0]) color("red") cylinder(h=5,d=screw5hd);	// screw head clearance
-					translate([2,-15,35]) color("black") cube([10,50,10]); // remove any of the cylinder on notch side
+					translate([2,-15,35]) color("black") 
+						cuboid([10,50,10],p1=[0,0]); // remove any of the cylinder on notch side
 				}
 			}
 		}
@@ -355,7 +362,8 @@ module BearingSupport(Qty=1,NotchIt=0) {	// keep the idler bearings from tilting
 module BearingBracketHorizontal() {
 	difference() {
 		union() {
-			translate([0,0,F625ZDoulbleStack*2+b_height+39]) color("blue") cubeX([38,F625ZDiameter,Tthickness],1);
+			translate([0,0,F625ZDoulbleStack*2+b_height+39]) color("blue") 
+				cuboid([38,F625ZDiameter,Tthickness],rounding=1,p1=[0,0]);
 			translate([37,9,F625ZDoulbleStack*2+b_height+39]) color("red") cylinder(h=Tthickness,d=F625ZDiameter);
 		}
 		translate([Vthickness+30,9,F625ZDoulbleStack*2+b_height]) color("blue") cylinder(h=50,d=screw5);
@@ -367,7 +375,8 @@ module BearingBracketHorizontal() {
 
 module 	BearingBracketHorizontalSupport() {
 	difference() { // angled support for top
-		translate([-11,6.5,F625ZDoulbleStack*2+b_height+30]) rotate([0,45,0]) color("yellow") cubeX([20,Tthickness,45],2);
+		translate([-11,6.5,F625ZDoulbleStack*2+b_height+30]) rotate([0,45,0]) color("yellow")
+			cuboid([20,Tthickness,45],rounding=2,p1=[0,0]);
 		translate([-19,6,F625ZDoulbleStack*2+b_height+10]) color("black") cube([20,7,40]);
 		translate([-4,6,F625ZDoulbleStack*2+b_height+42]) color("silver") cube([40,7,25]);
 	}
@@ -376,11 +385,10 @@ module 	BearingBracketHorizontalSupport() {
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 module MotorMountSupport(Side) {
-	if(Side) {
-		translate([-29,24.5,1.5]) rotate([0,46,0]) color("gray") cubeX([6,5,76.5],2);
-	} else {
-		translate([-28,-29.5,1.5]) rotate([0,51,0]) color("gray") cubeX([6,5,69],2);
-	}
+	if(Side)
+		translate([-29,24.5,1.5]) rotate([0,46,0]) color("gray") cuboid([6,5,76.5],rounding=2,p1=[0,0]);
+	else
+		translate([-28,-29.5,1.5]) rotate([0,51,0]) color("gray") cuboid([6,5,69],rounding=2,p1=[0,0]);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
