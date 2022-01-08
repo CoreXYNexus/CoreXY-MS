@@ -1,40 +1,28 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// nice (and horribly long) variable names for Thingiverse Customizer
-// 12/17/18 (SRC)	- edited to use in another scad file and added preview colors
-// 					  renamed to ZMotorLeadscrewCoupler.scad
-// 10/22/20 (SRC)	- Added use of brass inserts
-// 1/6/22 (SRC)		- BOSL2
+// ZMotorLeadscrewCoupler.scad base on a scad file from Thingiverse
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Modifications of original file made by Stephen Castello:
+// 12/17/18	- edited to use in another scad file and added preview colors, renamed to ZMotorLeadscrewCoupler.scad
+// 10/22/20	- Added use of brass inserts
+// 1/6/22	- BOSL2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// https://creativecommons.org/licenses/by-sa/4.0/
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <bosl2/std.scad>
 include <inc/brassinserts.scad>
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Use3mmInsert=1;
-
-// Height of the coupler, half for the motor shaft and half for the rod
-couplerHeight = 30;
-// External diameter of the coupler
-couplerExternalDiameter = 20;
-// Diameter of the motor shaft
-//motorShaftDiameter = 5;
-// Diameter of the rod
-//threadedRodDiameter = 5;
-// Diameter of the screw thread
+LargeInsert=1;
+couplerHeight = 30;				// Height of the coupler, half for the motor shaft and half for the rod
+couplerExternalDiameter = 20;	// External diameter of the coupler
 screwDiameter = 3.4;
 screwHeadDiameter = 7;
 screwThreadLength = 10;
-// Width across flats of the nut (wrench size)
-nutWidth = 5.7;
+nutWidth = 5.7;				// Width across flats of the nut (wrench size)
 nutThickness = 3;
-// Gap between the two halves
-halvesDistance = 0.5;
-
-/* [Hidden] */
-// end of Customizer variables
-// Portion of the shaft inside the coupler
-shaftLen = couplerHeight/2;
-// Portion of the rod inside the coupler
-rodLen = couplerHeight/2;
-//shaftScrewsDistance = motorShaftDiameter+screwDiameter+1;
-//rodScrewsDistance = threadedRodDiameter+screwDiameter+1;
+halvesDistance = 0.5;		// Gap between the two halves
+shaftLen = couplerHeight/2;	// Portion of the shaft inside the coupler
+rodLen = couplerHeight/2;	// Portion of the rod inside the coupler
 
 $fa = 0.02;
 $fs = 0.25;
@@ -83,7 +71,7 @@ module screw()
 	if(Use3mmInsert) {
 		translate([0,0,-(screwThreadLength-nutThickness)/2+3.5-big/2])
 			rotate([180,0,30])
-				color("lightgray") cyl(d=Yes3mmInsert(Use3mmInsert), h=big);
+				color("lightgray") cyl(d=Yes3mmInsert(Use3mmInsert,LargeInsert), h=big);
     } else { // nut
 		translate([0,0,-(screwThreadLength-nutThickness)/2-5-big/2])
 			rotate([180,0,30])

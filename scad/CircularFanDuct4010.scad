@@ -4,6 +4,8 @@
 // Created 8/10/2019
 // last upate 10/3/20
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// https://creativecommons.org/licenses/by-sa/4.0/
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 8/10/19	- Created fan duct of my own design
 // 8/12/19	- Added ability to set length
 // 8/27/19	- Created v3 with a taper next to the fan to clear the mount better
@@ -99,7 +101,7 @@ module CircularDuct(ShiftLR=0,Angle=0,ShiftBracketUD=0,ScrewHZ=0,Show=0) {
 	}
 	translate([-8,-0.75,0]) Blower4010Output();
 	MainDuct();
-	translate([16,-22,0]) color("green") cube([3,1,10]); // ****** will need adjusting if duct angle is changed
+	translate([16,-23,0]) color("green") cuboid([3,2,10],rounding=0.5,p1=[0,0]); // ****** will need adjusting if duct angle is changed
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +144,7 @@ module MainDuct() {
 
 module Blower4010Output() { // the output conector for the blower
 	difference() {
-		translate([0,-21,0]) color("cyan") rotate([90,0,0]) cube([27,15,8]);
+		translate([0,-21,0]) color("cyan") rotate([90,0,0]) cuboid([27,15,8],rounding=1,p1=[0,0]);
 		translate([1,-28,1]) color("red") cuboid([25,6,20],rounding=2,p1=[0,0]);
 		translate([1.5,-25,1]) color("white") cube([25,15,8]);
 	}

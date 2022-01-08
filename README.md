@@ -5,7 +5,7 @@ August 2020: Upgraded to a Duet 3 6HC with 1LC.  Currently using in stand alone,
 
 An older version is available at http://www.thingiverse.com/thing:1470253
 
-https://creativecommons.org/licenses/by-sa/3.0/
+https://creativecommons.org/licenses/by-sa/4.0/
 
 https://youtu.be/llArYEVT2ow
 
@@ -46,14 +46,10 @@ FancapL.stl is for the power supply fan to make it blow to the side.
 Uses:
 		OPENSCAD https://www.openscad.org/downloads.html  Use version 2019.05 or later.
 
-		cubeX from http://www.thingiverse.com/thing:112008
-		
 		BOSL2: https://github.com/revarbat/BOSL2
 		
 		NEMA17 from https://github.com/mtu-most/most-scad-libraries
 		
 		configuration.scad, metric.scad, fasteners.scad, functions.scad are from an old version of http://github.com/prusajr/PrusaMendel
-		
-		corner-tools.scad from https://www.myminifactory.com/it/object/3d-print-tools-for-fillets-and-chamfers-on-edges-and-corners-straight-and-or-round-45862 by Ewald Ikemann
 
 		
