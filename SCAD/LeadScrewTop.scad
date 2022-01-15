@@ -9,6 +9,8 @@
 // 10/31/20	- Add for loop for quanity
 // 1/4/22	- BOSL2
 ///////////////////////////////////////////////////////////////////////////
+// *** hulling() takes a awhile
+//////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <bosl2/std.scad>
 //////////////////////////////////////////////////////////////////////////
@@ -24,11 +26,11 @@ module top(Qty=1) {
 		translate([0,x*12,0]) {
 			difference() {
 				color("cyan") cyl(h=8,d=screw8+2,rounding=1);
-				translate([0,0,2]) color("red") cyl(h=8,d=screw8);
+				translate([0,0,2]) color("red") cyl(h=8,d=screw8-0.2);
 			}
-			translate([0,0,-3]) color("blue") hull() {
-				cyl(h=2,d=screw8+2);
-				translate([10,0,0]) cyl(h=2,d=screw2);
+			translate([0,0,-3]) color("blue") hulling("body") {
+				cyl(h=2,d=screw8+2, rounding=1, $tags="body");
+				translate([10,0,0]) cyl(h=2,d=screw2, rounding=1, $tags="body");
 			}
 		}
 	}

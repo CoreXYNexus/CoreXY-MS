@@ -109,8 +109,8 @@ Height608 = 7; 					// thickness of a 608
 NutClearance = 17;			// Clearance for a 8mm nut
 DiameterF625Z = 18;				// f625z flange diameter
 ShiftBeltMotor = 0; 				// move belt motor mount up/down (- shifts it up)
-GT2CalmpThickness = 6.1;			// thickness of the clamping part on the 40 tooth GT2 pulley
-idler_spacer_Thickness = GT2CalmpThickness + 0.9;	// thickness of idler bearing spacer
+GT2ClampThickness = 6.1;			// thickness of the clamping part on the 40 tooth GT2 pulley
+idler_spacer_Thickness = GT2ClampThickness + 0.9;	// thickness of idler bearing spacer
 ThrustWasherThickness=4;
 LayerThickness=0.3;
 ////////////////////////////////////////////////////////////////////////////
@@ -119,15 +119,15 @@ LayerThickness=0.3;
 			// 1st: Quantiy; 2nd: plates; 3rd: printable couplers; 4th ZNut ;5th: motor shaft diameter; 6th: leadscrew diameter
 //ReductionMotorMount(1);
 //BeltDrivenZAxis(3); // arg is quanity, includes drive motor mount
-//BeltDrivenZAxisMotorMount(3,0);
+//BeltDrivenZAxisMotorMount(1,0);
 // also need the following with BeltDrivenZAxis(), since a 200x200 build plate isn't big enough
-ZNutBracket(3,2.1,1); // arg is quanity, arg 2 is offset adjust; arg 3 to add tabs for printing
+//ZNutBracket(3,2.1,1); // arg is quanity, arg 2 is offset adjust; arg 3 to add tabs for printing
 //translate([50,20,0]) ZAxisMountPlates(3); // arg is quanity*2
 //ZMotorThrustSpacer(3,7.5-ThrustWasherThickness); // to use M5 thrust brearings under the coupler
-//DirectBeltDrive(3);
+ZDirectBeltDrive(1);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-module DirectBeltDrive(Qty=1) {
+module ZDirectBeltDrive(Qty=1) {
 	for(i = [0:Qty-1]) translate([0,65*i,0]) {
 		difference() {
 			union() {
