@@ -2,7 +2,7 @@
 // Endstops.scad - endstop holder for makerslide
 ////////////////////////////////////////////////////////////////////////////////////
 // created: 5/10/2016
-// last update: 10/31/21
+// last update: 1/18/22
 ////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,6 +20,7 @@
 // 5/6/21	- Adjusted x endstop size
 // 9/25/21	- Added wider x stop strike for exoslide
 // 10/31/21	- Made X endstop long enough to get past x-carriage belt holder
+// 1/18/22	- Renamed stuff, commented out StrikeX() in All(), since it's now on the X belt end
 ////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <bosl2/std.scad>
@@ -57,55 +58,27 @@ module All(BlackX=0,BlackY=0,EXOSlide=0) {
 	if(BlackY) translate([0,40,0])
 					YStopMount(10,0,0,Yes2mmInsert(Use2mmInsert),Yes5mmInsert(Use5mmInsert),4); // black microswitch
 	else translate([0,40,0]) YStopMount(22,10,8,Yes3mmInsert(Use3mmInsert,LargeInsert),screw4,8);	// TEMCo CN0097
-	translate([-20,-60,0])StrikeY(screw5);
-	translate([-30,-20,0]) StrikeX(screw5,EXOSlide);
+	translate([-10,-30,0])StrikeY(screw5);
+	//translate([-30,-50,0]) StrikeX(screw5,EXOSlide);
 }
 
 //////////////////////////////////////////////////////////////////////////
 
 module XStopMount(Sep,DiagOffset,Offset,ScrewSwitch,ScrewMount=screw5,Adjust) {
-	base(Sep,DiagOffset,Offset,ScrewSwitch,Adjust);
-	mount(ScrewMount);
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-module XStopMountL(Sep,DiagOffset,Offset,ScrewSwitch,ScrewMount=screw5,Adjust) {
-	baseL(Sep,DiagOffset,Offset,ScrewSwitch,Adjust);
-	mount(ScrewMount);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-module baseL(Sep,DiagOffset,Offset,Screw,Adjust) {  // long mount for x-carriage
-	difference() {
-		translate([-(24+Switch_ht)-Adjust,0,0]) color("yellow")
-			cuboid([Switch_ht+Adjust+28,HolderWidth,Switch_thk],rounding=2,p1=[0,0]);
-		// screw holes for switch
-		if(DiagOffset) {
-			translate([Adjust-22,0,0]) {
-				translate([-(Switch_ht-Offset)+14,SwitchShift,-1]) color("purple") cylinder(h = 11, d = Screw);
-				translate(v = [-(Switch_ht-Offset)+14+DiagOffset,SwitchShift+Sep,-1]) color("gray") cylinder(h = 11, d=Screw);
-			}
-		} else {
-			translate([-Switch_ht-Adjust-12,0,0]) {
-				translate([-(Switch_ht-Offset)+14,SwitchShift,-1]) color("purple") cylinder(h = 11, d = Screw);
-				translate(v = [-(Switch_ht-Offset)+14+DiagOffset,SwitchShift+Sep,-1]) color("gray") cylinder(h = 11, d=Screw);
-			}
-		}
-	}
+	EndstopBase(Sep,DiagOffset,Offset,ScrewSwitch,Adjust);
+	EndstopMount(ScrewMount);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 module YStopMount(Sep,DiagOffset,Offset,ScrewSwitch,ScrewMount=screw5,Adjust) {
-	base(Sep,DiagOffset,Offset,ScrewSwitch,Adjust);
-	mount(ScrewMount);
+	EndstopBase(Sep,DiagOffset,Offset,ScrewSwitch,Adjust);
+	EndstopMount(ScrewMount);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module mount(Screw=screw5) {
+module EndstopMount(Screw=screw5) {
 	difference() {
 		color("cyan") cuboid([13,HolderWidth,Switch_thk2],rounding=2,p1=[0,0]);
 		translate([8,6,-1]) cylinder(h=Switch_thk*2,d=Screw);
@@ -117,7 +90,7 @@ module mount(Screw=screw5) {
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-module base(Sep,DiagOffset,Offset,Screw,Adjust) {
+module EndstopBase(Sep,DiagOffset,Offset,Screw,Adjust) {
 	difference() {
 		translate([-8-Adjust,0,0]) color("yellow")
 			cuboid([Switch_ht+Adjust-8,HolderWidth,Switch_thk],rounding=2,p1=[0,0]);
@@ -141,13 +114,15 @@ module base(Sep,DiagOffset,Offset,Screw,Adjust) {
 module StrikeY(Screw=screw5) {	// used on y a-xis
 	difference() {
 		color("cyan") hull() {
-			translate([0,20,0]) cuboid([35,5,15],rounding=2,p1=[0,0]);
-			cuboid([35,5,5],rounding=2,p1=[0,0]);
+			translate([0,20,0]) cuboid([35,4,15],rounding=2,p1=[0,0]);
+			cuboid([35,4,4],rounding=2,p1=[0,0]);
 		}
-		translate([9,28,8]) rotate([90,0,0]) color("red") cylinder(h=30,r=Screw/2);
-		translate([9,23,8]) rotate([90,0,0]) color("blue") cylinder(h=30,d=screw5hd);
-		translate([29,28,8]) rotate([90,0,0]) color("red") cylinder(h=30,r=Screw/2);
-		translate([29,23,8]) rotate([90,0,0]) color("blue") cylinder(h=30,d=screw5hd);
+		translate([7.5,20,8]) {
+			translate([0,10,0]) rotate([90,0,0]) color("red") cylinder(h=30,d=Screw);
+			translate([20,10,0]) rotate([90,0,0]) color("blue") cylinder(h=30,d=Screw);
+			translate([0,1,0]) rotate([90,0,0]) color("blue") cylinder(h=30,d=screw5hd);
+			translate([20,1,0]) rotate([90,0,0]) color("red") cylinder(h=30,d=screw5hd);
+		}
 	}
 }
 

@@ -1,9 +1,9 @@
-///////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // XBeltEnds.scad - x axis bearing mount on the carriage plates
-///////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 6/27/2016
-// last upate 10/17/20
-///////////////////////////////////////////////////////////////////////////////////////
+// last upate 1/20/22
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 7/3/16	- added comments and some assembly info
@@ -12,132 +12,179 @@
 // 1/10/17	- added labels and colors to preview for easier editing
 // 8/19/18	- OpenSCAD 2018.06.01 for $preview
 // 10/17/20	- Now can use 5mm inserts
+// 1/16/22	- Added a endstop strike to left side, added locating tab to drill guide
+// 1/20/22	- Renamed vars to a better description
 ///////////////////////////////////////////////////////////////////////////////////////
 // Requires drilling two holes in the makerslide carriage plate
 // Use a couple of 3mm screws to space the XBeltEnds above the makerslide, mark the outline
 // of the XBeltEnds on the plate, align the drill guide with the marking and drill the 5mm holes
-// ------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------
 // On left side upper bearing set to rear, lower bearing set to front, stepper motor gear to match upper
 // On right side lower bearing set to rear, upper bearing set to front, stepper motor gear to match lower
-// ------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------
 // Uses 8 F625Z bearings, 8 5mm washers, 4 5x40mm screws
 // Bearing stack is one washer, two bearings flanges out, one washer and one spacer
-// U - bearings on upper, D - bearings on lower
-///////////////////////////////////////////////////////////////////////////////////////
+// U - bearings on upper, D - bearings on lower, removed unecessary code
+//-------------------------------------------------------------------------------------------------------------------
+// Left is X min, Right is X max
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <inc/brassinserts.scad>
-use <bosl2/std.scad>	// http://www.thingiverse.com/thing:112008
-$fn = 50;
-//////////////////////////////////////////////////////////////////////////////////////
-// vars
-width = 38;			// width of the bracket
-f625z_d = 16;		// diameter of bearing where the belt rides
-Obelt_height = 26;	// how far out from the carriage plate the inner belt is on the sides
-Ibelt_height = 17;	// how far out from the carriage plate the outer belt is on the sides
-belt_height = Obelt_height+2; // height of walls
-belt_offset = 2.5;	// adjust distance between inner & outer belts bearings
-belt = 10;			// belt width (used in base() to make the large center hole)
-Ibelt_adjust = -2;	// adjust inner belt bearing postion (- closer to plate, + farther away)
-Obelt_adjust = 2;	// adjust outer belt bearing postion (- closer to plate, + farther away)
-one_stack = 11.78;	// just the length of two washers & two F625Z bearings
+use <bosl2/std.scad> // https://github.com/revarbat/BOSL2
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+$fn = 100;
+Width = 38;						// width of the bracket
+F625ZDiameter = 16;				// diameter of bearing where the belt rides
+OuterBeltHeight = 26;			// how far out from the carriage plate the inner belt is on the sides
+InnerBeltHeight = 17;			// how far out from the carriage plate the outer belt is on the sides
+BeltHeight = OuterBeltHeight+2; // height of walls
+BeltOffset = 2.5;				// adjust distance between inner & outer belts bearings
+InnerBeltAdjust = -2;			// adjust inner belt bearing postion (- closer to plate, + farther away)
+OuterBeltAdjust = 2;			// adjust outer belt bearing postion (- closer to plate, + farther away)
+OneBearingStackHeight = 11.78;	// just the hieght of two washers & two F625Z bearings
 Use5mmInsert=1;
-///////////////////////////////////////////////////////////////////////////////////
+LayerThickness=0.3;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-all(1); // everything
+All(1,1); // everything
+//XBeltEnds(0,0);
+//XBeltEnds(1,1);
+//DrillGuide(screw5);
 
-//////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module all(Spacers) {	// all the parts as a plate
+module All(Spacers=0,Guide=0) {	// all the parts as a plate
 	//if($preview) %translate([0,0,-5]) cube([200,200,2],center=true); // show the 200x200 bed
-	XBeltEnds(0,Spacers);	// 1st arg: 0 - left, 1 - right; 2nd arg 0 - no bearing spacers; 1 - bearing spacers
-	translate([0,-40,0])	XBeltEnds(1,Spacers);
-	translate([40,-40,0])	DrillGuide();
+	rotate([0,90,0]) {
+		XBeltEnds(0);
+		translate([0,-45,0]) XBeltEnds(1);
+	}
+	if(Spacers) translate([-15,-30,-32.1]) BearingSpacer(OneBearingStackHeight,4);
+	if(Guide) translate([57,-33,-38]) DrillGuide();
 }
 
-///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module XBeltEnds(upper,spacers) {	// bearing mount bracket
-	Base();
-	XEndWalls(upper,0);
-	XEndWalls(upper,1);
-	if(spacers) {	// don't need them for the test prints after the first print
-		translate([-10,one_stack-2,0]) rotate([-90,0,-0]) bearspacer(one_stack);
-		translate([-10,one_stack*2,0]) rotate([-90,0,-0]) bearspacer(one_stack);
-	}
-	if(!upper) {
-		translate([10,10,4.5]) printchar("Left");
-		translate([8,35,12]) rotate([90,0,0]) printchar("D");
-		translate([30,35,30]) rotate([90,180,0]) printchar("U");
+module XBeltEnds(RightSide=0) {	// bearing mount bracket on x axis
+	Base(screw5);
+	XEndWalls(0,0,RightSide);
+	XEndWalls(1,1,RightSide);
+	if(!RightSide) {
+		translate([10,10,3]) printchar("Left",3,5);
+		translate([8,34.5,12]) rotate([90,0,0]) printchar("D",3,5);
+		translate([30,34.5,30]) rotate([90,180,0]) printchar("U",3,5);
 	} else {
-		translate([10,10,4.5]) printchar("Right");
-		translate([12,35,30]) rotate([90,180,0]) printchar("U");
-		translate([25,35,12]) rotate([90,0,0]) printchar("D");
+		translate([7,10,3]) printchar("Right",3,5);
+		translate([13,34.5,28]) rotate([90,180,0]) printchar("D",3,5);
+		translate([25,34.5,11]) rotate([90,0,0]) printchar("U",3,5);
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module XEndWalls(upper,lower) {	// the walls that hold the bearings
-	if(lower) {
-		difference() {	// lower bearing support wall
-			color("red") cuboid([width,5,belt_height+f625z_d],rounding=2,p1=[0,0]);
-			bearscrews(upper);
+module XEndWalls(Bottom=0,NotDoEndStop=0,Right=0) {	// the walls that hold the bearings
+	if(Bottom) {
+		if(Right) {
+			difference() {	// Lower bearing support wall
+				color("red") cuboid([Width,5,BeltHeight+F625ZDiameter],rounding=2,p1=[0,0]);
+				BearingScrewHoles(!Bottom,Yes5mmInsert(Use5mmInsert));
+			}
+		} else {
+			difference() {	// Lower bearing support wall
+				color("red") cuboid([Width,5,BeltHeight+F625ZDiameter],rounding=2,p1=[0,0]);
+				BearingScrewHoles(Bottom,Yes5mmInsert(Use5mmInsert));
+			}
 		}
 	} else {
-		difference() {	// upper bearing support wall
-			translate([0,one_stack*2+5,0]) color("blue") cuboid([width,5,belt_height+f625z_d],rounding=2,p1=[0,0]);
-			bearscrews(upper,Yes5mmInsert(Use5mmInsert));
+		if(Right) {
+			difference() {	// Top bearing support wall
+				translate([0,OneBearingStackHeight*2+5,0]) color("blue")
+					cuboid([Width,5,BeltHeight+F625ZDiameter],rounding=2,p1=[0,0]);
+				BearingScrewHoles(!Bottom,screw5);
+				translate([Width-F625ZDiameter/2-BeltOffset,37,InnerBeltHeight+F625ZDiameter/2+InnerBeltAdjust])
+					rotate([90,0,0]) color("gray")cylinder(h=5,d=screw5hd);
+				translate([F625ZDiameter/2+BeltOffset,37,OuterBeltHeight+F625ZDiameter/2+OuterBeltAdjust]) rotate([90,0,0])
+					color("yellow")cylinder(h=5,d=screw5hd);
+			}
+		} else {
+			difference() {	// Top bearing support wall
+				translate([0,OneBearingStackHeight*2+5,0]) color("blue")
+					cuboid([Width,5,BeltHeight+F625ZDiameter],rounding=2,p1=[0,0]);
+				BearingScrewHoles(Bottom,screw5);
+			}
+			if(!NotDoEndStop) {
+				translate([19,36.5,BeltHeight+F625ZDiameter-1]) color("green")
+					cuboid([Width,15,5],rounding=2);  // X endstop strike riser
+				translate([19,45,BeltHeight+F625ZDiameter+5.5]) color("pink")
+					cuboid([Width,10,18],rounding=2);  // X endstop strike
+			}
 		}
 	}
+	translate([BeltHeight+F625ZDiameter-6.15,2,2]) rotate([0,90,0]) color("green") cyl(h=LayerThickness,d=15);
+	translate([BeltHeight+F625ZDiameter-6.15,Width-7,2]) rotate([0,90,0]) color("purple") cyl(h=LayerThickness,d=15);
+	translate([BeltHeight+F625ZDiameter-6.15,2,42]) rotate([0,90,0]) color("white") cyl(h=LayerThickness,d=15);
+	translate([BeltHeight+F625ZDiameter-6.15,Width-7,42]) rotate([0,90,0]) color("lightgray") cyl(h=LayerThickness,d=15);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module bearscrews(upper,Screw=screw5) {	// bearing screw holes
-	if(upper) { // upper farther, lower closer
-		translate([width-f625z_d/2-belt_offset,50,Ibelt_height+f625z_d/2+Ibelt_adjust]) rotate([90,0,0])
+module BearingScrewHoles(Bottom,Screw=screw5) {
+	if(Bottom) { // Top farther, Lower closer
+		translate([Width-F625ZDiameter/2-BeltOffset,50,InnerBeltHeight+F625ZDiameter/2+InnerBeltAdjust]) rotate([90,0,0])
 			color("red") cylinder(h=60,d=Screw);
-		translate([f625z_d/2+belt_offset,50,Obelt_height+f625z_d/2+Obelt_adjust]) rotate([90,0,0])
+		translate([F625ZDiameter/2+BeltOffset,50,OuterBeltHeight+F625ZDiameter/2+OuterBeltAdjust]) rotate([90,0,0])
 			color("white") cylinder(h=60,d=Screw);
-	} else {	// upper closer, lower farther
-		translate([width-f625z_d/2-belt_offset,50,Obelt_height+f625z_d/2+Obelt_adjust]) rotate([90,0,0])
+	} else { // Top closer, Lower farther
+		translate([Width-F625ZDiameter/2-BeltOffset,50,OuterBeltHeight+F625ZDiameter/2+OuterBeltAdjust]) rotate([90,0,0])
 			color("yellow")cylinder(h=60,d=Screw);
-		translate([f625z_d/2+belt_offset,50,Ibelt_height+f625z_d/2+Ibelt_adjust]) rotate([90,0,0])
+		translate([F625ZDiameter/2+BeltOffset,50,InnerBeltHeight+F625ZDiameter/2+InnerBeltAdjust]) rotate([90,0,0])
 			color("gray")cylinder(h=60,d=Screw);
+		translate([Width-F625ZDiameter/2-BeltOffset,37,OuterBeltHeight+F625ZDiameter/2+OuterBeltAdjust]) rotate([90,0,0])
+			color("gray")cylinder(h=5,d=screw5hd);
+		translate([F625ZDiameter/2+BeltOffset,37,InnerBeltHeight+F625ZDiameter/2+InnerBeltAdjust]) rotate([90,0,0])
+			color("yellow")cylinder(h=5,d=screw5hd);
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module bearspacer(length=one_stack) {	// fill in the non-bearing space
-	rotate([90,0,0]) difference() {
-		color("pink") cyl(h=length,r=screw5,rounding=1);
-		color("cyan") cyl(h=length+5,d=screw5);
+module BearingSpacer(length=OneBearingStackHeight,Quanity=2) {
+	for(x=[0:Quanity-1]) {
+		translate([0,x*15,0]) difference() {
+			color("pink") cyl(h=length,r=screw5,rounding=1);
+			color("cyan") cyl(h=length+5,d=screw5);
+		}
 	}
-
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-
-module Base() { // base mount
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+module Base(Screw=screw5) {
 	difference() {
-		color("cyan") cuboid([width,one_stack*2+10,5],rounding=2,p1=[0,0]);
-		translate([width/4-1,22,-1]) color("salmon") cylinder(h=10,r=screw5/2);	// mounting screw holes
-		translate([width-width/4+1,12,-1]) color("green") cylinder(h=10,r=screw5/2);
+		color("cyan") cuboid([Width,OneBearingStackHeight*2+10,5],rounding=2,p1=[0,0]);
+		translate([Width/4-1,22,-1]) color("salmon") cylinder(h=10,d=Screw);	// mounting screw holes
+		translate([Width-Width/4+1,12,-1]) color("green") cylinder(h=10,d=Screw);
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module DrillGuide() {	// something to help in locating the holes to drill
-	Base();
-	translate([3,3,4.5]) printchar("Drill Guide");
+module DrillGuide(Screw=screw5) { // something to help in locating the holes to drill in the makerslide carriage plate
+	difference() {
+		Base(Screw);
+		translate([3,2.7,3]) printchar("Drill Guide",3,5);
+	}
+	translate([19,45,2.5]) color("red") cuboid([Width,35,5],rounding=2); // addon to base
+	translate([19,14.5+46,5]) color("blue") cuboid([Width,5,10],rounding=2); // lip
+		translate([2,2,0.15]) color("green") cyl(h=LayerThickness,d=15);
+		translate([2,Width+23,0.15]) color("purple") cyl(h=LayerThickness,d=15);
+		translate([Width-2,2,0.15]) color("white") cyl(h=LayerThickness,d=15);
+		translate([Width-2,Width+23,0.15]) color("lightgray") cyl(h=LayerThickness,d=15);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module printchar(String,Height=1.5,Size=4) { // print something
+module printchar(String,Height=1.5,Size=2) { // print text
 	color("coral") linear_extrude(height = Height) text(String, font = "Liberation Sans",size=Size);
 }
 
-/////////////////////////// corexy_XY.scad ///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

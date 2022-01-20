@@ -10,7 +10,6 @@
 // 9/14/21	- Added a mount to go on teh top of a E3DV6 heatsink: E3DV6Mount()
 // 10/5/21	- Added mount for titan and titan aero
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-include <CoreXY-MSv1-h.scad>
 include <BOSL2/std.scad>
 include <inc/brassinserts.scad>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +24,7 @@ StepperHoleOffset=31;
 
 //BerdAirMountLeft(35,2,0); // side with heater block, exoslide
 //BerdAirMountRight(13,2,0); // side without heater block, exoslide
-E3DV6Mount(2,1,0);  // moount on the top section of the heatsink
+E3DV6Mount(2,1,0);  // mount on the top section of the heatsink
 //BerdAirTitan(0,1,1,2);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +135,7 @@ module E3DV6Mount(PipeSize=2,DoClamp=1,SetScrew=0) {
 			translate([-22.5,0.25,4]) color("blue") cuboid([15,15.5,7],rounding=2);
 		}
 		translate([-32,-4,3.5]) color("pink") rotate([0,90,0]) cylinder(h=16,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
-		translate([-32,4,3.5]) color("pink") rotate([0,90,0]) cylinder(h=16,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		translate([-35,4,3.5]) color("pink") rotate([0,90,0]) cylinder(h=16,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
 		translate([0,0,-5]) color("red") cylinder(h=20,d=E3DV6diameter);
 		if(SetScrew) translate([0,0,2]) color("purple") rotate([0,90,0]) cylinder(h=20,d=screw3t);
 	}
@@ -149,12 +148,12 @@ module BAClamp(PipeSize=2) {
 	translate([-39,0,32]) rotate([0,-90,0]) {
 		difference() { // clamp
 			union() {
-				translate([-32,-E3DV6diameter/2,0]) color("green") cuboid([3,E3DV6diameter,8],rounding=1.5,p1=[0,0]);
+				translate([-32,-E3DV6diameter/2,0]) color("green") cuboid([5,E3DV6diameter,8],rounding=1.5,p1=[0,0]);
 				translate([-32,0,4]) rotate([0,90,0]) cylinder(h=LayerThickness,d=25);
 			}
 			translate([-33,-4,4.5]) color("blue") rotate([0,90,0]) cylinder(h=15,d=screw3);
 			translate([-33,4,4.5]) color("khaki") rotate([0,90,0]) cylinder(h=15,d=screw3);
-			translate([-29,0,-8]) color("gray") cylinder(h=20,d=PipeSize);
+			translate([-27,0,-5]) color("gray") cylinder(h=20,d=PipeSize);
 		}
 	}
 }
