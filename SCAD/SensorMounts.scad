@@ -2,7 +2,7 @@
 // SensorMounts.scad
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // created: 6/2/1019
-// last update: 11/27/21
+// last update: 1/22/22
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,8 +14,8 @@
 // 10/15/20	- Added IR mount for titan aero (mounts on printed extruder mount)
 // 9/18/21	- Added a bltount mount for the bmg extruder
 // 11/27/21	- Added BMGIRMount() for dc42's IR Sensor
+// 1/22/22	- BOSL2, renamed vars to a better name, removed unused modules
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-include <CoreXY-MSv1-h.scad>
 use <fanduct_v3.scad>
 include <inc/brassinserts.scad>
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,9 +24,9 @@ include <inc/brassinserts.scad>
 // adjustable proximity mount need beefing up 9/19/20
 //*****************************************************
 $fn=100;
-psensornut = 28; 	// size of proximity sensor nut
+wall = 8;		// thickness of the plates
 FanSpacing = 32;	// hole spacing for a 40mm fan
-PCfan_spacing = 47;	//FanSpacing+15;
+PCFanSpacing = FanSpacing+15;
 DuctLength=25; 		// set length of 50150 fan duct
 Thickness = 6.5;
 MHeight = 6;
@@ -34,9 +34,33 @@ MWidth = 60;
 FHeight = 10;
 MountingHoleHeight = 60; 	// screw holes may need adjusting when changing the front to back size
 ExtruderOffset = 18;		// adjusts extruder mounting holes from front edge
-IRSpacing=spacing;
 LayerThickness=0.3; // layer thickness
-Spacing = 17; 			// ir sensor bracket mount hole spacing
+//-----------------------------------------------
+ProxSensorDiameter = 19;	// diameter of proximity sensor
+ProxSensorrNutDiameter = 28; // size of proximity sensor nut
+//-----------------------------------------------------------------
+BLTouchMountHoleOffset = 18;// hole distance on BLTouch by ANTCLabs
+BLTouchLength = 30;	// length of bltouch mount plus a little
+BLTouchMountWidth = 16;	// width of bltouch mount plus a little
+BLTouchBodyDiameter = 14;	// diameter of bltouch body plus 1mm
+BLTouchRetractDepth = -2;	// a recess to adjust the z position to keep the retracted pin from hitting the bed
+//---------------------------------------------------------------------------------------
+// holes are taken from https://miscsolutions.wordpress.com/mini-height-sensor-board
+MountHole1X = 2.70;
+MountHole1Y = 14.92;
+MountHole2X = 21.11;
+MountHole2Y = 14.92;
+IRSpacing=17; 			// ir sensor bracket mount hole spacing
+IRHoleOffset = 3;		// ir sensor mount hole distance
+IRNotchDepth = 4;		// depth of notch to clear thru hole components
+IRMountHeight = 25;		// height of the mount
+IRMountWidth = 27;		// width of the mount
+IRThickness = 6;		// thickness of the mount
+IRMountY = IRMountHeight-3; // position of the ir mount holes from end
+IRReduce = 13.5; 		// hole in ir mount vertical position
+IRRecess = -2; 			// recess in ir mount for pin heater vertical depth
+ShiftHotend = 0;		// move hotend opening front/rear
+ShiftIR = -20;			// shift ir sensor bracket mount holes
 //------------------------------------------------------------------------------------------------
 Use2p5mmInsert=1;
 Use3mmInsert=1; // set to 1 to use 3mm brass inserts
@@ -52,8 +76,8 @@ StepperHoleOffset=31;
 //IRAdapter(0,0);
 //IRAdapterAero(0);
 //Spacer(3,7);
-//BMGBLTMount(7); // uses 50mm M3 screws to mount to extruder
-BMGIRMount(20); // uses 50mm M3 screws to mount to extruder
+BMGBLTMount(7); 	// uses 50mm M3 screws to mount to extruder
+//BMGIRMount(20);	// uses 50mm M3 screws to mount to extruder
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -140,8 +164,8 @@ module Short_Motor_Version(Duct=0,Move=0,Raise=0,Back=0,Offset=0) {
 module BracketMount_v2(Move=0) {
 	translate([3,10,FHeight/4+0.3]) rotate([90,0,0]) color("red") cylinder(h = 18,r = screw3/2,$fn=50);
 	translate([3,1,FHeight/4+0.3]) rotate([90,0,0]) color("gray") cylinder(h = 18,r = screw3hd/2,$fn=50);
-	translate([3+PCfan_spacing,10,FHeight/4+0.3]) rotate([90,0,0]) color("blue") cylinder(h = 18,r = screw3/2,$fn=50);
-	translate([3+PCfan_spacing,1,FHeight/4+0.3]) rotate([90,0,0]) color("plum") cylinder(h = 18,r = screw3hd/2,$fn=50);
+	translate([3+PCFanSpacing,10,FHeight/4+0.3]) rotate([90,0,0]) color("blue") cylinder(h = 18,r = screw3/2,$fn=50);
+	translate([3+PCFanSpacing,1,FHeight/4+0.3]) rotate([90,0,0]) color("plum") cylinder(h = 18,r = screw3hd/2,$fn=50);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,19 +173,14 @@ module BracketMount_v2(Move=0) {
 module FanBlowerMount(Move=0,Raise=0,Back=0,X=0,Y=0,Z=0,Spacer=0,Offset=0) {
 	if(Spacer) {
 		difference() {
-			translate([Move+6,-30+Back,0]) color("gray") cubeX([21,21-Back,Raise+Z+5],1);
+			translate([Move+6,-30+Back,0]) color("gray") cuboid([21,21-Back,Raise+Z+5],rounding=1,p1=[0,0]);
 			RemoveForBlower(Move+6,Raise,Spacer);
 			translate([Move+X,-14-Back+Y,Raise+Z]) rotate([0,90,0]) color("purple") cylinder(h=42,r=screw4/2,$fn=50);
 			translate([Move+2,-40+Back,10]) rotate([-45,0,0]) color("black") cube([30,30,10]);
 		}
-		//difference() {
-		//	translate([Move+6,Offset+2,0]) color("lightgray") cubeX([21,Offset,Thickness],1);
-		//	translate([0,0,0.5]) BracketMount(Move);
-		//	translate([5,-5-Offset,0]) color("plum") cube([30,20,20]);
-		//}
 	} else {
 		difference() {
-			translate([Move,-16+Back,0]) color("gray") cubeX([21,21-Back,Raise+4],2);
+			translate([Move,-16+Back,0]) color("gray") cuboid([21,21-Back,Raise+4],rounding=2,p1=[0,0]);
 			RemoveForBlower(Move,Raise);
 			translate([Move+X-3,-Back+Y,Raise+Z]) rotate([0,90,0]) color("purple") cylinder(h=42,r=screw4/2,$fn=50);
 			translate([Move-5,-29+Back,9]) rotate([-45,0,0]) color("black") cube([30,30,10]);
@@ -173,62 +192,9 @@ module FanBlowerMount(Move=0,Raise=0,Back=0,X=0,Y=0,Z=0,Spacer=0,Offset=0) {
 
 module RemoveForBlower(Move=0,Raise=0,Spacer=0) {
 	if(Spacer) {
-		translate([Move+3,-57,-10]) color("yellow") cubeX([15,45,Raise*2],1);
-		//translate([Move+3,-15.5,-17]) rotate([35,0,0]) color("lightgreen") cubeX([15,15,15],1);
+		translate([Move+3,-57,-10]) color("yellow") cuboid([15,45,Raise*2],rounding=1,p1=[0,0]);
 	} else {
-		translate([Move+3,-45,-10]) color("yellow") cubeX([15,45,Raise*2],1);
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module FanMountHoles(Screw=screw3,Left=1) {	// fan mounting holes
-	if(Left) {
-		translate([-extruder/2-22,-heightE/2 - 1.8*wall,heightE - extruder_back - fan_spacing/2 + fan_offset])
-			rotate([0,90,0]) color("pink") cylinder(h = 3*(ExtruderThickness+screw_depth),d = Screw);
-		translate([-extruder/2-22,-heightE/2 - 1.8*wall,heightE - extruder_back + fan_spacing/2 + fan_offset])
-			rotate([0,90,0]) color("skyblue") cylinder(h = 3*(ExtruderThickness+screw_depth),d = Screw);
-	} else { // one side fan mounting holes
-		translate([-extruder/2+35,-heightE/2 - 1.8*wall,heightE - extruder_back - fan_spacing/2 + fan_offset])
-			rotate([0,90,0]) color("pink") cylinder(h = ExtruderThickness+screw_depth,d = Screw);
-		translate([-extruder/2+35,-heightE/2 - 1.8*wall,heightE - extruder_back + fan_spacing/2 + fan_offset])
-			rotate([0,90,0]) color("skyblue") cylinder(h = ExtruderThickness+screw_depth,d = Screw);
-
-	}
-	translate([-38,-44.5,20]) rotate([0,90,0]) color("plum") nut(nut3,5);	// nut trap for fan
-	translate([-38.5,-44.5,52]) rotate([0,90,0]) color("blue") hull() {	// nut trap for fan
-		nut(nut3,2.55);
-		translate([0,8,0]) nut(nut3,2.5);
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module FanMountHolesPlatform(Screw=screw3,Left=1) {	// fan mounting holes
-	if(Left) {
-		translate([-extruder/2-22,-heightE/2 - 1.8*wall,heightE - extruder_back - fan_spacing/2 + fan_offset])
-			rotate([0,90,0]) color("pink") cylinder(h = 3*(ExtruderThickness+screw_depth),d = Screw);
-		translate([-extruder/2-22,-heightE/2 - 1.8*wall,heightE - extruder_back + fan_spacing/2 + fan_offset])
-			rotate([0,90,0]) color("skyblue") cylinder(h = 3*(ExtruderThickness+screw_depth),d = Screw);
-	} else { // one side fan mounting holes
-		translate([-extruder/2+35,-heightE/2 - 1.8*wall,heightE - extruder_back - fan_spacing/2 + fan_offset])
-			rotate([0,90,0]) color("pink") cylinder(h = ExtruderThickness+screw_depth,d = Screw);
-		translate([-extruder/2+35,-heightE/2 - 1.8*wall,heightE - extruder_back + fan_spacing/2 + fan_offset])
-			rotate([0,90,0]) color("skyblue") cylinder(h = ExtruderThickness+screw_depth,d = Screw);
-
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module FanNutHoles(Nut=nut3,Left=1) {	// fan mounting holes
-	rotate([0,90,0]) color("blue") hull() {	// nut trap for fan
-		nut(nut3,2.55);
-		translate([0,8,0]) nut(nut3,2.5);
-	}
-	translate([0,0,fan_spacing]) rotate([0,90,0]) color("plum") hull() {	// nut trap for fan
-		nut(nut3,2.55);
-		translate([0,8,0]) nut(nut3,2.5);
+		translate([Move+3,-45,-10]) color("yellow") cuboid([15,45,Raise*2],rounding=1,p1=[0,0]);
 	}
 }
 
@@ -236,22 +202,22 @@ module FanNutHoles(Nut=nut3,Left=1) {	// fan mounting holes
 
 module IRMountHoles(Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) // ir screw holes for mounting to extruder plate
 {
-	translate([Spacing,0,0]) rotate([90,0,0]) color("blue") cylinder(h=20,d=Screw);
+	translate([IRSpacing,0,0]) rotate([90,0,0]) color("blue") cylinder(h=20,d=Screw);
 	translate([0,0,0]) rotate([90,0,0]) color("red") cylinder(h=(20),d=Screw);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module IRMountHolesCS(Screw=screw3hd) { // ir screw holes for mounting to extruder plate
-	translate([spacing+shiftir+shifthotend,-25,0]) rotate([90,0,0]) color("blue") cylinder(h=5,d=Screw);
-	translate([shiftir+shifthotend,-25,0]) rotate([90,0,0]) color("red") cylinder(h=5,d=Screw);
+	translate([IRSpacing+ShiftIR+ShiftHotend,-25,0]) rotate([90,0,0]) color("blue") cylinder(h=5,d=Screw);
+	translate([ShiftIR+ShiftHotend,-25,0]) rotate([90,0,0]) color("red") cylinder(h=5,d=Screw);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module IRAdapter(Top,Taller=0) {  // ir sensor bracket stuff is from irsensorbracket.scad
 	difference() {
-		color("plum") cubeX([irmount_width,irmount_height+Taller,irthickness],2); // mount base
+		color("plum") cuboid([IRMountWidth,IRMountHeight+Taller,IRThickness],rounding=2,p1=[0,0]); // mount base
 		if(Taller>=0) ReduceIR(Taller);
 		IRMountingHoles(Taller);
 		RecessIR(Taller);
@@ -278,8 +244,8 @@ module AdjustableIRMount(Shift=0) {  // adjuster screw has spring between the pa
 	translate([33,-5,0]) rotate([90,0,0]) { // printable placement
 		difference() {
 			union() {
-				color("pink") cubeX([irmount_width,4,30],2);
-				translate([0,0,25]) color("plum") cubeX([irmount_width,15,5],2);
+				color("pink") cuboid([IRMountWidth,4,30],rounding=2,p1=[0,0]);
+				translate([0,0,25]) color("plum") cuboid([IRMountWidth,15,5],rounding=2,p1=[0,0]);
 			}
 			translate([-33,5,20]) AdjustHoles(screw3);
 			translate([25,40,3]) IRMountHoles(screw3);
@@ -316,15 +282,15 @@ module AdjustableProximtyMount(Shift=0,DoBase=0) { // shift not used
 	if(DoBase) translate([0,40,0]) AdjustSensorBaseMount();
 	rotate([0,-90,0]) difference() {
 		union() {
-			color("red") cubeX([32,33,5],2);
-			color("purple") cubeX([32,5,15+Shift],2);
-			translate([0,-15,10+Shift]) color("cyan") cubeX([32,20,5],2);
+			color("red") cuboid([32,33,5],rounding=2,p1=[0,0]);
+			color("purple") cuboid([32,5,15+Shift],rounding=2,p1=[0,0]);
+			translate([0,-15,10+Shift]) color("cyan") cuboid([32,20,5],rounding=2,p1=[0,0]);
 			translate([0,-3,31]) rotate([-90,0,0]) ProximityAngleSupport();
 			translate([0,8,-16+Shift]) rotate([90,0,0]) ProximityAngleSupport();
 		}
 		translate([-30,-11,5+Shift]) AdjustHoles(Yes3mmInsert(Use3mmInsert,LargeInsert),0);
-		translate([16,18,-2]) color("olive") cylinder(h=wall*2,d=psensord); // proximity sensor hole
-		translate([16,18,-3]) color("blue") cylinder(h=5,d=psensornut,$fn=6); // proximity nut
+		translate([16,18,-2]) color("olive") cylinder(h=wall*2,d=ProxSensorDiameter); // proximity sensor hole
+		translate([16,18,-3]) color("blue") cylinder(h=5,d=ProxSensorrNutDiameter,$fn=6); // proximity nut
 	}
 
 }
@@ -334,9 +300,9 @@ module AdjustableProximtyMount(Shift=0,DoBase=0) { // shift not used
 module BLTMount(Shift=0,Type=2) {
 	difference() {
 		union() {
-			color("plum") cubeX([irmount_width+10,20,5],2);
-			color("blue") cubeX([irmount_width+10,5,15+Shift],2);
-			translate([0,-15,10+Shift]) color("green") cubeX([irmount_width+10,20,5],2);
+			color("plum") cuboid([IRMountWidth+10,20,5],rounding=2,p1=[0,0]);
+			color("blue") cuboid([IRMountWidth+10,5,15+Shift],rounding=2,p1=[0,0]);
+			translate([0,-15,10+Shift]) color("green") cuboid([IRMountWidth+10,20,5],rounding=2,p1=[0,0]);
 		}
 		translate([-28,9,-2]) AdjustHoles(screw3,0);
 		translate([18,-23,10+Shift]) BLTouch_Holes(Type);
@@ -355,29 +321,29 @@ module AdjustHoles(Screw=Yes3mmInsert(Use3mmInsert,LargeInsert),DoNut=1) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module RecessIR(Taller=0) { // make space for the thru hole pin header
-	translate([hole1x+5,hole1y+irrecess+(irmount_height/4)+Taller,irnotch_d]) color("cyan") cube([11.5,10,5]);
+	translate([MountHole1X+5,MountHole1Y+IRRecess+(IRMountHeight/4)+Taller,IRNotchDepth]) color("cyan") cube([11.5,10,5]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module ReduceIR(Taller=0) { // reduce plastic usage and gives somewhere for air to go if using an all-metal hotend w/fan
-	translate([13.5,irmount_height-irreduce+Taller/2,-1]) color("teal") cylinder(h=10,r = irmount_width/4);
+	translate([13.5,IRMountHeight-IRReduce+Taller/2,-1]) color("teal") cylinder(h=10,r = IRMountWidth/4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module IRMountingHoles(Taller=0,Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) { // mounting screw holes for the ir sensor
-	translate([hole1x+iroffset-1.5,irmounty+Taller,-5]) rotate([0,0,0]) color("black") cylinder(h=20,d=Screw);
-	translate([hole2x+iroffset-1.5,irmounty+Taller,-5]) rotate([0,0,0]) color("white") cylinder(h=20,d=Screw);
+	translate([MountHole1X+IRHoleOffset-1.5,IRMountY+Taller,-5]) rotate([0,0,0]) color("black") cylinder(h=20,d=Screw);
+	translate([MountHole2X+IRHoleOffset-1.5,IRMountY+Taller,-5]) rotate([0,0,0]) color("white") cylinder(h=20,d=Screw);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module ProximityMount(Shift=0) {
 	difference() {
-		translate([0,-2.5,0]) color("red") cubeX([32,32,8],2);
-		translate([16,12,-2]) color("olive") cylinder(h=wall*2,d=psensord); // proximity sensor hole
-		translate([16,12,4.5]) color("blue") cylinder(h=5,d=psensornut,$fn=6); // proximity nut
+		translate([0,-2.5,0]) color("red") cuboid([32,32,8],rounding=2,p1=[0,0]);
+		translate([16,12,-2]) color("olive") cylinder(h=wall*2,d=ProxSensorDiameter); // proximity sensor hole
+		translate([16,12,4.5]) color("blue") cylinder(h=5,d=ProxSensorrNutDiameter,$fn=6); // proximity nut
 	}
 	SensorMount(Shift);
 	ProximityAngleSupport();
@@ -387,9 +353,7 @@ module ProximityMount(Shift=0) {
 
 module SensorMount(Shift=0,Thicker=0,NoTab=0) {
 	difference() {
-		translate([0,26,0]) color("cyan") cubeX([60,5+Thicker,13+Shift],2);
-		//translate([27,60,8+Shift]) IRMountHoles(screw3);
-		//translate([27,53,8+Shift]) IRMountHolesCS(screw3hd);
+		translate([0,26,0]) color("cyan") cuboid([60,5+Thicker,13+Shift],rounding=2,p1=[0,0]);
 		translate([37,40,8+Shift]) IRMountHoles(screw3);
 		translate([57,53,8+Shift]) IRMountHolesCS(screw3hd);
 	}
@@ -411,8 +375,8 @@ module ProximityAngleSupport() {
 
 module BLTouchMount(Type,Shift,NoTab=1) {
 	difference() {
-		translate([0,0,0]) color("salmon") cubeX([26,25,5],2);
-		translate([13,-4,bltdepth+3]) BLTouch_Holes(Type);
+		translate([0,0,0]) color("salmon") cuboid([26,25,5],rounding=2,p1=[0,0]);
+		translate([13,-4,BLTouchRetractDepth+3]) BLTouch_Holes(Type);
 	}
 	if(Type==1) BLTouchSupport();
 	translate([0,-5,0]) SensorMount(Shift,0,NoTab);
@@ -422,7 +386,7 @@ module BLTouchMount(Type,Shift,NoTab=1) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module BLTouchSupport() {
-	translate([1,4,4]) color("green") cube([bltl-6,bltw,LayerThickness]);
+	translate([1,4,4]) color("green") cube([BLTouchLength-6,BLTouchMountWidth,LayerThickness]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -447,24 +411,15 @@ module BLTouchBracketMountHoles(Shift) {
 
 module BLTouch_Holes(recess=0,Screw=Yes2p5mmInsert(Use2p5mmInsert)) {
 	if(recess == 2) {	// mounting screw holes only
-		translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,d=Screw);
-		translate([-bltouch/2,16,-10]) color("gray") cylinder(h=25,d=Screw);
-		translate([bltouch/2-9,16,-10]) color("white") cylinder(h=25,d=screw5); // adjuster access
+		translate([BLTouchMountHoleOffset/2,16,-10]) color("pink") cylinder(h=25,d=Screw);
+		translate([-BLTouchMountHoleOffset/2,16,-10]) color("gray") cylinder(h=25,d=Screw);
+		translate([BLTouchMountHoleOffset/2-9,16,-10]) color("white") cylinder(h=25,d=screw5); // adjuster access
 	}
-	//if(recess == 1) {	// dependent on the hotend, for mounting under the extruder plate
-	//	translate([-bltl/2+3,bltw/2+2.5,bltdepth-4]) color("cyan") minkowski() { // depression for BLTouch
-	//		// it needs to be deep enough for the retracted pin not to touch bed
-	//		cube([bltl-6,bltw-6,wall]);
-	//		cylinder(h=1,r=3);
-	//	}
-	//	translate([-bltl/2+8,bltw/2,-5]) color("blue") cube([bltd+1.5,bltd+1.5,wall+3]); // hole for BLTouch
-	//	translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,r=screw2/2);
-	//	translate([-bltouch/2,16,-10]) color("black") cylinder(h=25,r=screw2/2);
-	//}
 	if(recess == 0) {	// for mounting on top of the extruder plate
-		translate([-bltl/2+8,bltw/2-1,-5]) color("blue") cube([bltd,bltd+2,wall+3]); // hole for BLTouch
-		translate([bltouch/2,16,-10]) color("pink") cylinder(h=25,d=Screw);
-		translate([-bltouch/2,16,-10]) color("lightgray") cylinder(h=25,d=Screw);
+		translate([-BLTouchLength/2+8,BLTouchMountWidth/2-1,-5]) color("blue")
+			cube([BLTouchBodyDiameter,BLTouchBodyDiameter+2,wall+3]); // hole for BLTouch
+		translate([BLTouchMountHoleOffset/2,16,-10]) color("pink") cylinder(h=25,d=Screw);
+		translate([-BLTouchMountHoleOffset/2,16,-10]) color("lightgray") cylinder(h=25,d=Screw);
 	}
 }
 

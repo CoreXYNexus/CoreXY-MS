@@ -2,7 +2,7 @@
 // MotorAndBearingMounts.scad - hold the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
-// last update 1/4/22
+// last update 1/22/22
 /////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,74 +36,58 @@
 // 4/24/21	- Added thrust washer to front bearing mount base
 // 10/16/21	- Changed support on MotorMount()
 // 1/4/22	- BOSL2
+// 1/22/22	- Imporoved motor mount supports
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in FrontBearingBracket() must match stepper motor shaft in MotorMount()
 //       If the motors get hot, print it from something that can handle it
 //       Bearing stack is 5mm washer,F625Z,F625Z,5mm washer,5mm washer,F625Z,F625Z,5mm washer,
-//       M5x50, and a 5mm nut in the nut trap or brass insert
-//		 Motor mounts have two holes on the makerslide side, to allow the makerslide to be installed
-//		 either way.
+//       M5x50, and a 5mm brass insert
+//		 Motor mounts have two holes on the makerslide side, to allow the makerslide to be installed either way.
 //		 Adjustable front bearing has the motor adjustable, since you may not get the belts the same length.
 //		 Used M3x40 screw in the bearing holder, held in with a M3 mut. Each base uses a M3x10 Thrust washer.
 // --------------------------------------------------------------------------------------
 //		 Taller motor_mount on left side rear.
 //		 NON-adjustable bearing brackets at inside front corners & supports on outside
-//		 Install one M5 nut in each bearing bracket
+//		 Install one M5 brass insert in each bearing bracket
 /////////////////////////////////////////////////////////////////////////////////////////
-include <CoreXY-MSv1-h.scad>
+include <bosl2/std.scad>
+include <inc/nema17.scad>
 include <inc/brassinserts.scad>
 $fn=100;
 /////////////////////////////////////////////////////////////////////////////////////////
 // vars for this file
-b_posY = 29.5;		// bearing position X
-b_posX = 20;		// bearing position Y
-b_height = 10;		// amount to raise bearings
+b_posY = 29.5;				// bearing position X
+b_posX = 20;				// bearing position Y
+b_height = 10;				// amount to raise bearings
 F625ZDoulbleStack = 11.78;	// just the length of two washers & two F625Z bearings
-F625ZDiameter = 18; // diameter of the f625z bearing
+F625ZDiameter = 18; 		// diameter of the f625z bearing
 LayerThickness = 0.35;		// layer thickness used to print
-Vthickness = 7;		// thickness of bearing support vertical section
-Tthickness = 5;		// thickness of bearing support top and fillet
+Vthickness = 7;				// thickness of bearing support vertical section
+Tthickness = 5;				// thickness of bearing support top and fillet
 Use3mmInsert=1;
 LargeInsert=1;
 Use5mmInsert=1;
 Knob_Diameter=nut3*3;
 Knob_Height=3;
 WasherThickness=1;
-ThrustBrearingDiameter=10;
+ThrustBrearingDiameter=10;	// M3 thrust bearing
+TextFont="Liberation Sans";
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //NonAdjustableBearingMountSet(); // all the needed parts
 AdjustableFrontBearingMountSet(0);
 //AdjustableFrontBearingMount(0);
 //AdjustingKnob();
+//MotorMount(1);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module NonAdjustableBearingMountSet() {
-	//if($preview) %translate([20,10,-4]) cube([200,200,2],center=true); // show a 200x200 bed
 	translate([0,-5,0]) MotorMount(1);
 	translate([35,60,-2.5]) rotate([0,0,0]) FrontBearingBracket(0,"Right");
 	translate([80,-30,F625ZDoulbleStack*2+b_height+40]) rotate([0,180,0]) BearingSupport(2,0);
 	translate([0,65,0]) MotorMount(0);
 	translate([75,20,-2.5]) rotate([0,0,0]) mirror([1,0,0]) FrontBearingBracket(0,"Left"); // mirror it for the other side
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-module AdjustingKnob() {
-	difference() {
-		union() {
-			translate([0,0,27/2]) color("cyan") cyl(h=27,d=nut3*2,rounding=1);
-			translate([0,0,Knob_Height/2]) color("blue") cyl(h=Knob_Height,d=Knob_Diameter,rounding=1);
-		}
-		if(Use3mmInsert)  translate([0,0,-5]) color("red") cylinder(h=35,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
-		else translate([0,0,-4]) color("purple") cylinder(h=5,d=nut3,$fn=6);
-		translate([0,0,-5]) color("white") cylinder(h=35,d=screw3+0.1); // throuch hole for M3
-		for(i=[22.5:45:360]) {
-			translate([(Knob_Diameter)*sin(i)/2,(Knob_Diameter)*cos(i)/2,-1]) // knurls
-				color("purple") cylinder(r=0.7,h=Knob_Height+2);
-		}
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -206,6 +190,24 @@ module AdjustableFrontBearingMountBase(ThrustBearing=1,DoTabs=1) {
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+module AdjustingKnob() {
+	difference() {
+		union() {
+			translate([0,0,27/2]) color("cyan") cyl(h=27,d=ThrustBrearingDiameter+1,rounding=1);
+			translate([0,0,Knob_Height/2]) color("blue") cyl(h=Knob_Height,d=Knob_Diameter,rounding=1);
+		}
+		if(Use3mmInsert)  translate([0,0,-5]) color("red") cylinder(h=35,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		else translate([0,0,-4]) color("purple") cylinder(h=5,d=nut3,$fn=6);
+		translate([0,0,-5]) color("white") cylinder(h=35,d=screw3+0.1); // throuch hole for M3
+		for(i=[22.5:45:360]) {
+			translate([(Knob_Diameter)*sin(i)/2,(Knob_Diameter)*cos(i)/2,-1]) // knurls
+				color("purple") cylinder(r=0.7,h=Knob_Height+2);
+		}
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt motor
@@ -215,50 +217,49 @@ module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt
 			translate([-2,0,-4]) color("red") NEMA17_parallel_holes(7,5);
 		else 
 			translate([-2,0,-4]) rotate([0,0,45]) color("white")  NEMA17_x_holes(7,3);
-		//translate([0,0,10]) MakerslideNotchIt(Side);
 	}
 	if(!Side) {
 		MotorMountSupport(Side);
 		difference() { // make wall thicker at notch
 			translate([0,25,5]) color("white") cuboid([58,4,14],rounding=2);
-			translate([0,0,10]) MakerslideNotchIt(Side);
+			translate([0,0,10]) MakerslideNotchOnMotorMount(Side);
 			MountScrews(28);
 		}
 		difference() {
 			translate([0,27,23]) color("cyan") cuboid([59,5,48],rounding=2);
 			MountScrews(18);
-			translate([0,0,10]) MakerslideNotchIt(Side);
+			translate([0,0,10]) MakerslideNotchOnMotorMount(Side);
 		}
 		difference() {
 			translate([27,0,23]) color("pink") cuboid([5,59,48],rounding=2);
 			MountScrews(18);
-			translate([0,0,10]) MakerslideNotchIt(Side);
+			translate([0,0,10]) MakerslideNotchOnMotorMount(Side);
 		}
-		translate([25.8,1,30]) rotate([110,180,-90]) PrintString("R");//,1.5,4,"Babylon Industrial:style=Normal");
+		translate([25,-8,40]) rotate([90,180,-90]) PrintString("Right");//,1.5,4,"Babylon Industrial:style=Normal");
 	} else {
 		MotorMountSupport(Side);
 		difference() {
 			translate([0,-27,28]) color("cyan") cuboid([59,5,58],rounding=2);
-			translate([0,0,20]) MakerslideNotchIt(Side);
+			translate([0,0,20]) MakerslideNotchOnMotorMount(Side);
 			MountScrews(28);
 		}
 		difference() { // make wall thicker at notch
 			translate([0,-25,17]) color("white") cuboid([58,4,14],rounding=2);
-			translate([0,0,10]) MakerslideNotchIt(Side);
+			translate([0,0,10]) MakerslideNotchOnMotorMount(Side);
 			MountScrews(28);
 		}
 		difference() {
 			translate([27,0,28]) color("pink") cuboid([5,59,58],rounding=2);
 			MountScrews(28);
-			translate([0,0,20]) MakerslideNotchIt(Side);
+			translate([0,0,20]) MakerslideNotchOnMotorMount(Side);
 		}
-		translate([25.8,-1,40]) rotate([110,180,-90]) PrintString("L");//,1.5,4,"Babylon Industrial:style=Normal");
+		translate([25,-5,50]) rotate([90,180,-90]) PrintString("Left");//,1.5,4,"Babylon Industrial:style=Normal");
 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-module MakerslideNotchIt(Side=0) {
+module MakerslideNotchOnMotorMount(Side=0) {
 	if(Side)
 		translate([-59,-59/2-4.5,-10]) MakerslideNotch();
 	else
@@ -282,6 +283,7 @@ module MountScrews(Mount_S,Screw=screw5) { // all of them; Mount_S is hight of t
 	translate([21,18,Mount_S]) rotate([0,90,0]) color("green") cylinder(h=5,d=screw5hd);
 	translate([21,-18,Mount_S]) rotate([0,90,0]) color("blue") cylinder(h=5,d=screw5hd);
 	translate([-14,40,Mount_S+20]) rotate([90,0,0]) color("yellow") cylinder(h=80,d=Screw);
+	translate([-14,-21,Mount_S+20]) rotate([90,0,0]) color("white") cylinder(h=5,d=screw5hd);
 	translate([-14,26,Mount_S+20]) rotate([90,0,0]) color("khaki") cylinder(h=5,d=screw5hd);
 	translate([-42,18,Mount_S+20]) rotate([0,90,0]) color("gold") cylinder(h=80,d=Screw);
 	translate([21,18,Mount_S+20]) rotate([0,90,0]) color("gold") cylinder(h=5,d=screw5hd);
@@ -386,18 +388,31 @@ module 	BearingBracketHorizontalSupport() {
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 module MotorMountSupport(Side) {
-	if(Side)
-		translate([-29,24.5,1.5]) rotate([0,46,0]) color("gray") cuboid([6,5,76.5],rounding=2,p1=[0,0]);
-	else
-		translate([-28,-29.5,1.5]) rotate([0,51,0]) color("gray") cuboid([6,5,69],rounding=2,p1=[0,0]);
+	if(Side) {
+		color("gray") hull() {
+			translate([-29,24.5,-2]) cuboid([6,5,5],rounding=2,p1=[0,0]);
+			translate([24.5,24.5,51]) cuboid([5,5,6],rounding=2,p1=[0,0]);
+		}
+		color("green") hull() {
+			translate([-29.5,24.5,-2]) cuboid([6,5,5],rounding=2,p1=[0,0]);
+			translate([-29.5,-29.5,52]) cuboid([5,6,5],rounding=2,p1=[0,0]);
+		}
+	} else {
+		color("gray") hull() {
+			translate([-29.5,24.5,41]) cuboid([5,5,6],rounding=2,p1=[0,0]);
+			translate([-29.5,-29,-2.5]) cuboid([5,6,5],rounding=2,p1=[0,0]);
+		}
+		color("green") hull() {
+			translate([24.5,-29.5,42]) cuboid([5,5,5],rounding=2,p1=[0,0]);
+			translate([-29,-29.5,-2.5]) cuboid([6,5,5],rounding=2,p1=[0,0]);
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PrintString(String,Height=1.5,Size=4,Font="Liberation Sans",Color="coral") { // print something
+module PrintString(String,Height=1.5,Size=5,Font=TextFont,Color="coral") { // print some text
 	color(Color) linear_extrude(height = Height) text(String, font = Font,size=Size);
-	//"Babylon Industrial:style=Normal",size=Size);
-	//"Liberation Sans",size=Size);
 }
 
 /////////////////// emd of MotorAndBearingMounts.scad ////////////////////////////////////

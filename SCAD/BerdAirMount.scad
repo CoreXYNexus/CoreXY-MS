@@ -125,37 +125,42 @@ module AeroClamp(Side=0,DoTab=1,PipeSize=2) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module E3DV6Mount(PipeSize=2,DoClamp=1,SetScrew=0) {
+module E3DV6Mount(PipeSize=2,DoClamp=1,SetScrew=0,DoTab=1) {
 	difference() {
 		union() {
 			color("cyan") hull() {
 				translate([0,0,2-0.3]) cyl(h=3.5,d=E3DV6diameter*2-3,rounding=1.5);
 				translate([-30,-E3DV6diameter/2,0]) cuboid([3,E3DV6diameter,4],rounding=1.5,p1=[0,0]);
 			}
-			translate([-22.5,0.25,4]) color("blue") cuboid([15,15.5,7],rounding=2);
+			translate([-22.5,0.25,4]) color("blue") cuboid([15,E3DV6diameter,8],rounding=1);
 		}
-		translate([-32,-4,3.5]) color("pink") rotate([0,90,0]) cylinder(h=16,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
-		translate([-35,4,3.5]) color("pink") rotate([0,90,0]) cylinder(h=16,d=Yes3mmInsert(Use3mmInsert,LargeInsert));
+		translate([-56,0,4.25]) BAClampScrews(Yes3mmInsert(Use3mmInsert,LargeInsert));
 		translate([0,0,-5]) color("red") cylinder(h=20,d=E3DV6diameter);
 		if(SetScrew) translate([0,0,2]) color("purple") rotate([0,90,0]) cylinder(h=20,d=screw3t);
 	}
-	if(DoClamp) BAClamp(PipeSize);
+	if(DoClamp) BAClamp(PipeSize,DoTab);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module BAClamp(PipeSize=2) {
-	translate([-39,0,32]) rotate([0,-90,0]) {
+module BAClamp(PipeSize=2,DoTab=1) {
+	translate([-39,0,32]) rotate([0,-90,0]) { // remove to test fit
 		difference() { // clamp
 			union() {
-				translate([-32,-E3DV6diameter/2,0]) color("green") cuboid([5,E3DV6diameter,8],rounding=1.5,p1=[0,0]);
-				translate([-32,0,4]) rotate([0,90,0]) cylinder(h=LayerThickness,d=25);
+				translate([-32,-E3DV6diameter/2,0]) color("green") cuboid([5,E3DV6diameter,8],rounding=1,p1=[0,0]);
+				if(DoTab) translate([-32,0,4]) color("red")  rotate([0,90,0]) cylinder(h=LayerThickness,d=25);
 			}
-			translate([-33,-4,4.5]) color("blue") rotate([0,90,0]) cylinder(h=15,d=screw3);
-			translate([-33,4,4.5]) color("khaki") rotate([0,90,0]) cylinder(h=15,d=screw3);
+			translate([-43,0,4.25]) BAClampScrews(screw3);
 			translate([-27,0,-5]) color("gray") cylinder(h=20,d=PipeSize);
 		}
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BAClampScrews(Screw=Yes3mmInsert(Use3mmInsert,LargeInsert)) {
+	translate([0,-4,0]) color("blue") rotate([0,90,0]) cylinder(h=40,d=Screw);
+	translate([0,4,0]) color("khaki") rotate([0,90,0]) cylinder(h=40,d=Screw);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

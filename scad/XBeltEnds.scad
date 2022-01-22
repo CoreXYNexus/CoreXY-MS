@@ -2,7 +2,7 @@
 // XBeltEnds.scad - x axis bearing mount on the carriage plates
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 6/27/2016
-// last upate 1/20/22
+// last upate 1/22/22
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,6 +14,7 @@
 // 10/17/20	- Now can use 5mm inserts
 // 1/16/22	- Added a endstop strike to left side, added locating tab to drill guide
 // 1/20/22	- Renamed vars to a better description
+// 1/22/22	- XBeltEnds now use brass inserts to mount on makkerslide carriage plate
 ///////////////////////////////////////////////////////////////////////////////////////
 // Requires drilling two holes in the makerslide carriage plate
 // Use a couple of 3mm screws to space the XBeltEnds above the makerslide, mark the outline
@@ -47,8 +48,9 @@ LayerThickness=0.3;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 All(1,1); // everything
-//XBeltEnds(0,0);
-//XBeltEnds(1,1);
+//XBeltEnds(0);
+//translate([0,60,0])
+//	XBeltEnds(1);
 //DrillGuide(screw5);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,13 +68,13 @@ module All(Spacers=0,Guide=0) {	// all the parts as a plate
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module XBeltEnds(RightSide=0) {	// bearing mount bracket on x axis
-	Base(screw5);
+	Base(Yes5mmInsert(Use5mmInsert));
 	XEndWalls(0,0,RightSide);
 	XEndWalls(1,1,RightSide);
 	if(!RightSide) {
 		translate([10,10,3]) printchar("Left",3,5);
-		translate([8,34.5,12]) rotate([90,0,0]) printchar("D",3,5);
-		translate([30,34.5,30]) rotate([90,180,0]) printchar("U",3,5);
+		translate([12,31.5,11]) rotate([90,0,180]) printchar("D",3,5);
+		translate([25,34.5,25]) rotate([90,0,0]) printchar("U",3,5);
 	} else {
 		translate([7,10,3]) printchar("Right",3,5);
 		translate([13,34.5,28]) rotate([90,180,0]) printchar("D",3,5);
@@ -87,12 +89,12 @@ module XEndWalls(Bottom=0,NotDoEndStop=0,Right=0) {	// the walls that hold the b
 		if(Right) {
 			difference() {	// Lower bearing support wall
 				color("red") cuboid([Width,5,BeltHeight+F625ZDiameter],rounding=2,p1=[0,0]);
-				BearingScrewHoles(!Bottom,Yes5mmInsert(Use5mmInsert));
+				BearingScrewHoles(Bottom,Yes5mmInsert(Use5mmInsert));
 			}
 		} else {
 			difference() {	// Lower bearing support wall
 				color("red") cuboid([Width,5,BeltHeight+F625ZDiameter],rounding=2,p1=[0,0]);
-				BearingScrewHoles(Bottom,Yes5mmInsert(Use5mmInsert));
+				BearingScrewHoles(!Bottom,Yes5mmInsert(Use5mmInsert));
 			}
 		}
 	} else {
@@ -113,10 +115,16 @@ module XEndWalls(Bottom=0,NotDoEndStop=0,Right=0) {	// the walls that hold the b
 				BearingScrewHoles(Bottom,screw5);
 			}
 			if(!NotDoEndStop) {
-				translate([19,36.5,BeltHeight+F625ZDiameter-1]) color("green")
-					cuboid([Width,15,5],rounding=2);  // X endstop strike riser
-				translate([19,45,BeltHeight+F625ZDiameter+5.5]) color("pink")
-					cuboid([Width,10,18],rounding=2);  // X endstop strike
+				difference() {
+					union() {
+						translate([19,36.5,BeltHeight+F625ZDiameter-1]) color("green")
+							cuboid([Width,15,5],rounding=2);  // X endstop strike riser
+						translate([19,45,BeltHeight+F625ZDiameter+5.5]) color("pink")
+							cuboid([Width,10,18],rounding=2);  // X endstop strike
+					}
+					translate([F625ZDiameter/2+BeltOffset+17,45,OuterBeltHeight+F625ZDiameter/2+OuterBeltAdjust])
+						rotate([90,0,0]) color("purple")cylinder(h=15,d=screw5hd);
+				}
 			}
 		}
 	}
@@ -173,18 +181,18 @@ module DrillGuide(Screw=screw5) { // something to help in locating the holes to 
 		Base(Screw);
 		translate([3,2.7,3]) printchar("Drill Guide",3,5);
 	}
-	translate([19,45,2.5]) color("red") cuboid([Width,35,5],rounding=2); // addon to base
-	translate([19,14.5+46,5]) color("blue") cuboid([Width,5,10],rounding=2); // lip
-		translate([2,2,0.15]) color("green") cyl(h=LayerThickness,d=15);
-		translate([2,Width+23,0.15]) color("purple") cyl(h=LayerThickness,d=15);
-		translate([Width-2,2,0.15]) color("white") cyl(h=LayerThickness,d=15);
-		translate([Width-2,Width+23,0.15]) color("lightgray") cyl(h=LayerThickness,d=15);
+	translate([19,43,2.5]) color("red") cuboid([Width,33,5],rounding=2); // addon to base
+	translate([19,14.5+43,5]) color("blue") cuboid([Width,5,10],rounding=2); // lip
+	translate([2,2,0.15]) color("green") cyl(h=LayerThickness,d=15);
+	translate([2,Width+20,0.15]) color("purple") cyl(h=LayerThickness,d=15);
+	translate([Width-2,2,0.15]) color("white") cyl(h=LayerThickness,d=15);
+	translate([Width-2,Width+20,0.15]) color("gray") cyl(h=LayerThickness,d=15);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module printchar(String,Height=1.5,Size=2) { // print text
-	color("coral") linear_extrude(height = Height) text(String, font = "Liberation Sans",size=Size);
+module printchar(String,Height=1.5,Size=2,Color="coral") { // print text
+	color(Color) linear_extrude(height = Height) text(String, font = "Liberation Sans",size=Size);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

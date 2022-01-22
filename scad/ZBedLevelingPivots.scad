@@ -56,10 +56,11 @@ LengthAdjust=0;
 BedMountLength=80;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Pivots(3,1);// arg1: Quanity;Arg2: 0 for M5 pivots, 1 for 625z bearing pivots;Arg3: 0 for none, 1 for 2020, 2 for 2040
+//Pivots(3,1);// arg1: Quanity;Arg2: 0 for M5 pivots, 1 for 625z bearing pivots;Arg3: 0 for none, 1 for 2020, 2 for 2040
 // Length is between the mackerslide carriage plate and the bed frame
-//PivotBed(2,BedMountLength+LengthAdjust);		// equal length long bed pivots for 2020
-//translate([50,0,0]) PivotBed(1,ZCarriadgeWidth-BedWidth-BedMountLength+LengthAdjust); // equal length long bed pivots for 2020
+PivotBed(2,BedMountLength+LengthAdjust);		// equal length long bed pivots for 2020
+translate([50,0,0]) 
+	PivotBed(1,ZCarriadgeWidth-BedWidth-BedMountLength+LengthAdjust); // equal length long bed pivots for 2020
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -252,8 +253,12 @@ module PivotBed(Quanity=1,Length=ZLength,Adjust=0) { // pivot mounts on the make
 				}
 				if(Length>50) { // weight reduction
 					translate([5,-5,5]) color("blue") hull() {
-						translate([1.5,0,0]) cuboid([35,21,5],rounding=2,p1=[0,0]);
-						translate([29/4,0,Length-ZPivotLength-27]) cuboid([24,21,5],rounding=2,p1=[0,0]);
+						translate([1.5,0,0]) cuboid([16,21,5],rounding=2,p1=[0,0]);
+						translate([29/4,0,Length-ZPivotLength-27]) cuboid([10,21,5],rounding=2,p1=[0,0]);
+					}
+					translate([5,-5,5]) color("white") hull() {
+						translate([21.5,0,0]) cuboid([16,21,5],rounding=2,p1=[0,0]);
+						translate([29/4+14,0,Length-ZPivotLength-27]) cuboid([10,21,5],rounding=2,p1=[0,0]);
 					}
 				}
 				translate([14,10,-4]) color("red") cylinder(h=30,d=screw5);   // 2020 mount holes
@@ -261,6 +266,7 @@ module PivotBed(Quanity=1,Length=ZLength,Adjust=0) { // pivot mounts on the make
 				translate([34,10,-4]) color("green") cylinder(h=30,d=screw5);
 				translate([34,10,4]) color("red") cylinder(h=5,d=screw5hd);
 			}
+			if(Length>80) translate([24,10,Length/2-20]) color("red") cuboid([33,20,6],rounding=2);
 			translate([36,10,Length-ZPivotLength+Adjust]) color("red") rotate([0,-90,0]) BuiltInWasher();
 			translate([12.5,10,Length-ZPivotLength+Adjust]) color("blue") rotate([0,90,0])
 				BuiltInWasher(Yes5mmInsert(Use5mmInsert));
