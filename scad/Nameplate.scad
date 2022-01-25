@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CXY-MSv1 Nameplate - nameplate for the printer
 // created: 7/11/2018
-// last modified: 4/9/21
+// last modified: 1/25/22
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,32 +9,35 @@
 // 9/6/20	- Changed font
 // 9/22/20	- Adjusted size and screw mounting, removed unused inlcudes
 // 4/9/21	- Converted to BOSL2
+// 1/25/22	- Changed font and the method to change it
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <bosl2/std.scad>
-$fn=50;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+$fn=100;
+TextFont="ST Old English:style=Regular"; // "StarTrek Film BT:style=Regular";
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-plate();
+NamePlate();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module plate() {
+module NamePlate() {
 	difference() {
-		color("cyan") cuboid([108,20,4],rounding=2,p1=[0,0],except_edges=BOTTOM);
-		translate([7,10,-5]) color("red") cylinder(h=10,d=screw5,$fn=100);
-		translate([7,10,3]) color("blue") cylinder(h=10,d=screw5hd,$fn=100);
-		translate([99,10,-5]) color("blue") cylinder(h=10,d=screw5,$fn=100);
-		translate([99,10,3]) color("red") cylinder(h=10,d=screw5hd,$fn=100);
+		color("cyan") cuboid([106,20,4],rounding=2,p1=[0,0],except_edges=BOTTOM);
+		translate([7,10,0]) color("red") cyl(h=10,d=screw5);
+		translate([7,10,5]) color("blue") cyl(h=5,d=screw5hd);
+		translate([99,10,0]) color("blue") cyl(h=10,d=screw5);
+		translate([99,10,5]) color("red") cyl(h=5,d=screw5hd);
 	}	
-	translate([14,4.5,1]) printchar("CXY-MSv1",5,12);
+	translate([14,5.1,1]) printchar("CoreXY-MS",5,12);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 module printchar(String,TxtHeight=1,TxtSize=3.5) { // print something
-	color("darkgray") linear_extrude(height = TxtHeight) text(String, font = "StarTrek Film BT:style=Regular",size=TxtSize);
+	color("darkgray") linear_extrude(height = TxtHeight) text(String, font = TextFont,size=TxtSize);
 }
 
 
-///////////////// end of CXY-MSv1 Nameplate.scad ///////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
