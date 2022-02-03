@@ -1,1 +1,1 @@
-Photos of CXY-MSv1
+Photos and video of CoreXY-MS

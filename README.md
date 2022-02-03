@@ -3,11 +3,12 @@ A corexy printer using Makerslide, EXOSlide with Duet 3 6HC and 1LC using a Rasp
 
 August 2020: Upgraded to a Duet 3 6HC with 1LC.  Currently using in stand alone, no Pi.
 
-An older version is available at http://www.thingiverse.com/thing:1470253
+A very old version is available at http://www.thingiverse.com/thing:1470253
 
 https://creativecommons.org/licenses/by-sa/4.0/
 
-https://youtu.be/llArYEVT2ow
+https://youtu.be/llArYEVT2ow with Duet 2.
+https://www.youtube.com/watch?v=qqqCqKSmpecVideo with the Duet 3.
 
 All the horizontal extrusions, and the horizontal makerslide ends are tapped for 5mm.
 Vertical 2020 is drilled with a 5.5mm bit for access to the screws that hold everything together. Four in the top and two in the bottom. Use drillguide.stl for drilling the holes.
