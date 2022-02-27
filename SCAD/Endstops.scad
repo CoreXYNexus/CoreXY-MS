@@ -42,11 +42,12 @@ SwitchShift = 6;	// move switch mounting holes along width
 LayerThickness=0.3;
 ////////////////////////////////////////////////////////////////////////////
 
-All(1,1,1);
+//All(1,1,1);
 //XStopMount(22,10,8,Yes3mmInsert(Use3mmInsert,LargeInsert),screw5,8);	// TEMCo CN0097
 //XStopMount(10,0,0,Yes2mmInsert(Use2mmInsert),screw5,4); // black microswitch
 //YStopMount(22,10,8,Yes3mmInsert(Use3mmInsert,LargeInsert),screw4,8);	// TEMCo CN0097
-//YStopMount(10,0,0,Yes2mmInsert(Use2mmInsert),Yes5mmInsert(Use5mmInsert),4); // black microswitch
+//StopMount(10,0,0,Yes2mmInsert(Use2mmInsert),Yes5mmInsert(Use5mmInsert),4); // black microswitch
+YStopMountMS(10,0,0,Yes2mmInsert(Use2mmInsert),Yes5mmInsert(Use5mmInsert),4); // black microswitch
 //StrikeY(screw5);
 //StrikeX(screw5,0); // second arg: 1 for exoslide
 
@@ -69,11 +70,58 @@ module XStopMount(Sep,DiagOffset,Offset,ScrewSwitch,ScrewMount=screw5,Adjust) {
 	EndstopMount(ScrewMount);
 }
 
-///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module YStopMount(Sep,DiagOffset,Offset,ScrewSwitch,ScrewMount=screw5,Adjust) {
 	EndstopBase(Sep,DiagOffset,Offset,ScrewSwitch,Adjust);
 	EndstopMount(ScrewMount);
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+module YStopMountMS(Sep,DiagOffset,Offset,ScrewSwitch,ScrewMount=screw5,Adjust) { // mounts on MS
+	difference() {
+		color("cyan") cuboid([25,39,5],rounding=2); // 39 to fit between the MS rails
+		translate([-5,-10,0]) ExtrusionMountingHoles();
+		if(DiagOffset) { // switch mount
+			translate([Adjust+3,-11,0]) {
+				translate([-(Switch_ht-Offset)+14,SwitchShift,0]) color("purple") cyl(h = 11, d = ScrewSwitch);
+				translate(v = [-(Switch_ht-Offset)+14+DiagOffset,SwitchShift+Sep,0]) color("gray")
+					cyl(h = 11, d=ScrewSwitch);
+			}
+		} else {
+			translate([Adjust+9,-11,0]) {
+				translate([-(Switch_ht-Offset)+14,SwitchShift,0]) color("purple") cyl(h = 11, d = ScrewSwitch);
+				translate(v = [-(Switch_ht-Offset)+14+DiagOffset,SwitchShift+Sep,0])
+					color("gray") cyl(h = 11, d=ScrewSwitch);
+			}
+		}
+	}
+	translate([30,0,0]) difference() { // y strike on carriage plate
+		union() {
+			color("gray") cuboid([25,40,5],rounding=2);
+			translate([11,0,2.5]) color("purple") cuboid([5,40,10],rounding=2);
+		}
+		translate([-4,-10,0]) YStrikeMountHoles();
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module YStrikeMountHoles(Screw=Yes5mmInsert(Use5mmInsert)) {
+	color("green") cyl(h=20,d=Screw);
+	translate([0,20,0]) color("white") cyl(h=20,d=Screw);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module ExtrusionMountingHoles(Screw=screw5) {
+	color("red") cyl(h=20,d=Screw);
+	translate([0,20,0]) color("blue") cyl(h=20,d=Screw);
+	translate([0,0,4]) {
+		color("blue") cyl(h=5,d=screw5hd);
+		translate([0,20,0]) color("red") cyl(h=5,d=screw5hd);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

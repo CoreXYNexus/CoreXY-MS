@@ -17,18 +17,58 @@ $fn=100;
 Thickness=4;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CornerBrace(1);
+//CornerBrace(1);
+//CornerBrace2(1);
+Corner();
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Corner() {
+	difference() {
+		color("cyan") hull() {
+			cuboid([20,20,5],rounding=2);
+			translate([0,7.5,15]) cuboid([20,5,5],rounding=2);
+		}
+		translate([0,0,0]) color("red") cyl(h=50,d=screw5);
+		translate([0,0,9]) color("blue") cyl(h=20,d=screw5hd);
+		translate([0,0,8]) color("blue") rotate([90,0,0]) cyl(h=50,d=screw5);
+		translate([0,-1.5,8]) color("red") rotate([90,0,0]) cyl(h=20,d=screw5hd);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module CornerBrace2(Qty=1) {
+	for(x=[0:Qty-1]) {
+		translate([0,x*25,0]) difference() {
+			color("red") hull() {
+				cuboid([80,20,Thickness],rounding=2);
+				translate([-40,0,75]) cuboid([Thickness,20,Thickness],rounding=2);
+			}
+			translate([5,20.1,5.5]) BraceHollow2();
+			translate([-40,-11,0]) ScrewMount();
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BraceHollow2() {
+	translate([-22.5,-20.1,15.5]) color("cyan") rotate([90,0,0]) cyl(h=20.2,d=35,rounding=-2);
+	translate([6,-20.1,6]) color("blue") rotate([90,0,0]) cyl(h=20.1,d=15,rounding=-2);
+	translate([-33,-20.1,43.5]) color("green") rotate([90,0,0]) cyl(h=20.1,d=15,rounding=-2);
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module CornerBrace(Qty=1) {
 	for(i = [0:Qty-1]) {
 		translate([0,25*i,0]) difference() {
-			color("purple") hull() {
+			color("red") hull() {
 				cuboid([80,20,Thickness],rounding=2,p1=[0,0]);
 				translate([0,0,75]) cuboid([Thickness,20,Thickness],rounding=2,p1=[0,0]);
 			}
-			translate([5,20.1,5.5]) BraceSupportv3();
+			translate([5,20.1,5.5]) BraceHollow();
 			ScrewMount();
 		}
 	}
@@ -36,7 +76,7 @@ module CornerBrace(Qty=1) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module BraceSupportv3() {
+module BraceHollow() {
 	$fa=1;$fs=0.3;
 	triangle = [[0,0],[0,58],[58,0]];
 	rotate([90,0,0]) offset_sweep(triangle, height=20.2, bottom = os_circle(r=-2),steps=20,top = os_circle(r=-2));
@@ -45,13 +85,13 @@ module BraceSupportv3() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module ScrewMount() {
-	translate([12,10,-Thickness]) color("green") cylinder(h=40,d=screw5);
-	translate([12,10,Thickness]) color("pink") cylinder(h=25,d=screw5hd);
-	translate([-Thickness+1,10,12]) rotate([0,90,0]) color("pink") cylinder(h=40,d=screw5);
-	translate([Thickness,10,12]) rotate([0,90,0]) color("green") cylinder(h=25,d=screw5hd);
-	translate([65,10,-Thickness]) color("blue") cylinder(h=40,d=screw5);
-	translate([65,10,Thickness]) color("purple") cylinder(h=25,d=screw5hd);
-	translate([-Thickness+1,10,65]) rotate([0,90,0]) color("red") cylinder(h=40,d=screw5);
+	translate([12,10,-Thickness]) color("green") cylinder(h=35,d=screw5);
+	translate([12,10,25/2+1]) color("pink") cyl(h=25,d=screw5hd,rounding2=2);
+	translate([-Thickness+1,10,12]) rotate([0,90,0]) color("pink") cylinder(h=35,d=screw5);
+	translate([25/2+1.5,10,12]) rotate([0,90,0]) color("green") cyl(h=25,d=screw5hd,rounding2=2);
+	translate([65,10,-Thickness]) color("blue") cylinder(h=350,d=screw5);
+	translate([65,10,25/2]) color("purple") cyl(h=25,d=screw5hd);
+	translate([-Thickness+1,10,65]) rotate([0,90,0]) color("red") cylinder(h=35,d=screw5);
 	translate([Thickness,10,65]) rotate([0,90,0]) color("gray") cylinder(h=25,d=screw5hd);
 }
 

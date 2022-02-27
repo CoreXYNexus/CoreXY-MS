@@ -85,7 +85,8 @@ module PivotCarriage(Spacer=0,Holes_offset=42.5) { // bearing between bolt holes
 			translate([51.5,12,5.5]) rotate([0,0,90]) color("red") cylinder(h=10,d=nut5+0.5,$fn=6);
 			translate([51.5,12,-2]) color("blue") cylinder(h=20,d=screw5,$fn=100); // mounting hole
 		}
-		translate([51.5-Holes_offset,12,-2]) color("white") cylinder(h=20,d=Yes5mmInsert(Use5mmInsert),$fn=100); // mounting hole
+		translate([51.5-Holes_offset,12,-2]) color("white")
+			cylinder(h=20,d=Yes5mmInsert(Use5mmInsert),$fn=100); // mounting hole
 		if(!Use5mmInsert) {
 			translate([51.5-Holes_offset,12,5.5]) rotate([0,0,90]) color("plum") cylinder(h=10,d=nut5+0.5,$fn=6);
 			translate([51.5-Holes_offset,12,-2]) color("white") cylinder(h=20,d=screw5,$fn=100); // mounting hole
@@ -260,13 +261,25 @@ module PivotBed(Quanity=1,Length=ZLength,Adjust=0) { // pivot mounts on the make
 						translate([21.5,0,0]) cuboid([16,21,5],rounding=2,p1=[0,0]);
 						translate([29/4+14,0,Length-ZPivotLength-27]) cuboid([10,21,5],rounding=2,p1=[0,0]);
 					}
+					translate([24.5,0,20]) color("green") rotate([90,0,0]) cyl(h=50,d=screw5); // for 2020 bottom support
+					if(Length>80) translate([24.5,0,Length-60]) color("gold") rotate([90,0,0]) cyl(h=50,d=screw5);
 				}
 				translate([14,10,-4]) color("red") cylinder(h=30,d=screw5);   // 2020 mount holes
 				translate([14,10,4]) color("green") cylinder(h=5,d=screw5hd);
 				translate([34,10,-4]) color("green") cylinder(h=30,d=screw5);
 				translate([34,10,4]) color("red") cylinder(h=5,d=screw5hd);
 			}
-			if(Length>80) translate([24,10,Length/2-20]) color("red") cuboid([33,20,6],rounding=2);
+			difference() { // for 2020 bottom support
+				translate([24.5,10,20]) color("red") rotate([90,0,0]) cyl(h=20,d=screw5hd,rounding=2);
+				translate([24.5,0,20]) color("blue") rotate([90,0,0]) cyl(h=50,d=screw5);
+			}
+			if(Length>80) { // for 2020 bottom support
+				translate([24,10,Length/2-20]) color("red") cuboid([33,20,6],rounding=2);
+				difference() {
+					translate([24.5,10,Length-60]) color("blue") rotate([90,0,0]) cyl(h=20,d=screw5hd,rounding=2);
+					translate([24.5,0,Length-60]) color("red") rotate([90,0,0]) cyl(h=50,d=screw5);
+				}
+			}
 			translate([36,10,Length-ZPivotLength+Adjust]) color("red") rotate([0,-90,0]) BuiltInWasher();
 			translate([12.5,10,Length-ZPivotLength+Adjust]) color("blue") rotate([0,90,0])
 				BuiltInWasher(Yes5mmInsert(Use5mmInsert));

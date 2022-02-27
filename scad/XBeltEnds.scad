@@ -62,7 +62,7 @@ module All(Spacers=0,Guide=0) {	// all the parts as a plate
 		translate([0,-45,0]) XBeltEnds(1);
 	}
 	if(Spacers) translate([-15,-30,-32.1]) BearingSpacer(OneBearingStackHeight,4);
-	if(Guide) translate([57,-33,-38]) DrillGuide();
+	if(Guide) translate([57,-28,-38]) DrillGuide();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,12 +88,12 @@ module XEndWalls(Bottom=0,NotDoEndStop=0,Right=0) {	// the walls that hold the b
 	if(Bottom) {
 		if(Right) {
 			difference() {	// Lower bearing support wall
-				color("red") cuboid([Width,5,BeltHeight+F625ZDiameter],rounding=2,p1=[0,0]);
+				translate([0,-1,0]) color("red") cuboid([Width,6,BeltHeight+F625ZDiameter],rounding=2,p1=[0,0]);
 				BearingScrewHoles(Bottom,Yes5mmInsert(Use5mmInsert));
 			}
 		} else {
 			difference() {	// Lower bearing support wall
-				color("red") cuboid([Width,5,BeltHeight+F625ZDiameter],rounding=2,p1=[0,0]);
+				translate([0,-1,0]) color("red") cuboid([Width,6,BeltHeight+F625ZDiameter],rounding=2,p1=[0,0]);
 				BearingScrewHoles(!Bottom,Yes5mmInsert(Use5mmInsert));
 			}
 		}
@@ -117,10 +117,11 @@ module XEndWalls(Bottom=0,NotDoEndStop=0,Right=0) {	// the walls that hold the b
 			if(!NotDoEndStop) {
 				difference() {
 					union() {
-						translate([19,36.5,BeltHeight+F625ZDiameter-1]) color("green")
-							cuboid([Width,15,5],rounding=2);  // X endstop strike riser
-						translate([19,45,BeltHeight+F625ZDiameter+5.5]) color("pink")
-							cuboid([Width,10,18],rounding=2);  // X endstop strike
+						translate([19,38.5,BeltHeight+F625ZDiameter-1]) color("green")
+							cuboid([Width,20,5],rounding=2);  // X endstop strike riser
+						%translate([19,36,BeltHeight+F625ZDiameter+10]) cuboid([5,15,17]);
+						translate([19,49,BeltHeight+F625ZDiameter+7.5]) color("pink")
+							cuboid([Width,10,22],rounding=2);  // X endstop strike
 					}
 					translate([F625ZDiameter/2+BeltOffset+17,45,OuterBeltHeight+F625ZDiameter/2+OuterBeltAdjust])
 						rotate([90,0,0]) color("purple")cylinder(h=15,d=screw5hd);
@@ -168,7 +169,7 @@ module BearingSpacer(length=OneBearingStackHeight,Quanity=2) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module Base(Screw=screw5) {
 	difference() {
-		color("cyan") cuboid([Width,OneBearingStackHeight*2+10,5],rounding=2,p1=[0,0]);
+		color("cyan") cuboid([Width,OneBearingStackHeight*2+10,6],rounding=2,p1=[0,0]);
 		translate([Width/4-1,22,-1]) color("salmon") cylinder(h=10,d=Screw);	// mounting screw holes
 		translate([Width-Width/4+1,12,-1]) color("green") cylinder(h=10,d=Screw);
 	}
@@ -183,10 +184,13 @@ module DrillGuide(Screw=screw5) { // something to help in locating the holes to 
 	}
 	translate([19,43,2.5]) color("red") cuboid([Width,33,5],rounding=2); // addon to base
 	translate([19,14.5+43,5]) color("blue") cuboid([Width,5,10],rounding=2); // lip
-	translate([2,2,0.15]) color("green") cyl(h=LayerThickness,d=15);
-	translate([2,Width+20,0.15]) color("purple") cyl(h=LayerThickness,d=15);
-	translate([Width-2,2,0.15]) color("white") cyl(h=LayerThickness,d=15);
-	translate([Width-2,Width+20,0.15]) color("gray") cyl(h=LayerThickness,d=15);
+	translate([2,2,0.15]) color("green") cyl(h=LayerThickness,d=15); // corner printing support
+	translate([2,Width+20,0.15]) color("purple") cyl(h=LayerThickness,d=15); // corner printing support
+	translate([Width-2,2,0.15]) color("white") cyl(h=LayerThickness,d=15); // corner printing support
+	translate([Width-2,Width+20,0.15]) color("gray") cyl(h=LayerThickness,d=15); // corner printing support
+	translate([-10,45,2.5]) color("green") cuboid([40,10,5],rounding=2);  // side locate
+	translate([-28,45,5]) color("pink") cuboid([4,10,10],rounding=2); // lip
+	translate([-27,45,0.155]) color("lightblue") cyl(h=LayerThickness,d=15); // corner printing support
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

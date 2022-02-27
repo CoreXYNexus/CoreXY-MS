@@ -31,12 +31,18 @@ PlainLEDStripHolder(1,0);
 
 module PlainLEDStripHolder(DoTabs=1,ShiftShortLEDTab=0) {
 	difference() {
-		translate([0,-10,0]) color("cyan") cuboid([110,45,4],rounding=2);
-		translate([-37,15,0]) {
-			translate([0,-10,-3])color("red") cylinder(h=10,d=screw4);
-			translate([40,-10,-3]) color("blue") cylinder(h=10,d=screw4);
-			translate([0,-10,1.5])color("blue") cylinder(h=5,d=screw4hd);
-			translate([40,-10,1.5]) color("red") cylinder(h=5,d=screw4hd);
+		union() {
+			translate([0,-15,0]) color("cyan") cuboid([110,33,4],rounding=2);
+			translate([-10,5,0]) {
+				difference() {
+					union() {
+						translate([0,0,0]) color("green") cuboid([55,15,4],rounding=2);
+						translate([27,6,-1.8255]) color("purple") cyl(h=LayerThickness,d=10);
+						translate([-27,6,-1.8255]) color("khaki") cyl(h=LayerThickness,d=10);
+					}
+					translate([-20,10,0]) MountingHoles(screw4);
+				}
+			}
 		}
 		translate([0,11,0]) ZipTieHoleSlot();
 		translate([-50,11,0]) ZipTieHoleSlot();
@@ -65,13 +71,24 @@ module PlainLEDStripHolder(DoTabs=1,ShiftShortLEDTab=0) {
 			union() {
 				translate([52,-30,-2]) color("red") cylinder(h=LayerThickness,d=10);
 				translate([-52,-30,-2]) color("blue") cylinder(h=LayerThickness,d=10);
-				translate([52,11,-2]) color("gray") cylinder(h=LayerThickness,d=10);
-				translate([-52,11,-2]) color("white") cylinder(h=LayerThickness,d=10);
+				translate([52,-1,-2]) color("gray") cylinder(h=LayerThickness,d=10);
+				translate([-52,-1,-2]) color("white") cylinder(h=LayerThickness,d=10);
 			}
-			translate([0,10,0]) ZipTieHoleSlot();
-			translate([-99,10,0]) ZipTieHoleSlot();
+			translate([0,11,0]) ZipTieHoleSlot();
+			translate([-98,10,0]) ZipTieHoleSlot();
+			translate([0,25,0]) ZipTieHoleSlot();
+			translate([-98,25,0]) ZipTieHoleSlot();
 		}
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module MountingHoles(Screw=screw4) {
+	translate([0,-10,-5])color("red") cylinder(h=15,d=Screw);
+	translate([40,-10,-5]) color("blue") cylinder(h=15,d=Screw);
+	translate([0,-10,1.5])color("blue") cylinder(h=5,d=screw4hd);
+	translate([40,-10,1.5]) color("red") cylinder(h=5,d=screw4hd);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////

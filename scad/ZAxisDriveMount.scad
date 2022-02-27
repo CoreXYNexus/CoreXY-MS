@@ -113,6 +113,9 @@ GT2ClampThickness = 6.1;			// thickness of the clamping part on the 40 tooth GT2
 idler_spacer_Thickness = GT2ClampThickness + 0.9;	// thickness of idler bearing spacer
 ThrustWasherThickness=4;
 LayerThickness=0.3;
+BearingHoleClearance=19;
+StepperBossDiameter=23; // 22 plus some clearance
+BrassInsertLength=6; // for M3 insert
 ////////////////////////////////////////////////////////////////////////////
 
 //DirectDriveZAxis(3,1,1,1,5,8); 	// Z axis for bed leveling
@@ -125,6 +128,34 @@ LayerThickness=0.3;
 //translate([50,20,0]) ZAxisMountPlates(3); // arg is quanity*2
 //ZMotorThrustSpacer(3,7.5-ThrustWasherThickness); // to use M5 thrust brearings under the coupler
 ZDirectBeltDrive(1);
+//Collet(2);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Collet(Qty=1) {
+	%translate([0,7.5,-5]) rotate([90,0,0]) cyl(h=BrassInsertLength,d=3); // show length of brass insert
+	for(x=[0:Qty-1]) {
+		translate([0,x*28,0]) {
+			difference() {
+				union() {
+					translate([0,0,7]) color("cyan") cyl(h=Height608+2,d=screw8*2,rounding=2); // spacer
+					color("blue") cyl(h=Yes3mmInsert(Use3mmInsert)*2,d=screw8*2.7,rounding=2); // holder
+				}
+				color("red") cyl(h=30,d=screw8+0.3); // center hole
+				ColletScrews();
+			}
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module ColletScrews(Screw=Yes3mmInsert(Use3mmInsert)) {
+	translate([0,-7,0]) rotate([90,0,0]) color("white") cyl(h=20,d=Screw);
+	translate([7,0,0]) rotate([90,0,90]) color("green") cyl(h=20,d=Screw);
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module ZDirectBeltDrive(Qty=1) {
@@ -135,7 +166,7 @@ module ZDirectBeltDrive(Qty=1) {
 				translate([23,27,-2.5]) color("red") cuboid([BWidth+30,BWidth+3,Thickness],rounding=2,p1=[0,0]);
 				translate([23,26,-2.5]) color("green") cuboid([85,Thickness,40.5],rounding=2,p1=[0,0]);
 			}	
-			translate([76,60.5,-5]) color("white") NEMA17_parallel_holes(10,9);
+			translate([76,60.5,-5]) color("white") NEMA17_parallel_holes(10,9,StepperBossDiameter);
 			translate([45,33.5-Thickness,19]) rotate([90,0,0]) color("red")
 				cyl(l=Thickness+0.5, r=13, rounding1=-2, rounding2=-2);
 			translate([85,33.5-Thickness,19]) rotate([90,0,0]) color("red")
@@ -156,6 +187,7 @@ module ZDirectBeltDrive(Qty=1) {
 		translate([-BWidth+163-Thickness,-(BLength-85),32]) rotate([-30,0,0]) color("white") // support
 			cuboid([Thickness,BWidth+12,7],rounding=2,p1=[0,0]);
 		translate([-27.5,81.5,-2.5]) color("khaki") cuboid([135.4,Thickness,10],rounding=2,p1=[0,0]); // short wall
+		translate([-42,50,0]) Collet(1);
 	}
 }
 
@@ -488,6 +520,7 @@ module BearingMount(Spc=0,SpcThk=idler_spacer_Thickness,Idler=1,Makerslide=1,Sup
 			translate([0,-(ShaftOffset-BaseOffset),0]) color("navy") cuboid([BWidth,BLength,Thickness],rounding=1);
 			translate([0,-ShaftOffset,-6]) color("red") cylinder(h=10,d=Diameter608);
 			NotchForMakerSlide();
+		BearingHoldDown(Screw=screw3t);
 		}
 		translate([0,-ShaftOffset,0]) BearingHole();
 	}
@@ -498,13 +531,11 @@ module BearingMount(Spc=0,SpcThk=idler_spacer_Thickness,Idler=1,Makerslide=1,Sup
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module BearingHole() {	// holds the bearing
-	translate([0,0,-6.5]) difference() {
-		translate([0,0,Thickness/3-1]) color("red") cylinder(h=Height608+1,d=Diameter608+10);
-		translate([0,0,0]) color("red") cylinder(h=15,d=Diameter608);
-	}
 	difference() {
-		translate([0,0,-Height608-0.3]) color("white") cyl(h=Height608-2,d=Diameter608+10,rounding1=1);
-		translate([0,0,-Height608]) color("black") cyl(h=15,d=NutClearance);
+		translate([0,0,-Height608+3]) color("white") cyl(h=Height608+4,d1=Diameter608+5,d2=Diameter608+14.5,rounding1=2);
+		translate([0,0,-Height608]) color("black") cyl(h=15,d=BearingHoleClearance);
+		translate([0,0,-Height608+2]) color("gray") cylinder(h=15,d=Diameter608);
+		translate([0,11,0]) BearingHoldDown(Screw=screw3t);
 	}
 	BearingHole_support();
 }
@@ -512,9 +543,15 @@ module BearingHole() {	// holds the bearing
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module BearingHole_support() { // print support for bearing hole
-	translate([0,0,-5.05]) color("pink") cylinder(h=LayerThickness,d=Diameter608+5);
+	translate([0,0,-5.3]) color("pink") cylinder(h=LayerThickness,d=Diameter608+5);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BearingHoldDown(Screw=screw3t) { // uses two M3 screws and M3 washers
+	translate([0,-24,0]) color("green") rotate([0,0,0]) cyl(h=50,d=Screw);
+	translate([0,2.5,0]) color("cyan") rotate([0,0,0]) cyl(h=50,d=Screw);
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module BeltMotor(idler=0,HSlot=1) { // motor mount for belt drive
