@@ -120,8 +120,8 @@ module XEndWalls(Bottom=0,NotDoEndStop=0,Right=0) {	// the walls that hold the b
 						translate([19,38.5,BeltHeight+F625ZDiameter-1]) color("green")
 							cuboid([Width,20,5],rounding=2);  // X endstop strike riser
 						%translate([19,36,BeltHeight+F625ZDiameter+10]) cuboid([5,15,17]);
-						translate([19,49,BeltHeight+F625ZDiameter+7.5]) color("pink")
-							cuboid([Width,10,22],rounding=2);  // X endstop strike
+						translate([19,50.5,BeltHeight+F625ZDiameter+7.5]) color("pink")
+							cuboid([Width,14,22],rounding=2);  // X endstop strike
 					}
 					translate([F625ZDiameter/2+BeltOffset+17,45,OuterBeltHeight+F625ZDiameter/2+OuterBeltAdjust])
 						rotate([90,0,0]) color("purple")cylinder(h=15,d=screw5hd);

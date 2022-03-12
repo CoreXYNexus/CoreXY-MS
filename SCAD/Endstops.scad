@@ -44,10 +44,10 @@ LayerThickness=0.3;
 
 //All(1,1,1);
 //XStopMount(22,10,8,Yes3mmInsert(Use3mmInsert,LargeInsert),screw5,8);	// TEMCo CN0097
-//XStopMount(10,0,0,Yes2mmInsert(Use2mmInsert),screw5,4); // black microswitch
+XStopMount(10,0,0,Yes2mmInsert(Use2mmInsert),screw5,4); // black microswitch
 //YStopMount(22,10,8,Yes3mmInsert(Use3mmInsert,LargeInsert),screw4,8);	// TEMCo CN0097
 //StopMount(10,0,0,Yes2mmInsert(Use2mmInsert),Yes5mmInsert(Use5mmInsert),4); // black microswitch
-YStopMountMS(10,0,0,Yes2mmInsert(Use2mmInsert),Yes5mmInsert(Use5mmInsert),4); // black microswitch
+//YStopMountMS(10,0,0,Yes2mmInsert(Use2mmInsert),Yes5mmInsert(Use5mmInsert),4); // black microswitch
 //StrikeY(screw5);
 //StrikeX(screw5,0); // second arg: 1 for exoslide
 
@@ -131,8 +131,8 @@ module EndstopMount(Screw=screw5) {
 		color("cyan") cuboid([13,HolderWidth,Switch_thk2],rounding=2,p1=[0,0]);
 		translate([8,6,-1]) cylinder(h=Switch_thk*2,d=Screw);
 		color("blue") hull() {
-			translate([8,28,-1]) cylinder(h=Switch_thk*2,d=Screw);
-			translate([8,25,-1]) cylinder(h=Switch_thk*2,d=Screw);
+			translate([8,26,-1]) cylinder(h=Switch_thk*2,d=Screw);
+			translate([8,23,-1]) cylinder(h=Switch_thk*2,d=Screw);
 		}
 	}
 }
