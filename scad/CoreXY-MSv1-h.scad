@@ -8,7 +8,6 @@
 // 8/19/18	- Created to have only one file for all the common variables
 // 1/4/22	- BOSL2
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-include <inc/configuration.scad> // http://github.com/prusajr/PrusaMendel, which also uses functions.scad & metric.scad
 include <inc/screwsizes.scad>
 include <bosl2/std.scad> // https://github.com/revarbat/BOSL2
 use <inc/Nema17.scad>	// https://github.com/mtu-most/most-scad-libraries

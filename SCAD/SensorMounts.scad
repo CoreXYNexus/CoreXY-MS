@@ -76,8 +76,16 @@ StepperHoleOffset=31;
 //IRAdapter(0,0);
 //IRAdapterAero(0);
 //Spacer(3,7);
-BMGBLTMount(7); 	// uses 50mm M3 screws to mount to extruder
+//BMGBLTMount(7); 	// uses 50mm M3 screws to mount to extruder
 //BMGIRMount(20);	// uses 50mm M3 screws to mount to extruder
+BMGBLTPrint(7); // uses 50mm M3 screws to mount to extruder
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module BMGBLTPrint(Offset=5) {
+	rotate([0,-90,0]) BMGBLTMount(Offset);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 

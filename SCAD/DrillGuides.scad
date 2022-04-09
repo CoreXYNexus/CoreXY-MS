@@ -44,12 +44,6 @@ BedDrillClips(4);	// used to hold the bed onto the 2020 to drill the adjusting m
 					// M3 tap the 2020, drill the bed holes 3mm and countersink
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//module cubeX(Size,Round=0) {
-//	cuboid(Size,rounding=Round,p1=[0,0]);
-//}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 module BedDrillClips(Quanity=1) { // used to hold bed onto the 2020 to drill the adjusting mount holes
 	for(x=[0:Quanity-1]) {
 		translate([x*23,0,0]) difference() {
