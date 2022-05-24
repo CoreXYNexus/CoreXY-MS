@@ -25,22 +25,76 @@ LEDStripWidth=8.5;
 LayerThickness=0.35;
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-PlainLEDStripHolder(1,0);
+PlainLEDStripHolder1(1,0,0);	 // one strip
+//PlainLEDStripHolder2(1,-10,0); // two strips
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PlainLEDStripHolder(DoTabs=1,ShiftShortLEDTab=0) {
+module PlainLEDStripHolder1(DoTabs=1,ShiftMount=0,ShiftShortLEDTab=0) {
+	difference() {
+		union() {
+			hull() {
+				translate([0,-8,0]) color("cyan") cuboid([110,18,4],rounding=2);
+				translate([0,-1,3]) cuboid([110,4,4],rounding=2);
+			}
+			translate([ShiftMount,5,0]) {
+				difference() {
+					union() {
+						translate([0,0,0]) color("green") cuboid([40,15,4],rounding=2);
+						translate([20,6,-1.8255]) color("purple") cyl(h=LayerThickness,d=10);
+						translate([-20,6,-1.8255]) color("khaki") cyl(h=LayerThickness,d=10);
+					}
+					translate([-31,10,0]) MountingHoles(screw4);
+				}
+			}
+		}
+		translate([0,25,0]) {
+			ZipTieHoleSlot();
+			translate([-50,0,0]) ZipTieHoleSlot();
+			translate([-98,0,0]) ZipTieHoleSlot();
+		}
+	}
+	if(ShiftShortLEDTab != 0) {
+		translate([ShiftShortLEDTab,0,0]) difference() {
+			union() {
+				translate([0,-49,0]) color("blue") cuboid([20,40,4],rounding=2);
+				if(DoTabs) {
+					translate([-9,-68,-2]) color("gray") cylinder(h=LayerThickness,d=10);
+					translate([9,-68,-2]) color("white") cylinder(h=LayerThickness,d=10);
+				}
+			}
+			translate([-34,-85,0]) rotate([0,0,90]) ZipTieHoleSlot();
+			translate([-34,-112,0]) rotate([0,0,90]) ZipTieHoleSlot();
+		}
+	}
+	if(DoTabs) {
+		difference() {
+			union() {
+				translate([52,-15,-2]) color("red") cylinder(h=LayerThickness,d=10);
+				translate([-52,-15,-2]) color("blue") cylinder(h=LayerThickness,d=10);
+				translate([52,-1,-2]) color("gray") cylinder(h=LayerThickness,d=10);
+				translate([-52,-1,-2]) color("white") cylinder(h=LayerThickness,d=10);
+			}
+			translate([0,25,0]) ZipTieHoleSlot();
+			translate([-98,25,0]) ZipTieHoleSlot();
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module PlainLEDStripHolder2(DoTabs=1,ShiftMount=0,ShiftShortLEDTab=0) {
 	difference() {
 		union() {
 			translate([0,-15,0]) color("cyan") cuboid([110,33,4],rounding=2);
-			translate([-10,5,0]) {
+			translate([ShiftMount,5,0]) {
 				difference() {
 					union() {
-						translate([0,0,0]) color("green") cuboid([55,15,4],rounding=2);
-						translate([27,6,-1.8255]) color("purple") cyl(h=LayerThickness,d=10);
-						translate([-27,6,-1.8255]) color("khaki") cyl(h=LayerThickness,d=10);
+						translate([0,0,0]) color("green") cuboid([40,15,4],rounding=2);
+						translate([20,6,-1.8255]) color("purple") cyl(h=LayerThickness,d=10);
+						translate([-20,6,-1.8255]) color("khaki") cyl(h=LayerThickness,d=10);
 					}
-					translate([-20,10,0]) MountingHoles(screw4);
+					translate([-31,10,0]) MountingHoles(screw4);
 				}
 			}
 		}
@@ -89,6 +143,10 @@ module MountingHoles(Screw=screw4) {
 	translate([40,-10,-5]) color("blue") cylinder(h=15,d=Screw);
 	translate([0,-10,1.5])color("blue") cylinder(h=5,d=screw4hd);
 	translate([40,-10,1.5]) color("red") cylinder(h=5,d=screw4hd);
+	translate([60,-10,-5])color("pink") cylinder(h=15,d=Screw);
+	translate([20,-10,-5]) color("khaki") cylinder(h=15,d=Screw);
+	translate([60,-10,1.5])color("lightblue") cylinder(h=5,d=screw4hd);
+	translate([20,-10,1.5]) color("darkred") cylinder(h=5,d=screw4hd);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////

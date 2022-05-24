@@ -2,7 +2,7 @@
 // WireChain.scad
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // create 7/5/2016
-// last update 3/19/22
+// last update 5/21/22
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,6 +18,7 @@
 // 1/6/22	- BOSL2
 // 2/17/22	- Default only makes the one for the X axis
 // 3/15/22	- Added enstop mount to XMountWCSingle(); from endstops.scad
+// 5/21/22	- Adjusted X endstop position and widened mounting a bit
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Wire chain is set to uses M3 screws to attach ends
 // X uses one https://www.amazon.com/gp/product/B07QYM88MQ
@@ -63,12 +64,12 @@ module XMountWCSingle(Screw=Yes4mmInsert(Use4mmInsert),DoTabSupport=1) {
 				translate([2.5,42,35/2]) cuboid([6,Thickness+2,35],rounding=3); // wirechain mount
 			}
 			color("cyan") cuboid([Thickness+1,45,35],rounding=3,p1=[0,0]); // mount to xcarriage
-			translate([4,25,7/2]) color("gray") cuboid([6,30,7],rounding=3);
+			translate([4,22.5,8/2]) color("gray") cuboid([6,44,8],rounding=2.5); // endstop switch mounting
 		}
 		translate([43,50,8]) rotate([90,0,0]) WCSingleHoles(Screw);
 		translate([2,11,27]) rotate([0,90,0]) XMountHoles(screw5,1);
 		translate([20,55,25]) color("blue") rotate([90,0,0]) cylinder(h=20,d=screw5); // ziptie hole
-		translate([-1,20,-8.5]) rotate([0,90,0]) EndstopMounting();
+		translate([-1,13,-8.5]) rotate([0,90,0]) EndstopMounting();
 	}
 	if(DoTabSupport) {
 		translate([3,3,0]) color("green") cylinder(h=LayerThickness,d=20); // print support TabSupport

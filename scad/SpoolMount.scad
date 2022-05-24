@@ -2,7 +2,7 @@
 // SpoolMount.scad - mount a spool onto 2020
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created: 1/27/2019
-// last modified: 1/22/22
+// last modified: 5/12/22
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,6 +11,7 @@
 // 11/27/20	- Added spacers for the mounting rod for the sppol, since it's longer than needed for my current spools
 // 1/4/22	- BOSL2
 // 1/22/22	- Better variable names
+// 5/12/22	- Change mount screw holes to top
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // uses http://www.thingiverse.com/thing:1647748 to hold the spool
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +48,10 @@ module SpoolHolder(Length=60,MountWidth=28) {
 
 module RodMount(MountWidth=28) {
 	difference() {
-		translate([0,0,MountWidth]) rotate([90,0,0]) color("cyan") cyl(h=MountWidth,d=30,rounding=2);
+		color("cyan") hull() {
+			translate([0,0,MountWidth]) rotate([90,0,0]) color("cyan") cyl(h=MountWidth,d=30,rounding=2);
+			translate([0,0,MountWidth-10]) rotate([90,0,0]) color("cyan") cyl(h=MountWidth,d=30,rounding=2);
+		}
 		SpoolRodHole(screw8,MountWidth);
 		translate([0,0,10]) Slot2020(MountWidth);
 	}
@@ -66,16 +70,17 @@ module ExtrusionMount(Length=60,MountWidth=28) {
 	difference() {
 		color("lightgrey") cuboid([Length,MountWidth,MountWidth],rounding=2); 
 		Slot2020();
-		SpoolRodHole();
-		translate([-20,0,0]) MountHoles2020();
+		translate([-21,0,15]) MountHoles2020();
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module MountHoles2020(Screw=screw5,MountWidth=28) {
-	color("plum") rotate([90,0,0]) cyl(h=MountWidth+10,d=Screw);
-	translate([40,0,0]) color("yellow") rotate([90,0,0]) cyl(h=MountWidth+10,d=Screw);
+module MountHoles2020(Screw=screw5,ScrewHD=screw5hd) {
+	color("plum") cyl(h=20,d=Screw);
+	translate([42,0,0]) color("yellow") cyl(h=20,d=Screw);
+	color("yellow") cyl(h=5,d=ScrewHD);
+	translate([42,0,0]) color("plum") cyl(h=5,d=ScrewHD);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

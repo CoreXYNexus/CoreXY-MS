@@ -2,7 +2,7 @@
 // CoreXY-Z-Axis-Drive.scad --  z-axis motor mount for corexy makerslide
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 3/2/2013
-// Last Update: 12/30/21
+// Last Update: 5/21/22
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,8 @@
 // 12/15/20	- Redid the braces on the motor_mount() and added countersinks for M5 screws
 // 4/8/21	- BeltdriveMotorMount() is a separate printable item
 // 4/14/21	- Added DirectBeltDrive() where the motor drive the leadscrew via a belt and it mounts with the leadscrew
-// 12/26/21	- Direct belt drive for 20:40 with 2GT-200 belt; renamed modules and vars
+// 12/26/21	- Direct belt drive for 20:40 with 2GT-200 belt; renamed modules and vars, add thrust plate above 608
+// 5/21/22	- Tweaked ZDirectBeltDrive()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <inc/brassinserts.scad>
@@ -47,6 +48,8 @@ use <inc/nema17.scad>	// https://github.com/mtu-most/most-scad-libraries
 include <bosl2/std.scad>
 use <ZMotorLeadscrewCoupler.scad>
 $fn=100;
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+/*** Print with PETG or better ***/
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // Multi-motor z for bed leveling.  Makerslide carriage mount: two 525z bearings, M5 screw & nut,
 // washer in between, four m5 screws.  The center pivot uses two 625z bearings, three M5 screws & nuts.
@@ -60,8 +63,8 @@ $fn=100;
 // Uses M3x6 screws & washers for the stepper motor
 // Uses M5x6 screws & t-nuts for mounting to makerslide & extrusion and uses a #### belt
 //-----------------------------------------------------------------------------------------------------
-// For the belt version, you move the stepper motor mount to tension belt
-// Uses one 40 tooth GT2 belt pulley, 1 608 bearing, 2 washers, one LockRing
+// For the single belt version, you move the stepper motor mount to tension belt
+// Uses one 40 tooth GT2 belt pulley, 1 608 bearing, 2 washers, one Collet
 // on each z axis leadscrew.  Each bearing mount uses two F625Z, M5x30, M5 nut on the side
 // that makes the belt wrap around the most on the pulley (it'll be the side the stepper motor is on)
 // Idler uses a total of 4 F625Z bearings, 2 M5 washers, 2 M5 screws & nuts, 2 printed spacers
@@ -70,65 +73,83 @@ $fn=100;
 // Washers used are 1/32" (~0.75mm) thick precision washers
 // Motor uses a 20 tooth GT2 pulley (2:1 ratio to the leadscrews)
 // After printing belt version, clean out the support in the screw & bearing holes
-// If the motor gets hot, then the mount needs to printed with PETG or better
+// ZDirectBeltDrive() each uses a 2GT-200 belt, 608 and M8x16x5 thrust bearings
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 Use3mmInsert=1;
 Use5mmInsert=1;
 //-----------------------------------------------------------------------------------------------------------
-ShaftOffset = 11;		// adjust center of stepper motor or bearing mount
-CheckMotorPosition = false; // something to help set the motor postion
-BaseOffset = 5.5;		// shift base
-BWidth = 55;			// base width
-BLength = 48.5 + ShaftOffset;	// base length
-Thickness = 5; 			// thickness of everything
-MHeight = 40;			// mount wall height
-MSNotchDepth = 2.5;	// depth of the notch for makerslide
-MSNotchOffset = 21;	// where to put the notch
+ShaftOffset = 11;						// adjust center of stepper motor or bearing mount
+CheckMotorPosition = false; 			// something to help set the motor postion
+BaseOffset = 5.5;						// shift base
+BWidth = 55;							// base width
+BLength = 48.5 + ShaftOffset;			// base length
+Thickness = 5; 							// thickness of everything
+MHeight = 40;							// mount wall height
+MSNotchDepth = 2.5;						// depth of the notch for makerslide
+MSNotchOffset = 21;						// where to put the notch
 //-----------------------------------------------------------------------
-//HoleOffset = 140;			// mounting holes on makerslide carriage plate
-OutsideD = 155;		// overall length
-ThicknessZ = 15;		// actually the width
-Shift1 = 4;				// amount to shift mounting columns up/down
-Raise = 30 + Shift1;	// zrod distance from the carriage plate
-Clearance = 0.7;		// allow threaded rod to slide without problem
-ZRodTDiamater = 5 + Clearance;	// z rod thread size
-ZNutDiameter = 9.5;			// diameter of z rod nut (point to point + a little)
+OutsideD = 155;							// overall length
+ThicknessZ = 15;						// actually the width
+Shift1 = 4;								// amount to shift mounting columns up/down
+Raise = 30 + Shift1;					// zrod distance from the carriage plate
+Clearance = 0.7;						// allow threaded rod to slide without problem
+ZRodTDiamater = 5 + Clearance;			// z rod thread size
+ZNutDiameter = 9.5;						// diameter of z rod nut (point to point + a little)
 ZHeight = ZRodTDiamater +5 - Clearance;	// height is for zrod nut
-ZShift = ShaftOffset+7;			// move the zrod hole
-ZAdjust = 9.5;			// move inner cylinder hull to make connection to bar
-ZNutDepth = 3.5; 		// how deep to make the nut hole
-// Sizes below are for a TR8 flanged nut
-//FlangeScrew = 4;		// screw hole
-FlangeNutDiameter = 10.7;		// threaded section outside diameter
-FlangeNutOutsideDiameter = 22.5;	// flange outside diameter
-FlangeNutScrewOffset	= 16.5;		// flange nut distance of opposite screw holes
-TR8Diameter = 8+Clearance;	// diameter of TR8
+ZShift = ShaftOffset+7;					// move the zrod hole
+ZAdjust = 9.5;							// move inner cylinder hull to make connection to bar
+ZNutDepth = 3.5; 						// how deep to make the nut hole
+FlangeNutDiameter = 10.7;				// threaded section outside diameter
+FlangeNutOutsideDiameter = 22.5;		// flange outside diameter
+FlangeNutScrewOffset	= 16.5;			// flange nut distance of opposite screw holes
+TR8Diameter = 8+Clearance;				// diameter of TR8
 //-----------------------------------------------------------------------
-Diameter608 = 22+Clearance;		// outside diameter of a 608
-Height608 = 7; 					// thickness of a 608
-NutClearance = 17;			// Clearance for a 8mm nut
-DiameterF625Z = 18;				// f625z flange diameter
-ShiftBeltMotor = 0; 				// move belt motor mount up/down (- shifts it up)
-GT2ClampThickness = 6.1;			// thickness of the clamping part on the 40 tooth GT2 pulley
+Diameter608 = 22+Clearance;				// outside diameter of a 608
+Height608 = 7; 							// thickness of a 608
+DiameterF625Z = 18;						// f625z flange diameter
+ShiftBeltMotor = 0; 					// move belt motor mount up/down (- shifts it up)
+GT2ClampThickness = 6.1;				// thickness of the clamping part on the 40 tooth GT2 pulley
 idler_spacer_Thickness = GT2ClampThickness + 0.9;	// thickness of idler bearing spacer
 ThrustWasherThickness=4;
 LayerThickness=0.3;
 BearingHoleClearance=19;
-StepperBossDiameter=23; // 22 plus some clearance
-BrassInsertLength=6; // for M3 insert
+StepperBossDiameter=23;					// 22 plus some clearance
+BrassInsertLength=6;					// for M3 insert
 ////////////////////////////////////////////////////////////////////////////
 
 //DirectDriveZAxis(3,1,1,1,5,8); 	// Z axis for bed leveling
 			// 1st: Quantiy; 2nd: plates; 3rd: printable couplers; 4th ZNut ;5th: motor shaft diameter; 6th: leadscrew diameter
 //ReductionMotorMount(1);
 //BeltDrivenZAxis(3); // arg is quanity, includes drive motor mount
-//BeltDrivenZAxisMotorMount(1,0);
+//BeltDriveZAxisMotorMount(1,0);
 // also need the following with BeltDrivenZAxis(), since a 200x200 build plate isn't big enough
 //ZNutBracket(3,2.1,1); // arg is quanity, arg 2 is offset adjust; arg 3 to add tabs for printing
 //translate([50,20,0]) ZAxisMountPlates(3); // arg is quanity*2
 //ZMotorThrustSpacer(3,7.5-ThrustWasherThickness); // to use M5 thrust brearings under the coupler
 ZDirectBeltDrive(1);
 //Collet(2);
+//ThrustPlate(3,3); // minimum thickness is 3
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module ThrustPlate(Qty=1,Thickness=3) {
+	if(Thickness>=3) for(x=[0:Qty-1]) {
+		translate([x*36,0,0]) {
+			difference() {
+				color("cyan") cyl(h=Thickness,d=Diameter608*1.55,rounding=1.5);	// thrust plate
+				color("red") cyl(h=10,d=8+Clearance);							// zrod clearance
+				translate([0,11,0]) BearingHoldDown(screw3);			// screw holes for holding it down
+				translate([0,-10.5,26]) rotate([0,0,180]) BearingHoldDown(screw3hd); // screw hole countersinks
+				translate([0,0,-Thickness/2+0.45]) color("blue")
+					cyl(h=1,d1=12,d2=8+Clearance); // inner bearing/zrod clearance
+			}
+			difference() { // thrust washer dust shield
+				translate([0,0,2.5]) color("gold") cyl(h=Thickness+5,d=19,rounding=2);
+				translate([0,0,0]) color("green") cyl(h=Thickness+20,d=16.5);
+			}
+		}
+	} else echo("Too thin");
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -152,7 +173,7 @@ module Collet(Qty=1) {
 
 module ColletScrews(Screw=Yes3mmInsert(Use3mmInsert)) {
 	translate([0,-7,0]) rotate([90,0,0]) color("white") cyl(h=20,d=Screw);
-	translate([7,0,0]) rotate([90,0,90]) color("green") cyl(h=20,d=Screw);
+	//translate([7,0,0]) rotate([90,0,90]) color("green") cyl(h=20,d=Screw);
 }
 
 
@@ -164,30 +185,41 @@ module ZDirectBeltDrive(Qty=1) {
 			union() {
 				BeltDrivenZAxis(1,0); // arg is quanity, includes drive motor mount
 				translate([23,27,-2.5]) color("red") cuboid([BWidth+30,BWidth+3,Thickness],rounding=2,p1=[0,0]);
-				translate([23,26,-2.5]) color("green") cuboid([85,Thickness,40.5],rounding=2,p1=[0,0]);
+				translate([23,25.5,-2.5]) color("green") cuboid([85,Thickness,40.5],rounding=2,p1=[0,0]);
 			}	
-			translate([76,60.5,-5]) color("white") NEMA17_parallel_holes(10,9,StepperBossDiameter);
-			translate([45,33.5-Thickness,19]) rotate([90,0,0]) color("red")
+			translate([65,60.5,-Thickness]) color("white") NEMA17_parallel_holes(Thickness*2,35,StepperBossDiameter);
+			translate([45,32.8-Thickness,19]) rotate([90,0,0]) color("red")
 				cyl(l=Thickness+0.5, r=13, rounding1=-2, rounding2=-2);
-			translate([85,33.5-Thickness,19]) rotate([90,0,0]) color("red")
+			translate([85,32.8-Thickness,19]) rotate([90,0,0]) color("blue")
 				cyl(l=Thickness+0.5, r=13, rounding1=-2, rounding2=-2);
-			translate([40,61,0]) color("blue")
-				cyl(h=Thickness+0.5, r=10, rounding1=-2, rounding2=-2);
 		}
-		difference() {
-			translate([-BWidth+33-Thickness,-(BLength-85),32]) rotate([-30,0,0]) color("gray") // support
-				cuboid([Thickness,BWidth+10,7],rounding=2,p1=[0,0]);
+		difference() { // support
+			color("gray") hull() {
+				translate([-BWidth+32.5-Thickness,-(BLength-85),31])
+					cuboid([Thickness,5,7],rounding=2,p1=[0,0]);
+				translate([-BWidth+32.5-Thickness,-(BLength-141),0])
+					cuboid([Thickness,5,7],rounding=2,p1=[0,0]);
+			}
 			translate([0,-7,40]) NotchForMakerSlide();
 		}
-		difference() {
-			translate([-BWidth+80-Thickness,-(BLength-85),32]) rotate([-30,0,0]) color("lightgray") // support
-				cuboid([Thickness,BWidth+12,7],rounding=2,p1=[0,0]);
+		difference() { // support
+			translate([46,0,0]) color("lightgray") hull() {
+				translate([-BWidth+33-Thickness,-(BLength-85),31])
+					cuboid([Thickness,5,7],rounding=2,p1=[0,0]);
+				translate([-BWidth+33-Thickness,-(BLength-141),0])
+					cuboid([Thickness,5,7],rounding=2,p1=[0,0]);
+			}
 			translate([0,-7,40]) NotchForMakerSlide();
 		}
-		translate([-BWidth+163-Thickness,-(BLength-85),32]) rotate([-30,0,0]) color("white") // support
-			cuboid([Thickness,BWidth+12,7],rounding=2,p1=[0,0]);
-		translate([-27.5,81.5,-2.5]) color("khaki") cuboid([135.4,Thickness,10],rounding=2,p1=[0,0]); // short wall
-		translate([-42,50,0]) Collet(1);
+		translate([130,0,0]) color("purple") hull() { // support
+			translate([-BWidth+33-Thickness,-(BLength-85),31])
+				cuboid([Thickness,5,7],rounding=2,p1=[0,0]);
+			translate([-BWidth+33-Thickness,-(BLength-141),0])
+				cuboid([Thickness,5,7],rounding=2,p1=[0,0]);
+		}
+		translate([-27.5,81.5,-2.5]) color("khaki") cuboid([135.5,Thickness,10],rounding=2,p1=[0,0]); // short wall
+		translate([-42,50,2.1]) Collet(1);
+		translate([130,50,-1]) ThrustPlate(1,3);
 	}
 }
 
@@ -218,7 +250,6 @@ module DirectDriveZAxis(Quanity=1,Plates=0,ZNut=0,Coupler=1,Motorshaft=5,LeadScr
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module BeltDrivenZAxis(Quanity=1,Support=1) { // arg is quanity
-	//if($preview) %translate([-40,-100,-4.5]) cube([200,200,2]);
 	for(a=[0:Quanity-1]) {
 		translate([a*60,50,0]) BearingMount(0,0,0,1,Support);
 	}
@@ -226,8 +257,7 @@ module BeltDrivenZAxis(Quanity=1,Support=1) { // arg is quanity
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module BeltDrivenZAxisMotorMount(Quanity=1,Idler=1) { // arg is quanity
-	//if($preview) %translate([-60,-50,-4.5]) cube([200,200,2]);
+module BeltDriveZAxisMotorMount(Quanity=1,Idler=1) { // arg is quanity
 	for(a=[0:Quanity-1]) {
 		translate([a*60,50,0]) BeltStepperDriveMountZAxis(Idler);
 	}
@@ -247,34 +277,22 @@ module BeltDrive(Quanity=1,ZNut=1) {
 
 module BeltStepperDriveMountZAxis(Idler=1) {
 	translate([-30,-30,0]) BeltMotor(Idler);	// one stepper motor mount with idler
-	//translate([-30,-20,-2.5]) LockRing();	// something to hold leadscrew in bearing
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module MotorMount(makerslide=0) { // motor mount
-	rotate([180,0,0]) {				// added a thrust bearing?
-		NEMAPlate(,makerslide,1);
-		mount(makerslide);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module BeltMount(makerslide=0) { // motor mount
 	rotate([180,0,0]) {
-		NEMAPlate(0,1);
-		mount(0);
-		translate([50,0,2.5]) rotate([0,180,180]) BearingMount(0,0,0,0);
-
+		NEMAPlate(,makerslide,1);
+		Mount2020(makerslide);
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-module Mount(makerslide=0,Support=1) {
+module Mount2020(makerslide=0,Support=1) {
 	difference() {
-		translate([0,22,-18]) color("cyan") cuboid([BWidth,Thickness,MHeight],rounding=1);
+		translate([0,22,-18]) color("cyan") cuboid([BWidth,Thickness,MHeight],rounding=2);
 		ScrewMounting(Screw=screw5);
 		if(makerslide) NotchForMakerSlide();
 	}
@@ -283,10 +301,10 @@ module Mount(makerslide=0,Support=1) {
 		translate([-BWidth+Thickness,0,0]) SideSupport(Support); 
 	}
 	if(makerslide) { // inside support at ns notches
-		translate([-5+MSNotchOffset,20-MSNotchDepth,-MHeight+3]) color("blue")
-			cuboid([10,Thickness-1,MHeight-2],rounding=1,p1=[0,0]);
-		translate([-48+MSNotchOffset,20-MSNotchDepth,-MHeight+3]) color("red")
-			cuboid([10,Thickness-1,MHeight-2],rounding=1,p1=[0,0]);
+		translate([-5.5+MSNotchOffset,20-MSNotchDepth,-MHeight+3]) color("blue")
+			cuboid([10,Thickness-1,MHeight-2],rounding=2,p1=[0,0]);
+		translate([-47.5+MSNotchOffset,20-MSNotchDepth,-MHeight+3]) color("red")
+			cuboid([10,Thickness-1,MHeight-2],rounding=2,p1=[0,0]);
 	}
 }
 
@@ -298,12 +316,10 @@ module ScrewMounting(Screw=screw5) {
 	translate([10,30,-30]) rotate([90,0,0]) color("white") cylinder(h=20,d=Screw); // bottom screw hole
 	translate([-10,30,-10]) rotate([90,0,0]) color("blue") cylinder(h=20,d=Screw);	// top screw hole
 	translate([-10,30,-30]) rotate([90,0,0]) color("grey") cylinder(h=20,d=Screw);	// bottom screw hole
-	if(Screw==screw5) {
-		translate([10,20,-10]) rotate([90,0,0]) color("gray") cylinder(h=5,d=screw5hd); // top screw hole
-		translate([10,20,-30]) rotate([90,0,0]) color("blue") cylinder(h=20,d=screw5hd); // bottom screw hole
-		translate([-10,20,-10]) rotate([90,0,0]) color("white") cylinder(h=20,d=screw5hd);	// top screw hole
-		translate([-10,20,-30]) rotate([90,0,0]) color("red") cylinder(h=20,d=screw5hd);	// bottom screw hole
-	}
+	translate([10,20,-10]) rotate([90,0,0]) color("gray") cylinder(h=5,d=screw5hd); // top screw hole
+	translate([10,20,-30]) rotate([90,0,0]) color("blue") cylinder(h=20,d=screw5hd); // bottom screw hole
+	translate([-10,20,-10]) rotate([90,0,0]) color("white") cylinder(h=20,d=screw5hd);	// top screw hole
+	translate([-10,20,-30]) rotate([90,0,0]) color("red") cylinder(h=20,d=screw5hd);	// bottom screw hole
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -312,6 +328,13 @@ module NotchForMakerSlide() {
 	translate([-8+MSNotchOffset,31-MSNotchDepth,5]) rotate([0,90,0]) SingleMakerSlideNotch();
 	translate([-7.5-MSNotchOffset,31-MSNotchDepth,5]) rotate([0,90,0]) SingleMakerSlideNotch();
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+module SingleMakerSlideNotch() {
+	rotate([45,0,0]) color("white") cube([100,10,10]);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
 module SideSupport(MSupport=1,Support=1) {
@@ -325,8 +348,7 @@ module SideSupport(MSupport=1,Support=1) {
 
 ////////////////////////////////////////////////////////////////////////////
 
-module NEMAPlate(makerslide=0,HSlot=0) {
-	echo(HSlot);
+module NEMAPlate(makerslide=1,HSlot=0) {
 	difference() {
 		translate([-27.5,-(ShaftOffset-BaseOffset)-29.5,-1]) color("red")
 			cuboid([BWidth,BLength,Thickness+1],rounding=2,p1=[0,0]);
@@ -337,13 +359,7 @@ module NEMAPlate(makerslide=0,HSlot=0) {
 		if(makerslide) NotchForMakerSlide();
 	}
 	if(CheckMotorPosition) translate([12,24.5,3]) color("black") rotate([90,0,0])
-			cylinder(h=51,d=screw5); // used to help set nema17 position, the 51 is measured off an actual print
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-
-module SingleMakerSlideNotch() {
-	rotate([45,0,0]) color("white") cube([100,10,10]);
+		cylinder(h=51,d=screw5); // used to help set nema17 position, the 51 is measured off an actual print
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -411,8 +427,7 @@ module PlateMountHole(left,screw=screw5) {
 
 module PlateMountHole2(left,screw=screw5) {
 	if(!left) translate([OutsideD/2-20,ThicknessZ/2,-1]) color("blue") cylinder(h=Raise*2,r=screw/2);
-	else
-	translate([OutsideD/2+20,ThicknessZ/2,-1]) color("white") cylinder(h=Raise*2,r=screw/2);
+	else translate([OutsideD/2+20,ThicknessZ/2,-1]) color("white") cylinder(h=Raise*2,r=screw/2);
 }
 
 //////////////////////////////////////////////////////////////////
@@ -454,9 +469,6 @@ module ZHoleSupport(Type,AddOffset=0) { // will it need extra width at the zrod?
 					cylinder(h=ThicknessZ,r = ZRodTDiamater*2.5);
 			}
 		} else {
-			color("pink") //hull() {
-				//	rotate([90,0,0]) cylinder(h=ThicknessZ,r = FlangeNutOutsideDiameter/1.5);
-				//translate([OutsideD/2,ThicknessZ,ZHeight/2-ZShift+ZAdjust+5])
 			union() {
 				translate([OutsideD/2,ThicknessZ-7.5,ZHeight/2-ZShift-AddOffset]) rotate([90,0,0])
 					cyl(h=ThicknessZ,r = FlangeNutOutsideDiameter/1.5,rounding=2);
@@ -512,15 +524,14 @@ module testnut(Type) { 	// a shortened nut section for test fitting of the nut &
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// added a thrust bearing?
-module BearingMount(Spc=0,SpcThk=idler_spacer_Thickness,Idler=1,Makerslide=1,Support=1) { // bearing holder at bottom of z-axis
-	rotate([180,0,0]) {										// didn't bother to make a left/right versions
-		Mount(Makerslide,Support);
+module BearingMount(Spc=0,SpcThk=idler_spacer_Thickness,Idler=1,Makerslide=1,Support=1) { // bearing holder z-axis
+	rotate([180,0,0]) {
+		Mount2020(Makerslide,Support);
 		difference() {
 			translate([0,-(ShaftOffset-BaseOffset),0]) color("navy") cuboid([BWidth,BLength,Thickness],rounding=1);
 			translate([0,-ShaftOffset,-6]) color("red") cylinder(h=10,d=Diameter608);
 			NotchForMakerSlide();
-		BearingHoldDown(Screw=screw3t);
+			BearingHoldDown(Screw=screw3t);
 		}
 		translate([0,-ShaftOffset,0]) BearingHole();
 	}
@@ -550,7 +561,7 @@ module BearingHole_support() { // print support for bearing hole
 
 module BearingHoldDown(Screw=screw3t) { // uses two M3 screws and M3 washers
 	translate([0,-24,0]) color("green") rotate([0,0,0]) cyl(h=50,d=Screw);
-	translate([0,2.5,0]) color("cyan") rotate([0,0,0]) cyl(h=50,d=Screw);
+	translate([0,2.5,0]) color("purple") rotate([0,0,0]) cyl(h=50,d=Screw);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -560,12 +571,12 @@ module BeltMotor(idler=0,HSlot=1) { // motor mount for belt drive
 		MountBelt();	// motor mount base
 	}
 	difference() {	// mount to 2020
-		translate([-BWidth/2,-45,-Thickness/2-ShiftBeltMotor]) color("cyan") cuboid([BWidth,24.5,21],rounding=2,p1=[0,0]);	// base
+		translate([-BWidth/2,-45,-Thickness/2-ShiftBeltMotor]) color("cyan") cuboid([BWidth,24.5,21],rounding=2,p1=[0,0]);
 		translate([-BWidth/2-1,-37,-21-ShiftBeltMotor]) rotate([45,0,0]) color("gray") cube([BWidth+2,22,40]); // remove half
 		translate([-BWidth/2+10,-35,-Thickness/2-ShiftBeltMotor])
 			color("red") cylinder(h=40,d=screw5);	// mounting screw holes
 		translate([BWidth/2-10,-35,-Thickness/2-ShiftBeltMotor]) color("white") cylinder(h=40,d=screw5);
-		translate([-BWidth/2+10,-35,-Thickness/2-ShiftBeltMotor+1]) color("blue") cylinder(h=15,d=screw5hd);	// countersinks
+		translate([-BWidth/2+10,-35,-Thickness/2-ShiftBeltMotor+1]) color("blue") cylinder(h=15,d=screw5hd);// countersinks
 		translate([BWidth/2-10,-35,-Thickness/2-ShiftBeltMotor+1]) color("gray") cylinder(h=15,d=screw5hd);
 		translate([-BWidth/2-1,-42,-22.5]) color("pink")
 			cuboid([BWidth+5,22.5,20],rounding=2,p1=[0,0]); // make sure it doesn't go past top
@@ -606,16 +617,6 @@ module BearingIdler() {	// belt idler (currently not used)
 		translate([BWidth/2,-8,-Thickness/2]) color("pink") cylinder(h=40,d=screw5);
 		translate([-BWidth/2+18,-8,5]) color("salmon") cylinder(h=15,d=screw5hd);
 		translate([BWidth/2,-8,5]) color("black") cylinder(h=15,d=screw5hd);
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module LockRing() { // lock ring to hold TR8 leadscrew in bearing, may not be necessary since gravity will hold it
-	difference() {
-		color("cyan") cylinder(h=Height608+1,d=NutClearance-2);
-		translate([0,0,-1]) color("red") cylinder(h=15,d=TR8Diameter);
-		translate([0,0,2.5]) rotate([90,0,0]) color("black") cylinder(h=10,d=screw3t);
 	}
 }
 
@@ -736,4 +737,4 @@ module ReductionMotorMount(Quanity=3) {
 	}
 }
 
-/////////////// end of corexy-z-axis.scad ////////////////////////////////////////////////////////////////////
+/////////////// end of ZAxisDriveMount.scad ////////////////////////////////////////////////////////////////////

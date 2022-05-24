@@ -421,7 +421,7 @@ module BLTouch_Holes(recess=0,Screw=Yes2p5mmInsert(Use2p5mmInsert)) {
 	if(recess == 2) {	// mounting screw holes only
 		translate([BLTouchMountHoleOffset/2,16,-10]) color("pink") cylinder(h=25,d=Screw);
 		translate([-BLTouchMountHoleOffset/2,16,-10]) color("gray") cylinder(h=25,d=Screw);
-		translate([BLTouchMountHoleOffset/2-9,16,-10]) color("white") cylinder(h=25,d=screw5); // adjuster access
+		translate([BLTouchMountHoleOffset/2-9,16,-20]) color("white") cylinder(h=35,d=screw5); // adjuster access
 	}
 	if(recess == 0) {	// for mounting on top of the extruder plate
 		translate([-BLTouchLength/2+8,BLTouchMountWidth/2-1,-5]) color("blue")

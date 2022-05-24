@@ -37,7 +37,7 @@ module NamePlate(Raised=0,TheText="[printer]") {
 		translate([115,10,Thickness+1]) color("red") cyl(h=5,d=screw5hd);
 		if(!Raised) translate([Length/2,5,Thickness/2]) PrintString(TheText,Thickness*2,10);
 	}
-	if(Raised) translate([Length/2,5,Thickness]) PrintString(TheText,Thickness,10);
+	if(Raised) translate([Length/2,5,Thickness]) PrintString(TheText,Thickness,12);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

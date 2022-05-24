@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // XCarriage - x carriage for the COREXY-MSv1 using makerslide
 // created: 2/3/2014
-// last modified: 3/1/22
+// last modified: 5/3/22
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,12 +79,13 @@
 // 8/4/20	- Added an x carraidge with the single titan extruder mount: CarridgeAllInOneAndSingleTitanExtruder();
 // 9/27/20	- Added abilitiy to use M3 or M5 to BeltLoopHolderOppo() and CarridgeAllInOneAndSingleTitanExtruder()
 //			  for the belt loop holders. Changed recomendation from ABS to PETG. PETG prints without a heated chamber.
-//			  WireChainMount lets you change the monting holes on top of the belt mounting bracket to M4 or M5 inserts
+//			  WireChainMount lets you change the mounting holes on top of the belt mounting bracket to M4 or M5 inserts
 // 10/17/20	- changed extruder mount to allow dual titan areos
 // 11/8/20	- Added extra set of holes to mount the single titan aero extruder mount
 // 9/23/21	- BeltLoop adapter for exoslide
 // 1/6/22	- BOSL2 finished
 // 3/1/22	- Added a one piece EXOSLideAdapter that include the belt holders
+// 5/3/22	- Adjusted belt screw locations
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // What rides on the x-axis is separate from the extruder plate
 // I used 3x16mm cap head screws to mount the extruder plate to the carriage
@@ -991,8 +992,8 @@ module BeltLoopHolderScrew(ShiftY=0,Screw=screw5,ExtraThickness=5,NoBase=0) {
 		translate([11,-10+ShiftY,(LoopHeight)/2+6.49]) color("blue")
 			cuboid([23,15,LoopHeight+ExtraThickness],rounding=2);
 		translate([0,0,3]) {
-			translate([9,-10+ShiftY,LoopHeight/2+9.5]) color("gray") rotate([90,0,0]) cyl(h=30,d=Screw);
-			translate([9,-10+ShiftY,LoopHeight/2-1.5]) color("lightgray") rotate([90,0,0]) cyl(h=30,d=Screw);
+			translate([9,-10+ShiftY,LoopHeight/2+5.5]) color("gray") rotate([90,0,0]) cyl(h=30,d=Screw);
+			translate([9,-10+ShiftY,LoopHeight/2-5.5]) color("lightgray") rotate([90,0,0]) cyl(h=30,d=Screw);
 			if(!NoBase) translate([10,-21,0]) BeltLoopMouningHoles(Screw);	
 		}
 		if(!NoBase) translate([20,-21,ExtraThickness/1.65]) BeltLoopMountingCountersink(2,screw5hd);

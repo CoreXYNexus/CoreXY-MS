@@ -6,22 +6,34 @@
 	4.5mm min mount hole depth
 	22mm diameter shaft collar
 */
-include<fasteners.scad>
-$fn =48;
+//include<fasteners.scad>
+include <screwsizes.scad>
+//$fn =48;
 
 // dimensions:
 l_NEMA17 = 42; // length of one side
-d_NEMA17_collar = 28; // diameter of collar
+d_NEMA17_collar = 23; // diameter of collar
 d_NEMA17_shaft = 5.4; // diameter of collar
 cc_NEMA17_mount = 31; // c-c distance for mount holes
 c_d_NEMA17_mount = pow((cc_NEMA17_mount*cc_NEMA17_mount)/2,0.5); // distance from shaft center to mount hole
 c_d_NEMA17_corner = pow((l_NEMA17*l_NEMA17)/2,0.5); 
+d_M3_screw=screw3; // added to not use fasteners.scad 4/10/22 SRC
+$fn=100;
+d_M3_washer=9;// added to not use fasteners.scad
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// show:
+NEMA17_parallel_holes(5,5);
+translate([50,0,0]) NEMA17_x_holes(5,0);
+translate([0,50,0]) motor_plate_NEMA17(55,2,1,1);
+translate([65,60,0]) pedestal_NEMA17(50,4,5,22);
+
+///////////////////////////////////////
 
 // following makes parallel mount holes for NEMA17 motor
 module NEMA17_parallel_holes(
 	height,
 	l_slot,
-	d_collar = 28,
+	d_collar = d_NEMA17_collar,
 	cc_mount = 31,
 	d_mounts = d_M3_screw)
 	{

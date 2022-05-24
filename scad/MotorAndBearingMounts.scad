@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////////////////////
 // MotorAndBearingMounts.scad - hold the motors, belts & bearing bracket inside the frame
 /////////////////////////////////////////////////////////////////////////////////////////
 // created 7/5/2016
@@ -51,7 +51,7 @@
 //		 Install one M5 brass insert in each bearing bracket
 /////////////////////////////////////////////////////////////////////////////////////////
 include <bosl2/std.scad>
-include <inc/nema17.scad>
+use <inc/nema17.scad>
 include <inc/brassinserts.scad>
 $fn=100;
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -75,8 +75,8 @@ TextFont="Liberation Sans";
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //NonAdjustableBearingMountSet(); // all the needed parts
-AdjustableFrontBearingMountSet(0);
-//AdjustableFrontBearingMount(0);
+AdjustableFrontBearingMountSet();
+//AdjustableFrontBearingMount(0,0);
 //AdjustingKnob();
 //MotorMount(1);
 
@@ -92,18 +92,18 @@ module NonAdjustableBearingMountSet() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module AdjustableFrontBearingMountSet(Fit=0) {
+module AdjustableFrontBearingMountSet() {
 	translate([0,-33,2.55]) MotorMount(1,1);
 	translate([0,86,2.55]) MotorMount(0,1);
-	rotate([0,-90,0]) AdjustableFrontBearingMount(Fit);
-	translate([95,0,0]) rotate([0,-90,0]) AdjustableFrontBearingMount(Fit);
+	rotate([0,-90,0]) AdjustableFrontBearingMount(1,0);
+	translate([95,0,0]) rotate([0,-90,0]) AdjustableFrontBearingMount(1,0);
 	translate([-25,10,0]) AdjustingKnob();
 	translate([-5,10,0]) AdjustingKnob();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-module AdjustableFrontBearingMount(Fit=0) {
+module AdjustableFrontBearingMount(DoBase=1,Fit=0) {
 	difference() { // vertical
 		union() {
 			translate([0,0,45]) color("cyan")
@@ -115,23 +115,22 @@ module AdjustableFrontBearingMount(Fit=0) {
 				cuboid([34,F625ZDiameter,Tthickness],rounding=1,p1=[0,0]);
 			translate([33,9,F625ZDoulbleStack*2+b_height+40.5]) color("cyan")
 				cyl(h=Tthickness,d=F625ZDiameter,rounding=1); // top
-			translate([0,0,45]) color("green") cuboid([22,Tthickness-1,30],rounding=2,p1=[0,0]);
-			translate([0,14,45]) color("lightgreen") cuboid([22,Tthickness-1,30],rounding=2,p1=[0,0]);
+			translate([0,0,45]) color("green") cuboid([20,Tthickness-1,30],rounding=2,p1=[0,0]);
+			translate([0,14,45]) color("lightgreen") cuboid([20,Tthickness-1,30],rounding=2,p1=[0,0]);
+			translate([33,9,43]) color("green") cyl(h=4,d1=Yes5mmInsert(Use5mmInsert)+1,d2=F625ZDiameter); // M5 insert
+			translate([33,9,78]) color("red") cyl(h=4,d1=F625ZDiameter-0.5,d2=screw5+1);
 		}
 		translate([Vthickness+26,9,F625ZDoulbleStack+b_height+30]) color("lightgray") cylinder(h=50,d=screw5); // top
 		translate([Vthickness+26,9,F625ZDoulbleStack+b_height-5]) color("gray")
 			cylinder(h=50,d=Yes5mmInsert(Use5mmInsert)); // bottom
 		translate([Vthickness+26,9,F625ZDoulbleStack*2+b_height+42]) color("blue") cylinder(h=5,d=screw5hd);
-		translate([-10,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("plum") cylinder(h=50,d=screw3+0.1);
-		translate([Vthickness-1,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("white")
-			cylinder(h=50,d=screw3hd);
-		translate([Vthickness-8,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("plum")
-			cylinder(h=3,d=nut3,$fn=6);
+		translate([-25,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("plum")
+			cylinder(h=50,d=Yes3mmInsert(Use3mmInsert));
 	}
-	translate([Vthickness-5,9,F625ZDoulbleStack*2+b_height+27.5]) rotate([0,90,0]) color("purple") // support for m3 hole
-		cylinder(h=LayerThickness,d=screw3hd);
-	if(Fit) translate([0,0,-1]) AdjustableFrontBearingMountBase();  // fit parts
-	else  translate([5,27,-5]) AdjustableFrontBearingMountBase();
+	if(DoBase) {
+		if(Fit) translate([0,0,-1]) AdjustableFrontBearingMountBase();  // fit parts
+		else  translate([5,27,-5]) AdjustableFrontBearingMountBase();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
