@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 40mmTo30mmFan.scad
+// FanAdapters.scad
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 2/7/21
-// last update 5/21/22
+// last update 5/25/22
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,6 +12,7 @@
 // 10/19/21	- Added E3DV6 5150 blower adapter
 // 10/24/21	- Changed FanAdapterWithOffsetAngled() to a longer one for clearance for a BMG
 // 5/21/22	- Roundined mounting end for 5150 in Fan5150Mount()
+// 5/26/22	- Fixed tabs holding 5150 outlet, tweaked 5150 mount
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <BOSL2/std.scad>
@@ -36,7 +37,7 @@ HEMountThickness=10;
 //FanAdapterWithOffsetAngledLong();
 //FanAdapterWithOffsetAngled();
 //5150Adapter();
-Fan5150Mount();
+Fan5150Mount(30mmFanDiameter);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -46,20 +47,21 @@ module Fan5150Mount(Diameter=30mmFanDiameter) {
 			color("cyan") cuboid([Diameter+2,Diameter+2,10],rounding=2);
 			translate([-10.5,-6,45/2]) difference() {
 				union() {
-					hull() color("purple") {
-						translate([0,0,3]) cuboid([5,10,50],rounding=2);
-						translate([0,17/2,-20]) cuboid([5,17,5],rounding=2);
+					 color("purple") hull() {
+						translate([0,0,25]) cuboid([5,10,5],rounding=2);
+						translate([0,15/2-1,-20]) cuboid([5,16,5],rounding=2);
 					}
 					translate([0,0,27]) color("cyan") rotate([0,90,0]) cyl(h=5,d=screw4+5.5,rounding=2);
 				}
 				translate([-10,0,27]) color("green") rotate([0,90,0]) cylinder(h=20,d=Yes4mmInsert(Use4mmInsert));
 			}
-		translate([8,0,5]) color("red") cuboid([2,10,10],rounding=0.5);
-		translate([0,-11,5]) color("gray") cuboid([10,2,10],rounding=0.5);
-		translate([0,11,5]) color("blue") cuboid([10,2,10],rounding=0.5);
+			translate([8.5,0,5]) color("red") cuboid([2,15,10],rounding=0.5); // side
+			translate([-5,-11,5]) color("gray") cuboid([5,2,10],rounding=0.5); // side with tab
+			translate([5,-11,5]) color("lightgray") cuboid([5,2,10],rounding=0.5); // side with tab
+			translate([-0.25,11.5,5]) color("blue") cuboid([15,2,5],rounding=0.5); // underneath
 		}
 		translate([-8,-10,0]) color("green") cube([15.5,20.5,10]);
-		translate([0,0,-7]) hull() color("blue") {
+		translate([0,0,-7])  color("blue") hull(){
 			translate([0,0,-1]) cylinder(h=5,d=Diameter);
 			translate([-8,-10,4]) cube([15,20,5]);
 		}

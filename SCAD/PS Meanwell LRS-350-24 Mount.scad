@@ -2,12 +2,15 @@
 // MeanWell LRS-350-24 power supply moount
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 9/5/2021
-// last update 9/11/21
+// last update 6/9/22
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 9/5/21	- Mount for powersupply PSMount(), with braces PSMountV2, both for edge mouting to 2020/2040
 // 9/11/21	- PSMountV3() for flate mounting to 2040/2020
+// 6/9/22	- Added link to power supply, adjusted screw holes
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 24vdc Power Suppley: https://www.meanwell.com/productPdf.aspx?i=459
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <CoreXY-MSv1-h.scad>
 include <inc/brassinserts.scad>
@@ -21,17 +24,18 @@ $fn=100;
 Width=10;
 Thickness=6.5;
 CoverThickness=Thickness-2.5;
-ScrewHorzOffset=154.5;
-ScrewVertOffset=54.5;
+ScrewHorzOffset=150;
+ScrewVertOffset=50;
 Length1=ScrewHorzOffset+10;
 Length2=ScrewVertOffset+10;
 LayerThickness=0.4;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//PSMount();
-PSMountV2();
-//PSMountV3();
-//PSCover();
+//PSMount(); // 2020/2040 no support
+PSMountV2(); // 2020/2040 support
+//PSMountV3(); // mount to bottom of 2040
+translate([0,70,0])
+	PSCover();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -53,11 +57,11 @@ module PSCover() {
 module PSMountV2() {
 	difference() {
 		translate([-5,-5,0]) PSBase();
-		translate([3,0,0]) PSScrewHoles();
+		PSScrewHoles();
 	}
 	difference() {
 		translate([-5,-50,0]) ExtrusionMount();
-		translate([3,0,0]) PSScrewHoles();
+		PSScrewHoles();
 	}
 	MountSupport();
 }
@@ -91,7 +95,7 @@ module MountSupport(Screw=screw5) {
 module PSMountV3() {
 	difference() {
 		translate([-5,-5,0]) PSBase(0);
-		translate([3,0,0]) PSScrewHoles();
+		PSScrewHoles();
 	}
 	translate([3,0,0]) ExtrusionMountEnds();
 }
@@ -101,11 +105,11 @@ module PSMountV3() {
 module PSMount() {
 	difference() {
 		translate([-5,-5,0]) PSBase();
-		translate([3,0,0]) PSScrewHoles();
+		PSScrewHoles();
 	}
 	difference() {
 		translate([-5,-50,0]) ExtrusionMount();
-		translate([3,0,0]) PSScrewHoles();
+		PSScrewHoles();
 	}
 }
 

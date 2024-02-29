@@ -73,7 +73,7 @@ $fn=100;
 // Washers used are 1/32" (~0.75mm) thick precision washers
 // Motor uses a 20 tooth GT2 pulley (2:1 ratio to the leadscrews)
 // After printing belt version, clean out the support in the screw & bearing holes
-// ZDirectBeltDrive() each uses a 2GT-200 belt, 608 and M8x16x5 thrust bearings
+// ZDirectBeltDrive() each uses a 2GT-200 belt, 608 and M8x16x5 thrust bearing
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 Use3mmInsert=1;
 Use5mmInsert=1;
@@ -115,6 +115,8 @@ LayerThickness=0.3;
 BearingHoleClearance=19;
 StepperBossDiameter=23;					// 22 plus some clearance
 BrassInsertLength=6;					// for M3 insert
+ThrustDiameter=16;
+ThrustClearance = 2.1;		// PLA; allow thrust bearing install without problem
 ////////////////////////////////////////////////////////////////////////////
 
 //DirectDriveZAxis(3,1,1,1,5,8); 	// Z axis for bed leveling
@@ -126,7 +128,7 @@ BrassInsertLength=6;					// for M3 insert
 //ZNutBracket(3,2.1,1); // arg is quanity, arg 2 is offset adjust; arg 3 to add tabs for printing
 //translate([50,20,0]) ZAxisMountPlates(3); // arg is quanity*2
 //ZMotorThrustSpacer(3,7.5-ThrustWasherThickness); // to use M5 thrust brearings under the coupler
-ZDirectBeltDrive(1);
+ZDirectBeltDrive(3);
 //Collet(2);
 //ThrustPlate(3,3); // minimum thickness is 3
 
@@ -137,15 +139,15 @@ module ThrustPlate(Qty=1,Thickness=3) {
 		translate([x*36,0,0]) {
 			difference() {
 				color("cyan") cyl(h=Thickness,d=Diameter608*1.55,rounding=1.5);	// thrust plate
-				color("red") cyl(h=10,d=8+Clearance);							// zrod clearance
+				color("red") cyl(h=10,d=9+Clearance);							// zrod clearance
 				translate([0,11,0]) BearingHoldDown(screw3);			// screw holes for holding it down
 				translate([0,-10.5,26]) rotate([0,0,180]) BearingHoldDown(screw3hd); // screw hole countersinks
 				translate([0,0,-Thickness/2+0.45]) color("blue")
-					cyl(h=1,d1=12,d2=8+Clearance); // inner bearing/zrod clearance
+					cyl(h=1,d1=12,d2=9+Clearance); // inner bearing/zrod clearance
 			}
 			difference() { // thrust washer dust shield
-				translate([0,0,2.5]) color("gold") cyl(h=Thickness+5,d=19,rounding=2);
-				translate([0,0,0]) color("green") cyl(h=Thickness+20,d=16.5);
+				translate([0,0,2.5]) color("gold") cyl(h=Thickness+5,d=ThrustDiameter+3.5,rounding=2);
+				translate([0,0,0]) color("green") cyl(h=Thickness+20,d=ThrustDiameter+ThrustClearance);
 			}
 		}
 	} else echo("Too thin");
@@ -154,7 +156,7 @@ module ThrustPlate(Qty=1,Thickness=3) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Collet(Qty=1) {
-	%translate([0,7.5,-5]) rotate([90,0,0]) cyl(h=BrassInsertLength,d=3); // show length of brass insert
+	%translate([0,7.5,-5]) rotate([90,0,0]) cyl(h=BrassInsertLength,d=Yes3mmInsert(Use3mmInsert)); // show length of insert
 	for(x=[0:Qty-1]) {
 		translate([0,x*28,0]) {
 			difference() {
@@ -163,7 +165,7 @@ module Collet(Qty=1) {
 					color("blue") cyl(h=Yes3mmInsert(Use3mmInsert)*2,d=screw8*2.7,rounding=2); // holder
 				}
 				color("red") cyl(h=30,d=screw8+0.3); // center hole
-				ColletScrews();
+				ColletScrew();
 			}
 		}
 	}
@@ -171,12 +173,9 @@ module Collet(Qty=1) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module ColletScrews(Screw=Yes3mmInsert(Use3mmInsert)) {
+module ColletScrew(Screw=Yes3mmInsert(Use3mmInsert)) {
 	translate([0,-7,0]) rotate([90,0,0]) color("white") cyl(h=20,d=Screw);
-	//translate([7,0,0]) rotate([90,0,90]) color("green") cyl(h=20,d=Screw);
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module ZDirectBeltDrive(Qty=1) {
@@ -187,7 +186,7 @@ module ZDirectBeltDrive(Qty=1) {
 				translate([23,27,-2.5]) color("red") cuboid([BWidth+30,BWidth+3,Thickness],rounding=2,p1=[0,0]);
 				translate([23,25.5,-2.5]) color("green") cuboid([85,Thickness,40.5],rounding=2,p1=[0,0]);
 			}	
-			translate([65,60.5,-Thickness]) color("white") NEMA17_parallel_holes(Thickness*2,35,StepperBossDiameter);
+			translate([65,56,-Thickness]) color("white") NEMA17_parallel_holes(Thickness*2,35,StepperBossDiameter);
 			translate([45,32.8-Thickness,19]) rotate([90,0,0]) color("red")
 				cyl(l=Thickness+0.5, r=13, rounding1=-2, rounding2=-2);
 			translate([85,32.8-Thickness,19]) rotate([90,0,0]) color("blue")
@@ -563,6 +562,7 @@ module BearingHoldDown(Screw=screw3t) { // uses two M3 screws and M3 washers
 	translate([0,-24,0]) color("green") rotate([0,0,0]) cyl(h=50,d=Screw);
 	translate([0,2.5,0]) color("purple") rotate([0,0,0]) cyl(h=50,d=Screw);
 }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module BeltMotor(idler=0,HSlot=1) { // motor mount for belt drive

@@ -2,7 +2,7 @@
 // CameraMount.scad - MS lifecam holder and a PI Zero & PI Cam holder
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 1/31/16
-// last update 4/17/22
+// last update 6/9/22
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,6 +28,7 @@
 //			- to allow shifth to one side of the 2020
 // 9/4/21	- Added side mount selection to PICamera2020AllInOne()
 // 4/17/22	- removed unecessary clearance holes in PICamera2020AllInOne()
+// 6/9/22	- Move 2020 mounting closer to pi, clearance for power plug to z axis plate
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://www.raspberrypi.org/documentation/hardware/raspberrypi/mechanical/README.md
 // https://www.raspberrypi-spy.co.uk/2013/05/pi-camera-module-mechanical-dimensions
@@ -87,11 +88,8 @@ PICamera2020AllInOne(2,0.2,0);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-module cubeX(Size,Round,Center) { // temporary module; remove when all cubeX() are converted
-	if(Center)
-		cuboid(Size,rounding=Round);
-	else
-		cuboid(Size,rounding=Round,p1=[0,0]);
+module cubeX(Size,Round) { // temporary module; remove when all cubeX() are converted
+	cuboid(Size,rounding=Round,p1=[0,0]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +178,10 @@ module PICamera2020(AddPI0Mount=0,AddThickness=0,HQ=0) {
 
 module PICamera2020AllInOne(Mount,AddThickness=0,HQ=0) {
 	difference() {
-		translate([0,0,6+AddThickness]) rotate([180,0,0]) ExtensionV3(1,0,AddThickness,Mount);
+		union() {
+			translate([0,0,6+AddThickness]) rotate([180,0,0]) ExtensionV3(1,0,AddThickness,Mount);
+			if(Mount==2) translate([0,-49,0]) color("purple") cubeX([Length,16,MountThickness],2);
+		}
 		if(Mount==1) {
 			color("red") hull() {
 				translate([45,-24,-5]) cylinder(h=20,d=screw5);
@@ -199,18 +200,14 @@ module PICamera2020AllInOne(Mount,AddThickness=0,HQ=0) {
 				translate([68,-13,MountThickness-4]) cylinder(h=10,d=screw5hd);
 			}
 		}
-	}
-	if(Mount==2) {
-		difference() {
-			translate([0,-49,0]) color("purple") cubeX([Length,16,MountThickness],2);
-			//translate([58,-36,4]) color("pink") cubeX([25,10,10],2); // clearance for power plug
-			color("red") translate([10,-43,-5]) cylinder(h=20,d=screw5);
-			color("blue") translate([10,-43,MountThickness-3]) cylinder(h=10,d=screw5hd);
-			color("green") translate([Length-10,-43,-5]) cylinder(h=20,d=screw5);
-			color("plum") translate([Length-10,-43,MountThickness-3]) cylinder(h=10,d=screw5hd);
+		if(Mount==2) {
+			color("red") translate([10,-41,-5]) cylinder(h=20,d=screw5);
+			color("blue") translate([10,-41,MountThickness-3]) cylinder(h=10,d=screw5hd);
+			color("green") translate([Length-10,-41,-5]) cylinder(h=20,d=screw5);
+			color("plum") translate([Length-10,-41,MountThickness-3]) cylinder(h=10,d=screw5hd);
 		}
 	}
-	translate([0,-16,0]) difference() {
+	translate([0,-16,0]) difference() { // attachment for camera mount 
 		color("red") hull() {
 			translate([-5,-6,23]) color("red") cubeX([20.5,MountThickness,7],2);
 			translate([0,-6,0]) cubeX([15,MountThickness,5],2);

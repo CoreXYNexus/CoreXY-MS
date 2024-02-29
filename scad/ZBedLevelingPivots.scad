@@ -2,7 +2,7 @@
 // Z-Bed_Leveling_Pivots.scad --  z-axis bed rotatable bed mounts for independent z motor bed leveling
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Created: 10/22/20
-// Last Update: 5/8/22
+// Last Update: 6/19/22
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,6 +31,9 @@
 // 5/3/22	- Renamed variables to a better description, added PivotsOverLeadScrew() to have bed pivots at the leadscrew
 // 5/5/22	- Removed unused code, renamed modules lower case names with upper/lower names, removed non-bearing code
 // 5/8/22	- Added rounded version of CenterPivot(), changed BasePivotOverLeadscrew() to rounded bearing section
+// 6/19/22	- Got mkaerslide plate drwaing an updated the mounting holes
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// https://www.inventables.com/technologies/standard-wheel-carriage-plate
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <inc/screwsizes.scad>
 include <inc/brassinserts.scad>
@@ -70,8 +73,59 @@ FourTab();  // tabs to hold ends
 translate([55,35,0]) rotate([-90,0,0])
 	PivotBed(1,ZCarriadgeWidth-BedWidth-FrontBedMountLength,PivotLengthOverLeadScrew);
 TwoTab();  // tabs to hold ends
+//MakerSlidePlateHoles();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module MakerSlidePlateHoles(Height=20,Screw=screw5,All=0) {
+	if(All) {
+		translate([10,12.7,0]) cyl(h=Height,d=Screw);
+		translate([10,35,0]) cyl(h=Height,d=Screw);
+		translate([10,45,0]) cyl(h=Height,d=Screw);
+		translate([10,55,0]) cyl(h=Height,d=Screw);	
+		translate([10,77.3,0]) cyl(h=Height,d=Screw);
+		translate([30,12.7,0]) cyl(h=Height,d=Screw);
+		translate([30,77.3,0]) cyl(h=Height,d=Screw);
+		
+		translate([47.7,12.7,0]) cyl(h=Height,d=Screw);
+		translate([47.7,45,0]) cyl(h=Height,d=Screw);
+		translate([47.7,77.3,0]) cyl(h=Height,d=Screw);
+	}
+	translate([60,35,0]) cyl(h=Height,d=Screw);
+	translate([60,55,0]) cyl(h=Height,d=Screw);
+
+	translate([70,12.7,0]) cyl(h=Height,d=Screw);
+	if(All) translate([70,45,0]) cyl(h=Height,d=Screw);
+	translate([70,77.3,0]) cyl(h=Height,d=Screw);
+	if(All) {
+		translate([80,12.7,0]) cyl(h=Height,d=Screw);
+		translate([80,35,0]) cyl(h=Height,d=Screw);
+		translate([80,45,0]) cyl(h=Height,d=Screw);
+		translate([80,55,0]) cyl(h=Height,d=Screw);	
+		translate([80,77.3,0]) cyl(h=Height,d=Screw);
+	}
+	translate([90,12.7,0]) cyl(h=Height,d=Screw);
+	if(All) translate([90,45,0]) cyl(h=Height,d=Screw);
+	translate([90,77.3,0]) cyl(h=Height,d=Screw);
+
+	translate([100,35,0]) cyl(h=Height,d=Screw);
+	translate([100,55,0]) cyl(h=Height,d=Screw);
+	if(All) {
+		translate([112.3,12.7,0]) cyl(h=Height,d=Screw);
+		translate([112.3,77.3,0]) cyl(h=Height,d=Screw);
+	
+		translate([130,12.7,0]) cyl(h=Height,d=Screw);
+		translate([130,77.3,0]) cyl(h=Height,d=Screw);
+
+		translate([150,12.7,0]) cyl(h=Height,d=Screw);
+		translate([150,35,0]) cyl(h=Height,d=Screw);
+		translate([150,45,0]) cyl(h=Height,d=Screw);
+		translate([150,55,0]) cyl(h=Height,d=Screw);	
+		translate([150,77.3,0]) cyl(h=Height,d=Screw);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module FourTab() {
 	translate([64.5,23,-19.85]) color("gray") cyl(h=LayerThickness,d=10); 
@@ -141,14 +195,7 @@ module BasePivotOverLeadscrew(Spacer=1,Center=1,Square=0,HoleOffset=41.5) {  // 
 		}
 		translate([0,0,10]) BearingHole();  // pivot bearing
 		translate([0,0,-17.5-Height625Z])  BearingFlange(Clearance); // space for bearing flange
-		translate([-HoleOffset/4,-21,-35]) { // top mounting holes
-			color("red") cyl(h=50,d=Yes5mmInsert(Use5mmInsert));
-			translate([20,0,0]) color("green") cyl(h=50,d=Yes5mmInsert(Use5mmInsert));
-		}
-		translate([HoleOffset/2,0,-35]) { // bottom mounting hole
-			translate([0,0,0]) color("blue") cyl(h=50,d=Yes5mmInsert(Use5mmInsert)); // mounting hole
-			translate([-HoleOffset,0,0]) color("lightgray") cyl(h=50,d=Yes5mmInsert(Use5mmInsert)); // mounting hole
-		}
+		translate([-80,-35,-15]) MakerSlidePlateHoles();
 		translate([0,0,5]) rotate([90,0,0]) color("khaki") cyl(h=50,d=11); // leadscrew hole
 	}
 	if(Spacer) translate([42,0,-5/2]) difference() { // spacer for holding bearing in place

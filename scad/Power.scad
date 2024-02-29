@@ -2,7 +2,7 @@
 // Power.scad - uses a pc style power socket with switch
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // created 7/4/2016
-// last update 12/25/21
+// last update 6/16/22
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://creativecommons.org/licenses/by-sa/4.0/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,12 +27,16 @@
 // 4/20/21	- Added toggle switch mount
 // 4/22/21	- Adjusted some holes in the Power Inlet
 // 12/25/21	- Fixed Meanwell RS-15-5 mount
+// 6/15/22	- Added vars for MW RS155 hole positions
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Version 0 uses Digi-Key Part number: CCM1666-ND : combined power socket and switch
 //		 http://www.digikey.com/product-detail/en/te-connectivity-corcom-filters/1609112-3/CCM1666-ND/758835
 //		 ---------------------------------------------------------------------------------------------------
 //		 If the socket hole size changes, then the size & postions of the walls/wings & socket may need adjusting
 //		 The power socket uses 3mm screws to mount, drill with 2.5mm and tap after installing the socket
+//-------------------------------------------------------------------------------------------------------------
+// 5vdc Power Supply: https://www.meanwell.com/webapp/product/search.aspx?prod=RS-15
+// 24vdc Power Supply is in PS Meanwell LRS-350-24 Mount.scad; https://www.meanwell.com/productPdf.aspx?i=459
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 include <BOSL2/std.scad>
 include <inc/screwsizes.scad>
@@ -69,26 +73,28 @@ TogglwSwitchWidth=16;
 ToggleSwitchHeight=26;
 ToggleOffsetHoleSize=22;
 Clearance=0.7;  // clearance for hole
+MeanWellRS155Offset=40.1;
+MeanWellrs155EndOffset=11.5;
+TabDiameter=20;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//all(1);// Horizontal(0) Vertical(1) Toggle; flip=0;Makerslide=1,PBQuantiy=2,Version=0
+//Power(1);// Horizontal(0) Vertical(1) Toggle; flip=0;Makerslide=1,PBQuantiy=2,Version=0
 //PowerInlet(0,0);
 //testfit();	// print part of it to test fit the socket & 2020
 //PowerSwitch(0,"POWER");		// 1st arg: flip label; 2nd arg:Text Label, default="POWER"
 //translate([40,0,0]) PowerSwitch(0," 5VDC");
 //powersupply_cover();
 //powersupply_cover_v2();
-//PowerSupplyMount(1,2);
+////PowerSupplyMount(1,2); // old mount
 //PowerInletHousing(1; // separate switch
 //PowerInletHousing(0); // built in switch
 //PowerInletHousingCover(); // test fit cover to power inlet housing
-//PS12vdc(2);
-//PS5vdcMount();
-PowerToggleSwitch(1);
+MeanWellRS155Mount();
+//PowerToggleSwitch(1);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module all(VerticalToogle=0,Version=0) {
+module Power(VerticalToogle=0,Version=0) {
 	translate([0,-12,0]) PowerInletHousing(Version);
 	translate([0,-5,45]) rotate([180,0,0]) PowerInletHousingCover();
 	translate([-50,-45,0]) PowerToggleSwitch(VerticalToogle);
@@ -151,20 +157,29 @@ module PowerInlet(Version=0,Cvr=1) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PS5vdcMount() { // meanwell RS-15-5
+module MeanWellRS155Mount() { // meanwell RS-15-5
 	difference() {
-		color("cyan") cuboid([50,60,4],rounding=2,p1=[0,0]);
+		union() {
+			color("cyan") cuboid([50,60,4],rounding=2,p1=[0,0]);
+			// printing corner support
+			translate([2,2,0]) color("red") cyl(h=LayerThickness,d=TabDiameter);
+			translate([48,2,0]) color("blue") cyl(h=LayerThickness,d=TabDiameter);
+			translate([2,58,0]) color("gray") cyl(h=LayerThickness,d=TabDiameter);
+			translate([48,58,0]) color("lightgray") cyl(h=LayerThickness,d=TabDiameter);
+		}
 		translate([10,10,-2]) color("red") cylinder(h=10,d=screw5);
 		translate([10,10,-4]) color("blue") cylinder(h=5,d=screw5hd);
 		translate([10,50,-2]) color("blue") cylinder(h=10,d=screw5);
 		translate([10,50,-4]) color("red") cylinder(h=5,d=screw5hd);
-		translate([36,10.4+1.5,-1]) color("plum") cylinder(h=10,d=screw3);
-		translate([36,10.4+1.5,3]) color("black") cylinder(h=5,d=screw3hd);
-		translate([36,49.55+1.5,-1]) color("black") cylinder(h=10,d=screw3);
-		translate([36,49.55+1.5,3]) color("plum") cylinder(h=5,d=screw3hd);
+		translate([40,MeanWellrs155EndOffset,0]) {
+			translate([0,0,2]) color("plum") cyl(h=15,d=screw3);
+			translate([0,0,5]) color("black") cyl(h=5,d=screw3hd);
+			translate([0,MeanWellRS155Offset,2]) color("black") cyl(h=15,d=screw3);
+			translate([0,MeanWellRS155Offset,5]) color("plum") cyl(h=5,d=screw3hd);
+		}
 	}
-		translate([10,10,1]) color("white") cylinder(h=LayerThickness,d=screw5hd);
-		translate([10,50,1]) color("gray") cylinder(h=LayerThickness,d=screw5hd);
+	translate([10,10,1]) color("white") cylinder(h=LayerThickness,d=screw5hd); // M5 CS support
+	translate([10,50,1]) color("gray") cylinder(h=LayerThickness,d=screw5hd); // M5 CS support
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,7 +194,8 @@ module powersupply_cover_v2() { // square version
 		translate([111,PowerSupplyCoverHeight/2+4,-2]) rotate([0,0,180]) pwr_supply_cover_vents(18); // ventilation
 	}
 	translate([PowerSupplyCoverWidth/5,0.5,PowerSupplyCoverDepth/6]) rotate([90,0,0]) printchar("DANGER HIGH VOLTAGE",1.5,4);
-	translate([PowerSupplyCoverWidth/1.2,54.5,PowerSupplyCoverDepth/6]) rotate([90,0,180]) printchar("DANGER HIGH VOLTAGE",1.5,4);
+	translate([PowerSupplyCoverWidth/1.2,54.5,PowerSupplyCoverDepth/6]) rotate([90,0,180])
+		printchar("DANGER HIGH VOLTAGE",1.5,4);
 	difference() {
 		translate([0,0,0]) color("red") cube([2,PowerSupplyCoverHeight+4,PowerSupplyCoverDepth]);
 		pwrc_supply_screws(screw4); // mount it to the power supply
@@ -451,7 +467,8 @@ module makerslide_mount(mks) {
 	} else {
 		translate([Length/2,Width/2,-2]) color("gold") cylinder(h=Thickness*2,r=screw5/2);
 		translate([Length/2,Width/2,Thickness/2]) color("lightgray") cylinder(h=Thickness*2,r=screw5hd/2);
-		translate([Length/2-screw5hd/2,Width/2-screw5hd/2,Thickness/2]) color("black") cube([screw5hd,screw5hd,LayerThickness]);
+		translate([Length/2-screw5hd/2,Width/2-screw5hd/2,Thickness/2]) color("black")
+			cube([screw5hd,screw5hd,LayerThickness]);
 	}
 }
 
@@ -462,44 +479,9 @@ module mks_mount_support(mks) {
 		translate([Length/2-10-screw5hd/2,Width/2-screw5hd/2,Thickness/2])
 			color("black") cube([screw5hd,screw5hd,LayerThickness]);
 	} else
-		translate([Length/2-screw5hd/2,Width/2-screw5hd/2,Thickness/2]) color("black") cube([screw5hd,screw5hd,LayerThickness]);
+		translate([Length/2-screw5hd/2,Width/2-screw5hd/2,Thickness/2]) color("black")
+		cube([screw5hd,screw5hd,LayerThickness]);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PS12vdc(Qty=1) { // Sunpower SP-180A
-	for(a =[0:Qty-1]) {
-		translate([0,a*30,0]) {
-			difference() {
-				color("cyan") cuboid([PS12Width,25,5],rounding=2,p1=[0,0]);
-				translate([10,25/2,-3]) color("red") cylinder(h=10,d=screw3);
-				translate([10+PS12Offest,25/2,-3]) color("blue") cylinder(h=10,d=screw3);
-				translate([10,25/2,2]) color("blue") cylinder(h=5,d=screw3hd);
-				translate([10+PS12Offest,25/2,2]) color("red") cylinder(h=5,d=screw3hd);
-			}
-			difference() {
-				color("plum") cuboid([5,25,25],rounding=2,p1=[0,0]);
-				translate([-3,25/2,15]) rotate([0,90,0]) color("green") cylinder(h=10,d=screw5);
-				translate([4,25/2,15]) rotate([0,90,0]) color("gray") cylinder(h=5,d=screw5hd);
-			}
-			PS12Supports();
-		}
-	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module PS12Supports() {
-	color("white") difference() {
-		translate([-3,0,0]) rotate([0,12,0]) cuboid([PS12Width,5,25],rounding=2,p1=[0,0]);
-		translate([-4,-1,-22]) cube([PS12Width+5,7,25]);
-		translate([-28,-1,-13]) cube([30,7,30]);
-	}
-	translate([0,20,0]) color("black") difference() {
-		translate([-3,0,0]) rotate([0,12,0]) cuboid([PS12Width,5,25],rounding=2,p1=[0,0]);
-		translate([-4,-1,-22]) cube([PS12Width+5,7,25]);
-		translate([-28,-1,-13]) cube([30,7,30]);
-	}
-}
-
-//////////////// end of powersocket.scad /////////////////////////
+//////////////// end of power.scad ///////////////////////////////////////////////////////////////////////////////////

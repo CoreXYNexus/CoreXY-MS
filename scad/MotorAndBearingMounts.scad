@@ -37,6 +37,7 @@
 // 10/16/21	- Changed support on MotorMount()
 // 1/4/22	- BOSL2
 // 1/22/22	- Imporoved motor mount supports
+// 5/2/23	- Enlarged adjustability on MotorMount()
 /////////////////////////////////////////////////////////////////////////////////////////
 // NOTE: Bearing position in FrontBearingBracket() must match stepper motor shaft in MotorMount()
 //       If the motors get hot, print it from something that can handle it
@@ -49,6 +50,7 @@
 //		 Taller motor_mount on left side rear.
 //		 NON-adjustable bearing brackets at inside front corners & supports on outside
 //		 Install one M5 brass insert in each bearing bracket
+//		 Print motor mounts with ABS or PETG
 /////////////////////////////////////////////////////////////////////////////////////////
 include <bosl2/std.scad>
 use <inc/nema17.scad>
@@ -75,10 +77,11 @@ TextFont="Liberation Sans";
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //NonAdjustableBearingMountSet(); // all the needed parts
-AdjustableFrontBearingMountSet();
+//AdjustableFrontBearingMountSet(); // all the needed parts
 //AdjustableFrontBearingMount(0,0);
 //AdjustingKnob();
-//MotorMount(1);
+MotorMount();
+translate([70,0,0]) MotorMount(1);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -211,11 +214,11 @@ module AdjustingKnob() {
 
 module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt motor
 	difference() {	// motor mounting holes
-		color("blue") cuboid([59,59,5],rounding=2);
+		color("blue") cuboid([65,59,5],rounding=2);
 		if(Adjustable)
-			translate([-2,0,-4]) color("red") NEMA17_parallel_holes(7,5);
+			translate([0,0,-4]) color("red") NEMA17_parallel_holes(7,9);
 		else 
-			translate([-2,0,-4]) rotate([0,0,45]) color("white")  NEMA17_x_holes(7,3);
+			translate([0,0,-4]) rotate([0,0,45]) color("white")  NEMA17_x_holes(7,3);
 	}
 	if(!Side) {
 		MotorMountSupport(Side);
@@ -225,12 +228,12 @@ module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt
 			MountScrews(28);
 		}
 		difference() {
-			translate([0,27,23]) color("cyan") cuboid([59,5,48],rounding=2);
+			translate([0,27,23]) color("cyan") cuboid([65,5,48],rounding=2);
 			MountScrews(18);
 			translate([0,0,10]) MakerslideNotchOnMotorMount(Side);
 		}
 		difference() {
-			translate([27,0,23]) color("pink") cuboid([5,59,48],rounding=2);
+			translate([30,0,23]) color("pink") cuboid([5,59,48],rounding=2);
 			MountScrews(18);
 			translate([0,0,10]) MakerslideNotchOnMotorMount(Side);
 		}
@@ -238,7 +241,7 @@ module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt
 	} else {
 		MotorMountSupport(Side);
 		difference() {
-			translate([0,-27,28]) color("cyan") cuboid([59,5,58],rounding=2);
+			translate([0,-27,28]) color("cyan") cuboid([64,5,58],rounding=2);
 			translate([0,0,20]) MakerslideNotchOnMotorMount(Side);
 			MountScrews(28);
 		}
@@ -248,7 +251,7 @@ module MotorMount(Side=0,Adjustable=1) {	// 0 - lower belt motor; 1 = upper belt
 			MountScrews(28);
 		}
 		difference() {
-			translate([27,0,28]) color("pink") cuboid([5,59,58],rounding=2);
+			translate([30,0,28]) color("pink") cuboid([5,59,58],rounding=2);
 			MountScrews(28);
 			translate([0,0,20]) MakerslideNotchOnMotorMount(Side);
 		}
@@ -389,21 +392,21 @@ module 	BearingBracketHorizontalSupport() {
 module MotorMountSupport(Side) {
 	if(Side) {
 		color("gray") hull() {
-			translate([-29,24.5,-2]) cuboid([6,5,5],rounding=2,p1=[0,0]);
-			translate([24.5,24.5,51]) cuboid([5,5,6],rounding=2,p1=[0,0]);
+			translate([-32,24.5,-2]) cuboid([6,5,5],rounding=2,p1=[0,0]);
+			translate([27,24.5,51]) cuboid([5,5,6],rounding=2,p1=[0,0]);
 		}
 		color("green") hull() {
-			translate([-29.5,24.5,-2]) cuboid([6,5,5],rounding=2,p1=[0,0]);
-			translate([-29.5,-29.5,52]) cuboid([5,6,5],rounding=2,p1=[0,0]);
+			translate([-32,24.5,-2]) cuboid([6,5,5],rounding=2,p1=[0,0]);
+			translate([-32,-29,52]) cuboid([5,6,5],rounding=2,p1=[0,0]);
 		}
 	} else {
 		color("gray") hull() {
-			translate([-29.5,24.5,41]) cuboid([5,5,6],rounding=2,p1=[0,0]);
-			translate([-29.5,-29,-2.5]) cuboid([5,6,5],rounding=2,p1=[0,0]);
+			translate([-33,24.5,41]) cuboid([5,5,6],rounding=2,p1=[0,0]);
+			translate([-33,-29,-2.5]) cuboid([5,6,5],rounding=2,p1=[0,0]);
 		}
 		color("green") hull() {
-			translate([24.5,-29.5,42]) cuboid([5,5,5],rounding=2,p1=[0,0]);
-			translate([-29,-29.5,-2.5]) cuboid([6,5,5],rounding=2,p1=[0,0]);
+			translate([27.5,-29.5,42]) cuboid([5,5,5],rounding=2,p1=[0,0]);
+			translate([-33,-29.5,-2.5]) cuboid([6,5,5],rounding=2,p1=[0,0]);
 		}
 	}
 }
